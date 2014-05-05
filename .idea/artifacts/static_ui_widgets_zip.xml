@@ -1,0 +1,13 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="static_ui_widgets.zip">
+    <output-path>$PROJECT_DIR$/out/artifacts/static_ui_widgets_zip</output-path>
+    <root id="archive" name="static_ui_widgets.zip.jar">
+      <element id="directory" name="investigations">
+        <element id="dir-copy" path="$PROJECT_DIR$/investigations" />
+      </element>
+      <element id="directory" name="lastChanges">
+        <element id="dir-copy" path="$PROJECT_DIR$/lastChanges" />
+      </element>
+    </root>
+  </artifact>
+</component>
