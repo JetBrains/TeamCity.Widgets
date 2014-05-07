@@ -24,9 +24,9 @@ angular.module('changesApp.config', [])
         })
         .constant('config', {
           baseUrl: '/',
-          pageUrl: '/guestAuth/app/rest/changes?locator=count:30,start:0',
-          sinceUrl: '/guestAuth/app/rest/changes?sinceChange=id:',
-          changeUrl: '/guestAuth/app/rest/changes/id:',
+          pageUrl: 'guestAuth/app/rest/changes?locator=count:30,start:0',
+          sinceUrl: 'guestAuth/app/rest/changes?sinceChange=id:',
+          changeUrl: 'guestAuth/app/rest/changes/id:',
           funPatternsUrl: 'patterns.json',
           reload: 1000 * 1 * 60, maxCount: 15, funPatternsReload: 1000 * 30});
 
