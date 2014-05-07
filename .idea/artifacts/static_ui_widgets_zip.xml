@@ -3,10 +3,23 @@
     <output-path>$PROJECT_DIR$/out/artifacts/static_ui_widgets_zip</output-path>
     <root id="archive" name="static_ui_widgets.zip">
       <element id="directory" name="investigations">
-        <element id="dir-copy" path="$PROJECT_DIR$/investigations" />
+        <element id="directory" name="public">
+          <element id="dir-copy" path="$PROJECT_DIR$/investigations/public" />
+        </element>
+        <element id="directory" name="js">
+          <element id="dir-copy" path="$PROJECT_DIR$/investigations/js" />
+          <element id="file-copy" path="$PROJECT_DIR$/investigations/top_fullScreen.html" />
+        </element>
       </element>
       <element id="directory" name="lastChanges">
-        <element id="dir-copy" path="$PROJECT_DIR$/lastChanges" />
+        <element id="directory" name="public">
+          <element id="dir-copy" path="$PROJECT_DIR$/lastChanges/public" />
+        </element>
+        <element id="directory" name="js">
+          <element id="dir-copy" path="$PROJECT_DIR$/lastChanges/js" />
+        </element>
+        <element id="file-copy" path="$PROJECT_DIR$/lastChanges/last_fullScreen.html" />
+        <element id="file-copy" path="$PROJECT_DIR$/lastChanges/patterns.json" />
       </element>
     </root>
   </artifact>
