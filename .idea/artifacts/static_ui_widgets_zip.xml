@@ -8,8 +8,8 @@
         </element>
         <element id="directory" name="js">
           <element id="dir-copy" path="$PROJECT_DIR$/investigations/js" />
-          <element id="file-copy" path="$PROJECT_DIR$/investigations/top_fullScreen.html" />
         </element>
+        <element id="file-copy" path="$PROJECT_DIR$/investigations/top_fullScreen.html" />
       </element>
       <element id="directory" name="lastChanges">
         <element id="directory" name="public">
