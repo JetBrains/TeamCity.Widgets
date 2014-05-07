@@ -26,6 +26,23 @@ angular.module('investigationsApp.controllers', ['investigationsApp.services'])
               }, delay);
               $log.debug("Next update will be performed in " + delay + "ms.");
             };
+            var processUrlParams = function () {
+              var so = $location.search();
+              $log.info(so.mode);
+              config.currentMode = config.modes[0];
+              config.modes.forEach(function (mode) {
+                if (mode.name == so.mode) {
+                  config.currentMode = mode;
+                }
+              });
+              $log.info("mode set to: " + config.currentMode.name);
+              $log.info(so.locator);
+              if (so.locator !== undefined) {
+                config.locator = so.locator;
+              }
+              $log.info("locator set to: " + config.locator);
+            };
+
             var loadInvestigations = function () {
               $log.debug('controller.loadInvestigations starts...');
               var promise = Loader.externalLoad();
@@ -56,15 +73,7 @@ angular.module('investigationsApp.controllers', ['investigationsApp.services'])
             var storedData = $localStorage.invWidgetData;
             $log.debug("--Restored from local storage -" + storedData);
 
-            var so = $location.search();
-            $log.info(so.mode);
-            config.currentMode = config.modes[0];
-            config.modes.forEach(function (mode) {
-              if (mode.name == so.mode) {
-                config.currentMode = mode;
-              }
-            });
-            $log.info("current mode set to: " + config.currentMode.name);
+            processUrlParams();
 
             if (storedData === undefined) {
               loadInvestigations($http, $timeout);

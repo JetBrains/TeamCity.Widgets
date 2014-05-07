@@ -23,7 +23,9 @@ angular.module('investigationsApp.services', ['investigationsApp.config'])
             externalLoad: function (theScope) {
               $log.debug('making external load...');
               var deferred = $q.defer();
-              $http.get(config.url).
+              var url = config.baseUrl + config.url + "?locator=" + config.locator;
+              $log.debug("External load from:" + url);
+              $http.get(url).
                       success(function (data, status, headers, config) {
                         if (data === undefined || data.count === undefined || data.investigation === undefined) {
                           $log.info("No investigations found.");
@@ -35,7 +37,7 @@ angular.module('investigationsApp.services', ['investigationsApp.config'])
                           deferred.resolve(groups);
                         }
                       }).error(function (data, status, headers, config) {
-                        $log.error("An error occurred during loading investigations from url: " + config.url + ". Status: " + status);
+                        $log.error("An error occurred during loading investigations from url: " + url + ". Status: " + status);
                         deferred.reject(data);
                       });
               return deferred.promise;

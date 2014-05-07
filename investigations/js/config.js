@@ -23,24 +23,41 @@ angular.module('investigationsApp.config', [])
           }
         })
         .constant('config', {
-          /*url: '/teamcity',*/
+          baseUrl: "/",
+          url: 'guestAuth/app/rest/investigations',
           /*url: '/investigations.json',*/
-          url: '/guestAuth/app/rest/investigations?locator=state:TAKEN',
+          /*url: '/guestAuth/app/rest/investigations?locator=state:TAKEN',*/
+          locator: "state:TAKEN",
           reload: 1000 * 5 * 60,
           modes: [
-            {name: "top", title: ["Top TeamCity", "Investigations"], description: function (details) {
-              return "Showing top " + details.assigneesShown + " assignees (out of " + details.assigneesTotal +
-                      ") handling " + Math.round((details.investigationShown / details.investigationsTotal * 100))
-                      + "% of all investigations.";
-            }},
+            { name: "top",
+              title: ["Top TeamCity", "Investigations"],
+              description: function (details) {
+                return "Showing top " + details.assigneesShown + " assignees (out of " + details.assigneesTotal +
+                        ") handling " + Math.round((details.investigationShown / details.investigationsTotal * 100))
+                        + "% of all investigations.";
+              },
+              dataProvider: function (data, n) {
+                return data.slice(0, n);
+              }
+            },
             {name: "random", title: ["Random TeamCity", "Investigations"], description: function (details) {
               return "Showing random " + details.assigneesShown + " assignees (out of " + details.assigneesTotal +
                       ") handling " + Math.round((details.investigationShown / details.investigationsTotal * 100))
                       + "% of all investigations.";
-            }},
+            },
+              dataProvider: function (data, n) {
+                return data.slice(Math.max(data.length - n, 0), data.length);
+              }
+            },
             {name: "full", title: ["TeamCity", "Investigations"], description: function () {
               return "";
-            }}
+            },
+
+              dataProvider: function (data, n) {
+                return data;
+              }
+            }
           ],
           description: ""});
 

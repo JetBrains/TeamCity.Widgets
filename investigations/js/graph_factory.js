@@ -20,9 +20,9 @@ angular.module('investigationsApp.graphs', [])
         .factory("Graph", ['$rootScope', '$log', function ($rootScope, $log) {
 
           var Graph = function (mode) {
-            this.mode = mode;
-            $log.info("Graph mode: " + mode.name);
-            this.title = mode.title;
+            this.config = mode;
+            $log.info("Graph config: " + this.config.name);
+            this.title = this.config.title;
             this.dateRanges = this.createDateRanges();
             this.color = d3.scale.ordinal()
                     .range([ "#ff0000", "#bf1b21", "#940a0e", "#5c0002", "#450003", "#35090b"]);
@@ -270,13 +270,6 @@ angular.module('investigationsApp.graphs', [])
             });
           };
 
-          Graph.prototype.sliceData = function (data) {
-            if (this.mode.name == 'random') {
-              return data.slice(25, 25 + this.slices);
-            } else {
-              return data.slice(0, this.slices);
-            }
-          };
 
           Graph.prototype.prepareData = function (data, updateDetails) {
             var self = this;
@@ -293,7 +286,7 @@ angular.module('investigationsApp.graphs', [])
               return b.items.length - a.items.length;
             });
 
-            data = this.sliceData(data);
+            data = this.config.dataProvider(data,this.slices);
 
             data.sort(function (a, b) {
               return self.sortByName(a.name, b.name);
