@@ -22,7 +22,8 @@ angular.module('changesApp.config', [])
             'Accept': 'application/json'
           }
         })
-        .constant('config', { baseUrl: '/teamcity?url=',
+        .constant('config', {
+          baseUrl: '/',
           pageUrl: '/guestAuth/app/rest/changes?locator=count:30,start:0',
           sinceUrl: '/guestAuth/app/rest/changes?sinceChange=id:',
           changeUrl: '/guestAuth/app/rest/changes/id:',
