@@ -17,8 +17,8 @@
 'use strict';
 
 angular.module('investigationsApp.controllers', ['investigationsApp.services'])
-        .controller('LoaderCtrl', ['$scope', '$log', '$http', '$timeout', '$localStorage', 'Loader', 'config', '$location',
-          function ($scope, $log, $http, $timeout, $localStorage, Loader, config, $location) {
+        .controller('LoaderCtrl', ['$scope', '$log', '$http', '$timeout', '$sessionStorage', 'Loader', 'config', '$location',
+          function ($scope, $log, $http, $timeout, $sessionStorage, Loader, config, $location) {
 
             var schedule = function (delay) {
               $timeout(function () {
@@ -51,7 +51,7 @@ angular.module('investigationsApp.controllers', ['investigationsApp.services'])
                         clearCache();
                         $scope.data = data;
                         $scope.updateDetails = Date.now();
-                        saveToLocalStorage(data, $scope.updateDetails);
+                        saveTosessionStorage(data, $scope.updateDetails);
                       },
                       function (reason) {
                         $log.error('Failed: ' + reason);
@@ -60,17 +60,17 @@ angular.module('investigationsApp.controllers', ['investigationsApp.services'])
               schedule(config.reload);
             };
 
-            var saveToLocalStorage = function (data, ts) {
-              $localStorage.invWidgetData = {investigations: data, updated: ts};
-              $log.debug("--Saved to local storage -" + $localStorage.invWidgetData);
+            var saveTosessionStorage = function (data, ts) {
+              $sessionStorage.invWidgetData = {investigations: data, updated: ts};
+              $log.debug("--Saved to local storage -" + $sessionStorage.invWidgetData);
             };
 
             var clearCache = function () {
               $log.debug("--Clean local storage -");
-              delete $localStorage.invWidgetData;
+              delete $sessionStorage.invWidgetData;
             };
 
-            var storedData = $localStorage.invWidgetData;
+            var storedData = $sessionStorage.invWidgetData;
             $log.debug("--Restored from local storage -" + storedData);
 
             processUrlParams();

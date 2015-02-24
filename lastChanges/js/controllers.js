@@ -18,7 +18,7 @@
 
 angular.module('changesApp.controllers', ['changesApp.services'])
         .controller('ChangesLoaderCtrl', ['$scope', '$log', '$http', '$timeout', '$localStorage', 'ChangesLoader', 'config',
-          function ($scope, $log, $http, $timeout, $localStorage, ChangesLoader, config) {
+          function ($scope, $log, $http, $timeout, $sessionStorage, ChangesLoader, config) {
             var schedule = function (delay) {
               $log.debug("schedule. sinceId:" + $scope.sinceId);
               $timeout(function () {
@@ -73,7 +73,7 @@ angular.module('changesApp.controllers', ['changesApp.services'])
                                         $scope.data.pop();
                                       }
                                       var ts = Date.now();
-                                      saveToLocalStorage($scope.data, loadedChange.id, ts);
+                                      saveTosessionStorage($scope.data, loadedChange.id, ts);
                                       $scope.updateDetails = ts;
                                       createUpdateDescription();
                                     }
@@ -106,17 +106,17 @@ angular.module('changesApp.controllers', ['changesApp.services'])
               return name;
             };
 
-            var saveToLocalStorage = function (data, sinceId, ts) {
-              $localStorage.lastChanges = {shownChanges: data, sinceId: sinceId, updated: ts};
-              $log.debug("--Saved to local storage -");
+            var saveTosessionStorage = function (data, sinceId, ts) {
+              $sessionStorage.lastChanges = {shownChanges: data, sinceId: sinceId, updated: ts};
+              $log.debug("--Saved to session storage -");
             };
 
             var clearCache = function () {
-              $log.debug("--Clean local storage -");
-              delete $localStorage.lastChanges;
+              $log.debug("--Clean session storage -");
+              delete $sessionStorage.lastChanges;
             };
 
-            var storedData = $localStorage.lastChanges;
+            var storedData = $sessionStorage.lastChanges;
             $log.debug("--Restored from local storage -");
             $log.debug(storedData);
             if (storedData === undefined) {
