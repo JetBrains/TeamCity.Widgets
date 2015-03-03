@@ -32,12 +32,12 @@
             sColors: ["green","green","green","green","green"],
             fColors: [ "#ff0000", "#bf1b21", "#940a0e", "#5c0002", "#450003", "#35090b"],
             domReady: function() {
-                if (this.parentNode!=undefined && this.parentNode.getAttribute!=undefined) {
+                /*if (this.parentNode!=undefined && this.parentNode.getAttribute!=undefined) {
                     var rowspan = this.parentNode.getAttribute("rowspan");
                     if (rowspan != undefined) {
                         this.height = this.parentNode.offsetHeight-20 + "px";
                     }
-                }
+                }*/
             },
             dataChanged: function(oldValue, newValue){
                 if (this.data[0]==undefined){

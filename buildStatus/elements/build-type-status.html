@@ -20,15 +20,12 @@
     <template>
         <style>
             :host {
-            background-color: {{color}};
-            padding: 0.5em;
-            display: block;
-            height: {{height}};
-            cursor: pointer;
+                display: block;
+                cursor: pointer;
             }
         </style>
         <div horizontal layout on-click="{{goToBuild}}">
-            <div flex> <content></content> <!--<div style="font-size: 8px;">{{locator}}</div>-->
+            <div flex><content></content> <!--<div style="font-size: 8px;">{{locator}}</div>-->
             </div>
             <div>
 
@@ -42,7 +39,10 @@
     </template>
     <script>
         Polymer('build-type-status', {
-
+            colorChanged: function(oldValue, newValue){
+                this.parentNode.style.backgroundColor = newValue;
+                this.parentNode.style.padding = "10px";
+            }
         });
     </script>
 </polymer-element>
