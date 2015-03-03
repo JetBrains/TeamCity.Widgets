@@ -1,0 +1,67 @@
+<!--
+  ~ Copyright 2000-2015 JetBrains s.r.o.
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/core-ajax/core-ajax.html">
+<polymer-element name="build-data" attributes="locator data updated"  on-update="{{goAjax}}">
+    <template>
+
+        <core-ajax
+                id="ajax"
+                url="/app/rest/builds/?locator={{locator}},start:0,count:5&fields=$long,build:(id,status,state,webUrl,problemOccurrences,testOccurrences)"
+                body='{}'
+                method="get"
+                handleAs="json"
+                headers='{"Accept": "application/json"}'
+                contentType="application/json"
+                on-core-response="{{ handleResponse }}"
+                on-core-error="{{ handleError }}"></core-ajax>
+
+    </template>
+    <script>
+        Polymer('build-data', {
+            domReady: function () {
+            },
+            goAjax: function () {
+                this.$.ajax.go();
+            },
+            locatorChanged: function (oldValue, newValue) {
+                this.goAjax();
+            },
+            handleResponse: function (event, detail, source) {
+                if (event.detail.response == undefined || event.detail.response.build == undefined) {
+                    this.data = [];
+                    return;
+                }
+                this.data = [];
+                for (var i = 0; i < 5; i++) {
+                    this.data[i] = event.detail.response.build[i];
+                }
+                this.status = 'OK';
+                this.job('build-status-update', function () {
+                    this.fire('update');
+                }, 60 * 1000);
+                this.updated = new Date();
+                this.fire("core-signal", {name: "status-updated", data: this.updated});
+            },
+            handleError: function (event, detail, source) {
+                this.error = detail;
+                this.status = 'ERROR';
+            }
+
+        });
+    </script>
+</polymer-element>

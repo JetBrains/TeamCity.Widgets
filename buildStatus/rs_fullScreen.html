@@ -1,0 +1,179 @@
+<!--
+  ~ Copyright 2000-2015 JetBrains s.r.o.
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<!DOCTYPE html>
+<html>
+<head> <!-- 1. Load platform support before any code that touches the DOM. -->
+    <script src="bower_components/webcomponentsjs/webcomponents.min.js" type="text/javascript"></script>
+
+
+    <!-- 2. Load the component using an HTML Import -->
+    <meta charset="UTF-8">
+    <link rel="import" href="elements/build-type-status.html">
+    <link rel="import" href="elements/project-status-compact.html">
+    <link rel="import" href="elements/branch-name.html">
+
+    <style>
+        html, body{
+            font-family: Verdana;
+            font-size: 1.1em;
+            color: white;
+            background-color: black;
+        }
+        table tr td{
+            padding-bottom: 5px;
+        }
+        table tr th{
+            text-align: left;
+        }
+        h2{
+            margin: 5px;
+        }
+        .bs{
+            margin: 5px;
+        }
+        .branchName{
+            font-size: 0.5em;
+        }
+        .vertical{
+            -ms-writing-mode: tb-lr;
+            -webkit-writing-mode: vertical-lr;
+            -moz-writing-mode: vertical-lr;
+            -ms-writing-mode: vertical-lr;
+            writing-mode: vertical-lr;
+            /*-webkit-text-orientation: upright;
+            -moz-text-orientation: upright;
+            -ms-text-orientation: upright;
+            text-orientation: upright;*/
+        }
+    </style>
+</head>
+<body>
+<h2>ReSharper Über Alles <span class="branchName"><branch-name showDefault="true"></branch-name></span></h2>
+<div horizontal layout>
+    <div>
+        <div vertical layout>
+            <div><h3>Compile</h3></div>
+            <div horizontal layout>
+                <div class="bs"><build-type-status locator="buildType:DotNetDiv_Wave02_Compile_PlatformCore">Platform Core</build-type-status></div>
+                <div class="bs"><build-type-status locator="buildType:DotNetDiv_Wave02_Compile_Platform">Platform</build-type-status></div>
+                <div class="bs"><build-type-status locator="buildType:DotNetDiv_Wave02_Compile_PsiFeatures">Psi.Features</build-type-status></div>
+            </div>
+            <div horizontal layout>
+                <div class="bs"><build-type-status locator="buildType:DotNetDiv_Wave02_Compile_PsiFeaturesCpp">Psi.Features Cpp</build-type-status></div>
+                <div class="bs"><build-type-status locator="buildType:DotNetDiv_Wave02_Compile_PsiFeaturesTcAddin">Psi.Features TC Addin</build-type-status></div>
+            </div>
+            <div horizontal layout>
+                <div class="bs"><build-type-status locator="buildType:DotNetDiv_Wave02_Compile_DotCommon">dotCommon</build-type-status></div>
+                <div class="bs"><build-type-status locator="buildType:DotNetDiv_Wave02_Compile_DotCommonPsi">dotCommonPsi</build-type-status></div>
+            </div>
+            <div horizontal layout>
+                <div class="bs"><build-type-status locator="buildType:DotNetDiv_Wave02_Compile_EtwService">EtwService</build-type-status></div>
+                <div class="bs"><build-type-status locator="buildType:DotNetDiv_Wave02_Compile_EtwServiceCpp">EtwService Cpp</build-type-status></div>
+            </div>
+            <div horizontal layout>
+                <div class="bs"><build-type-status locator="buildType:DotNetDiv_Wave02_Compile_Profiler">Profiler</build-type-status></div>
+                <div class="bs"><build-type-status locator="buildType:DotNetDiv_Wave02_Compile_ProfilerCpp">Profiler Cpp</build-type-status></div>
+                <div class="bs"><build-type-status locator="buildType:DotNetDiv_Wave02_Compile_Timeline">Timeline</build-type-status></div>
+            </div>
+
+            <div horizontal layout>
+                <div class="bs"><build-type-status locator="buildType:DotNetDiv_Wave02_Compile_ReSharper">ReSharper</build-type-status></div>
+                <div class="bs"><build-type-status locator="buildType:DotNetDiv_Wave02_Compile_ReSharperAutomationTools">AutomationTools</build-type-status></div>
+                <div class="bs"><build-type-status locator="buildType:DotNetDiv_Wave02_Compile_DotPeek">dotPeek</build-type-status></div>
+            </div>
+            <div horizontal layout>
+                <div class="bs"><build-type-status locator="buildType:DotNetDiv_Wave02_Compile_DotCover">dotCover</build-type-status></div>
+                <div class="bs"><build-type-status locator="buildType:DotNetDiv_Wave02_Compile_DotTrace">dotTrace</build-type-status></div>
+                <div class="bs"><build-type-status locator="buildType:DotNetDiv_Wave02_Compile_DotMemory">dotMemory</build-type-status></div>
+            </div>
+        </div>
+    </div>
+    <div>
+        <div><h3>Tests</h3></div>
+        <div horizontal layout>
+            <div class="bs"><build-type-status locator="buildType:DotNetDiv_Wave02_Tests_Platform64">Platform AMD64</build-type-status></div>
+            <div class="bs"><build-type-status locator="buildType:DotNetDiv_Wave02_Tests_Platform32">Platform x86</build-type-status></div>
+        </div>
+        <div horizontal layout>
+            <div class="bs"><build-type-status locator="buildType:DotNetDiv_Wave02_Tests_PsiFeaturesCpp">Psi.Features Cpp</build-type-status></div>
+            <div class="bs"><build-type-status locator="buildType:DotNetDiv_Wave02_Tests_PsiFeatures_E0">E0</build-type-status></div>
+            <div class="bs"><build-type-status locator="buildType:DotNetDiv_Wave02_Tests_PsiFeatures_E1">E1</build-type-status></div>
+            <div class="bs"><build-type-status locator="buildType:DotNetDiv_Wave02_Tests_PsiFeatures_E2">E2</build-type-status></div>
+            <div class="bs"><build-type-status locator="buildType:DotNetDiv_Wave02_Tests_PsiFeatures_E3">E3</build-type-status></div>
+        </div>
+
+        <div horizontal layout>
+            <div class="bs"><build-type-status locator="buildType:DotNetDiv_Wave02_Tests_DotCommon">dotCommon</build-type-status></div>
+            <div class="bs"><build-type-status locator="buildType:DotNetDiv_Wave02_Tests_DotCommonPsi">dotCommonPsi</build-type-status></div>
+        </div>
+        <div>
+            <div class="bs"><build-type-status locator="buildType:DotNetDiv_Wave02_Tests_PsiFeaturesTcAddin">TC Addin</build-type-status></div>
+
+        </div>
+        <div horizontal layout>
+            <div class="bs"><build-type-status locator="buildType:DotNetDiv_Wave02_Tests_Profiler">Profiler Tests</build-type-status></div>
+            <div class="bs"><build-type-status locator="buildType:DotNetDiv_Wave02_Tests_ProfilerDaily">Daily</build-type-status></div>
+            <div class="bs"><build-type-status locator="buildType:DotNetDiv_Wave02_Tests_Timeline">Timeline</build-type-status></div>
+        </div>
+        <div horizontal layout>
+            <div class="bs"><build-type-status locator="buildType:DotNetDiv_Wave02_Tests_ReSharperAutomationTools">AutomationTools</build-type-status></div>
+            <div class="bs"><build-type-status locator="buildType:DotNetDiv_Wave02_Tests_DotPeek">dotPeek</build-type-status></div>
+        </div>
+
+
+        <div horizontal layout>
+            <div class="bs"><build-type-status locator="buildType:DotNetDiv_Wave02_Tests_DotCover">dotCover</build-type-status></div>
+            <div class="bs"><build-type-status locator="buildType:DotNetDiv_Wave02_Tests_DotTrace">dotTrace</build-type-status></div>
+           <div class="bs"><build-type-status locator="buildType:DotNetDiv_Wave02_Tests_DotMemory">dotMemory</build-type-status></div>
+        </div>
+
+
+    </div>
+    <div>
+        <h3>Integration Test</h3>
+            <div class="bs"><build-type-status locator="buildType:DotNetDiv_Wave02_TestsIntegration_AllTriggerStarterManual">(*) All trigger starter</build-type-status></div>
+            <div class="bs"><build-type-status locator="buildType:DotNetDiv_Wave02_TestsIntegration_AllScheduleTriggerStarter">(*) All trigger starter ensure UberCompile</build-type-status></div>
+            <div class="bs"><build-type-status locator="buildType:DotNetDiv_Wave02_TestsIntegration_PlatformVsWin7x64VS11ProWithFinishBuildTrigger">(*) Platform [Vs] Win7x64+VS11Pro</build-type-status></div>
+            <div class="bs"><build-type-status locator="buildType:DotNetDiv_Wave02_TestsIntegration_ReSharperWin81x64VS12UltU4NightlyAcceptanceWit">Re# Win81x64+VS12UltU4 (NA)</build-type-status></div>
+        <div layout horizontal>
+            <div class="bs"><project-status-compact project="DotNetDiv_Wave02_TestsIntegration_Platform">Platform</project-status-compact></div>
+            <div class="bs"><project-status-compact project="DotNetDiv_Wave02_TestsIntegration_Ube">Uber</project-status-compact></div>
+        </div>
+        <div layout horizontal>
+            <div class="bs"><project-status-compact project="DotNetDiv_Wave02_TestsIntegration_PsiFeatures">Psi.Features</project-status-compact></div>
+        </div>
+        <div layout horizontal>
+            <div class="bs"><project-status-compact project="DotNetDiv_Wave02_TestsIntegration_PsiFeatures_ConfigurationSpecific">Psi.Features Conf</project-status-compact></div>
+        </div>
+        <div layout horizontal>
+            <div class="bs"><project-status-compact project="DotNetDiv_Wave02_TestsIntegration_DotCover">DC</project-status-compact></div>
+            <div class="bs"><project-status-compact project="DotNetDiv_Wave02_TestsIntegration_DotMemory">DM</project-status-compact></div>
+            </div>
+        <div layout horizontal>
+        <div class="bs"><project-status-compact project="DotNetDiv_Wave02_TestsIntegration_DotTrace">DT</project-status-compact></div>
+        <div class="bs"><project-status-compact project="DotNetDiv_Wave02_TestsIntegration_DotTraceReSharper">DT+RS</project-status-compact></div>
+            </div>
+    </div>
+    <div>
+        <h3>&nbsp;</h3>
+        <div><div class="vertical" style="width: 80px; height: 20em; text-align: center;"><build-type-status locator="buildType:DotNetDiv_Wave02_PostCompile_InstallerEmbedded">Embedded&nbsp;Installers</build-type-status></div></div>
+    </div>
+</div>
+
+</body>
+</html>
+

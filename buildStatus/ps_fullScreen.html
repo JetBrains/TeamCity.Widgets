@@ -1,0 +1,62 @@
+<!--
+  ~ Copyright 2000-2015 JetBrains s.r.o.
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<!DOCTYPE html>
+<html>
+<head> <!-- 1. Load platform support before any code that touches the DOM. -->
+    <script src="bower_components/webcomponentsjs/webcomponents.min.js" type="text/javascript"></script>
+
+    <!-- 2. Load the component using an HTML Import -->
+    <link rel="import" href="elements/build-type-status.html">
+    <link rel="import" href="elements/build-type-status-compact.html">
+    <link rel="import" href="elements/project-status.html">
+    <style>
+        html, body{
+            font-family: Verdana;
+            font-size: 1.0em;
+            color: white;
+            background-color: black;
+        }
+        table tr td{
+            padding-bottom: 5px;
+        }
+        table tr th{
+            text-align: left;
+        }
+        h2{
+            margin: 5px;
+        }
+        div{
+            margin: 5px;
+        }
+    </style>
+</head>
+<body>
+<h2>PhpStorm</h2>
+<div horizontal layout>
+
+    <div><build-type-status locator="buildType:PhpStormTrunk_PHPUnitTests">PHPUnit Tests</build-type-status></div>
+    <div><build-type-status locator="buildType:bt1029">PHP Tests</build-type-status></div>
+
+    <div><build-type-status locator="buildType:PhpStormTrunk_PHPEnvTests">PHP Env Tests</build-type-status></div>
+    <div><build-type-status locator="buildType:PhpStormTrunk_PluginsCompatibilityCheck">Plugins Compatibility Check</build-type-status></div>
+    <div><build-type-status locator="buildType:bt1102">Patches</build-type-status></div>
+    <div><build-type-status locator="buildType:bt1414">Upload</build-type-status></div>
+    <div><build-type-status locator="buildType:bt1028">Installers</build-type-status></div>
+    <div><build-type-status locator="buildType:bt3913">Integration Performance Tests</build-type-status></div>
+</div>
+</body>
+</html>

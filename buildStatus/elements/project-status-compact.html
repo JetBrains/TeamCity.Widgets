@@ -1,0 +1,35 @@
+<!--
+  ~ Copyright 2000-2015 JetBrains s.r.o.
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="project-data.html">
+<link rel="import" href="build-type-status-compact.html">
+<polymer-element name="project-status-compact" attributes="project buildTypes">
+    <template>
+          <project-data project="{{project}}" buildTypes="{{buildTypes}}"></project-data>
+        <div horizontal layout>
+            <div style="padding: 5px;"><content></content></div>
+          <template repeat="{{bt in buildTypes}}">
+              <div style="padding: 5px;"><build-type-status-compact locator="buildType:{{bt.id}}" width="30px" height="1em"></build-type-status-compact></div>
+          </template>
+        </div>
+    </template>
+    <script>
+        Polymer('project-status-compact', {
+
+        });
+    </script>
+</polymer-element>

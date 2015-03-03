@@ -21,6 +21,9 @@
         <element id="file-copy" path="$PROJECT_DIR$/lastChanges/last_fullScreen.html" />
         <element id="file-copy" path="$PROJECT_DIR$/lastChanges/patterns.json" />
       </element>
+      <element id="directory" name="buildStatus">
+        <element id="dir-copy" path="$PROJECT_DIR$/buildStatus/vulcanized" />
+      </element>
     </root>
   </artifact>
 </component>
