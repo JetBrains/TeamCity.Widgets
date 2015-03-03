@@ -25,7 +25,7 @@
             <div vertical?="{{orientation=='v'}}"
                  horizontal?="{{orientation=='h'}}" layout wrap>
                 <template repeat="{{bt in buildTypes}}">
-                    <div style="padding: 5px;"><build-type-status locator="buildType:{{bt.id}}">{{bt.name}}</build-type-status></div>
+                    <div style="margin: 5px;"><build-type-status locator="buildType:{{bt.id}}">{{bt.name}}</build-type-status></div>
                 </template>
             </div>
     </template>
