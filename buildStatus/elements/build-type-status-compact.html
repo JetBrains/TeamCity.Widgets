@@ -16,13 +16,13 @@
 
 <link rel="import" href="../bower_components/polymer/polymer.html">
 <link rel="import" href="build-status.html">
-<polymer-element name="build-type-compact-status" extends="build-status" attributes="width height">
+<polymer-element name="build-type-status-compact" extends="build-status" attributes="width height">
     <template>
          <span style="cursor:pointer; display: inline-block; width:{{width}}; height:{{height}}; background-color:{{color}};"
                on-click="{{goToBuild}}"></span>
     </template>
     <script>
-        Polymer('build-type-compact-status', {
+        Polymer('build-type-status-compact', {
             width: '100%',
             height: '1em'
         });

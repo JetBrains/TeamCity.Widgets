@@ -25,6 +25,7 @@
     <link rel="import" href="elements/build-type-status.html">
     <link rel="import" href="elements/project-status-compact.html">
     <link rel="import" href="elements/branch-name.html">
+    <link rel="import" href="elements/project-status-page.html">
 
     <style>
         html, body{
@@ -62,6 +63,7 @@
     </style>
 </head>
 <body>
+<project-status-page>
 <h2>ReSharper Über Alles <span class="branchName"><branch-name showDefault="true"></branch-name></span></h2>
 <div horizontal layout>
     <div>
@@ -173,7 +175,7 @@
         <div><div class="vertical" style="width: 80px; height: 20em; text-align: center;"><build-type-status locator="buildType:DotNetDiv_Wave02_PostCompile_InstallerEmbedded">Embedded&nbsp;Installers</build-type-status></div></div>
     </div>
 </div>
-
+</project-status-page>
 </body>
 </html>
 
