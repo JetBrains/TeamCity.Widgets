@@ -16,6 +16,7 @@
 
 <link rel="import" href="../bower_components/polymer/polymer.html">
 <link rel="import" href="../bower_components/core-signals/core-signals.html">
+<script src="../bower_components/uri.js/src/URI.min.js" type="text/javascript"></script>
 <link rel="import" href="build-data.html">
 <polymer-element name="build-status" attributes="locator data updated buildStatus buildStatusLevel branch">
     <template>
@@ -32,12 +33,7 @@
             sColors: ["green","green","green","green","green"],
             fColors: [ "#ff0000", "#bf1b21", "#940a0e", "#5c0002", "#450003", "#35090b"],
             domReady: function() {
-                /*if (this.parentNode!=undefined && this.parentNode.getAttribute!=undefined) {
-                    var rowspan = this.parentNode.getAttribute("rowspan");
-                    if (rowspan != undefined) {
-                        this.height = this.parentNode.offsetHeight-20 + "px";
-                    }
-                }*/
+
             },
             dataChanged: function(oldValue, newValue){
                 if (this.data[0]==undefined){
@@ -78,7 +74,11 @@
             },
             goToBuild: function(){
                 if (this.lastBuild!=undefined) {
-                    var win = window.open(this.lastBuild.webUrl, '_blank');
+                    var localUri = new URI();
+                    var uri = new URI(this.lastBuild.webUrl);
+                    var path = uri.path();
+                    var search = uri.search();
+                    var win = window.open(localUri.path(path).search(search), '_blank');
                     win.focus();
                 }
             }

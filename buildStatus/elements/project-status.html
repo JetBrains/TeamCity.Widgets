@@ -16,15 +16,22 @@
 
 <link rel="import" href="../bower_components/polymer/polymer.html">
 <link rel="import" href="project-data.html">
+<link rel="import" href="project-status-compact.html">
 <link rel="import" href="build-type-status.html">
 <script src="../bower_components/uri.js/src/URI.min.js" type="text/javascript"></script>
-<polymer-element name="project-status" attributes="project buildTypes projectName orientation">
+<polymer-element name="project-status" attributes="projectId project orientation">
     <template>
-        <project-data project="{{project}}" projectName="{{projectName}}" buildTypes="{{buildTypes}}"></project-data>
-        <h3>{{projectName}}</h3>
+        <project-data projectId="{{projectId}}" project="{{project}}"></project-data>
+        <h3>{{project.Name}}</h3>
+            <template if="{{project.projects!=null && project.projects.project!=null}}">
+                <template repeat="{{sp in project.projects.project}}">
+                    <!--<project-status projectId="{{sp.id}}"></project-status>-->
+                    <project-status-compact projectId="{{sp.id}}" project="{{sp}}">{{sp.name}}</project-status-compact>
+                </template>
+            </template>
             <div vertical?="{{orientation=='v'}}"
                  horizontal?="{{orientation=='h'}}" layout wrap>
-                <template repeat="{{bt in buildTypes}}">
+                <template repeat="{{bt in project.buildTypes.buildType}}">
                     <div style="margin: 5px;"><build-type-status locator="buildType:{{bt.id}}">{{bt.name}}</build-type-status></div>
                 </template>
             </div>
@@ -33,9 +40,9 @@
         Polymer('project-status', {
             orientation: 'h',
             domReady: function(){
-                var url = URI.parseQuery(new URI().query());
+                var url = new URI.parseQuery(new URI().query());
                 if (url != undefined && url.project!=undefined) {
-                    this.project = url.project;
+                    this.projectId = url.project;
                 }
                 if (url != undefined && url.orientation!=undefined) {
                     this.orientation = url.orientation;

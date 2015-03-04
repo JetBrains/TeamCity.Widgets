@@ -17,12 +17,12 @@
 <link rel="import" href="../bower_components/polymer/polymer.html">
 <link rel="import" href="project-data.html">
 <link rel="import" href="build-type-status-compact.html">
-<polymer-element name="project-status-compact" attributes="project buildTypes">
+<polymer-element name="project-status-compact" attributes="projectId project">
     <template>
-          <project-data project="{{project}}" buildTypes="{{buildTypes}}"></project-data>
-        <div horizontal layout>
+        <project-data project="{{project}}" projectId="{{projectId}}"></project-data>
+        <div horizontal layout wrap>
             <div style="padding: 5px;"><content></content></div>
-          <template repeat="{{bt in buildTypes}}">
+          <template repeat="{{bt in project.buildTypes.buildType}}">
               <div style="padding: 5px;"><build-type-status-compact locator="buildType:{{bt.id}}" width="30px" height="1em"></build-type-status-compact></div>
           </template>
         </div>

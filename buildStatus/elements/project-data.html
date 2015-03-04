@@ -16,11 +16,11 @@
 
 <link rel="import" href="../bower_components/polymer/polymer.html">
 <link rel="import" href="../bower_components/core-ajax/core-ajax.html">
-<polymer-element name="project-data" attributes="project buildTypes projectName">
+<polymer-element name="project-data" attributes="projectId project">
     <template>
         <core-ajax
                 id="ajax"
-                url="/app/rest/projects/id:{{project}}"
+                url="/app/rest/projects/id:{{projectId}}"
                 body='{}'
                 method="get"
                 handleAs="json"
@@ -37,15 +37,14 @@
             goAjax: function () {
                 this.$.ajax.go();
             },
-            projectChanged: function (oldValue, newValue) {
+            projectIdChanged: function (oldValue, newValue) {
                 this.goAjax();
             },
             handleResponse: function (event, detail, source) {
-                if (event.detail.response==undefined || event.detail.response.buildTypes==undefined || event.detail.response.buildTypes.buildType==undefined){
+                if (event.detail.response==undefined){
                     return;
                 }
-                this.buildTypes = event.detail.response.buildTypes.buildType;
-                this.projectName = event.detail.response.name;
+                this.project = event.detail.response;
                 this.status = 'OK';
             },
             handleError: function (event, detail, source) {
