@@ -6,26 +6,27 @@ More about project purpose you can read in [Dashboarding with TeamCity](http://b
 
 To use widgets with your server you have two options
 * download ready-to-install [TeamCity.WidgetsPlugin plugin](https://github.com/JetBrains/TeamCity.WidgetsPlugin) and add it to your server (you need to re-start server to make the plugin work).
-Widgets will be available under the  <TeamCity context path>/app/widgets/<widget name>/<page name>
-* or if you are already using our [StaticUIExtension plugin](https://confluence.jetbrains.com/display/TW/StaticUIExtensions) you can add [download](https://teamcity.jetbrains.com/viewLog.html?buildTypeId=TeamCityPluginsByJetBrains_Widgets_WidgetsPlugin&buildId=lastPinned) widgets package and unpack it to <your server data directory>/config/_static_ui_extensions/pages/ folder. In this case you don't need to restart the server.
-Widgets become immediately available under the <TeamCity context path>/app/static_content/widgets/<widget name>/<page name>
+Widgets will be available under the  ``<TeamCity context path>/app/widgets/<widget name>/<page name>``
+* or if you are already using our [StaticUIExtension plugin](https://confluence.jetbrains.com/display/TW/StaticUIExtensions) you can add [download](https://teamcity.jetbrains.com/viewLog.html?buildTypeId=TeamCityPluginsByJetBrains_Widgets_WidgetsPlugin&buildId=lastPinned) widgets package and unpack it to ``<your server data directory>/config/_static_ui_extensions/pages/`` folder. In this case you don't need to restart the server.
+Widgets become immediately available under the ``<TeamCity context path>/app/static_content/widgets/<widget name>/<page name>``
 
 Widgets
 =======
 
-* TeamCity investigations - relates to TeamCity investigations
-Name: **investigation**
-Available pages:
-* top_fullScreen.html - shows 'TAKEN' TeamCity investigations grouped by assignee and ages.
+* TeamCity investigations - relates to TeamCity investigations  
+    Name: **investigation**  
+    Available pages:
+    * top_fullScreen.html - shows 'TAKEN' TeamCity investigations grouped by assignee and ages.
 
-Widget is available under <TeamCity context path>/app/widgets/investigation/top_fullScreen.html
-If used with StaticUIExtension widget is available under <TeamCity context path>/app/static_content/widgets/investigations/top_fullScreen.html
+    Widget is available under ``<TeamCity context path>/app/widgets/investigation/top_fullScreen.html``
+    If used with StaticUIExtension widget is available under ``<TeamCity context path>/app/static_content/widgets/investigations/top_fullScreen.html``
 
-* TeamCity latest commits - shows data related to VCS changes
-Name: **lastChanges**
-Available pages: -
-Widget is available under <TeamCity context path>/app/widgets/lastChanges/last_fullScreen.html
-If used with StaticUIExtension widget is available under <TeamCity context path>/app/static_content/widgets/lastChanges/last_fullScreen.html
+* TeamCity latest commits 
+    Name: **lastChanges**  
+    Available pages:last_fullScreen.html - shows latest VCS commits  
+    
+    Widget is available under ``<TeamCity context path>/app/widgets/lastChanges/last_fullScreen.html``
+    If used with StaticUIExtension widget is available under ``<TeamCity context path>/app/static_content/widgets/lastChanges/last_fullScreen.html``
 
 Implementation details:
 - current implementation is based on angular js and d3js
