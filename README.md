@@ -18,8 +18,10 @@ Widgets
     Available pages:
     * top_fullScreen.html - shows 'TAKEN' TeamCity investigations grouped by assignee and ages.
 
-    Widget is available under ``<TeamCity context path>/app/widgets/investigation/top_fullScreen.html``
-    If used with StaticUIExtension widget is available under ``<TeamCity context path>/app/static_content/widgets/investigations/top_fullScreen.html``  
+    Widget is available under  
+    ``<TeamCity context path>/app/widgets/investigation/top_fullScreen.html``
+    If used with StaticUIExtension widget is available under  
+    ``<TeamCity context path>/app/static_content/widgets/investigations/top_fullScreen.html``  
 
 
 * TeamCity latest commits 
@@ -27,8 +29,10 @@ Widgets
     Available pages:
     * last_fullScreen.html - shows latest VCS commits  
     
-    Widget is available under ``<TeamCity context path>/app/widgets/lastChanges/last_fullScreen.html``
-    If used with StaticUIExtension widget is available under ``<TeamCity context path>/app/static_content/widgets/lastChanges/last_fullScreen.html``
+    Widget is available under  
+    ``<TeamCity context path>/app/widgets/lastChanges/last_fullScreen.html``
+    If used with StaticUIExtension widget is available under  
+    ``<TeamCity context path>/app/static_content/widgets/lastChanges/last_fullScreen.html``
 
 Implementation details:
 - current implementation is based on angular js and d3js
