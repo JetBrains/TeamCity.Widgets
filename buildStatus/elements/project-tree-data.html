@@ -15,29 +15,28 @@
   -->
 
 <link rel="import" href="../bower_components/polymer/polymer.html">
-<link rel="import" href="../bower_components/core-ajax/core-ajax.html">
+<link rel="import" href="teamcity-ajax.html">
 <polymer-element name="project-tree-data" attributes="projectId projects">
     <template>
-        <core-ajax
+        <teamcity-ajax
                 id="ajax"
                 body='{}'
                 method="get"
                 handleAs="json"
                 headers='{"Accept": "application/json"}'
                 contentType="application/json"
-                on-core-response="{{ handleResponse }}"
-                on-core-error="{{ handleError }}"></core-ajax>
+                on-core-response="{{ handleResponse }}"></teamcity-ajax>
     </template>
     <script>
         Polymer('project-tree-data', {
             projects:[],
-            url:"/teamcity?url=/app/rest/projects/id:",
+            url:"/app/rest/projects/id:",
             domReady: function () {
                 //this.goAjax();
             },
             goAjax: function (pid) {
-                this.$.ajax.url = this.url + pid;
-                this.$.ajax.go();
+                this.$.ajax.baseUrl = this.url + pid;
+                this.$.ajax.goAjax();
             },
             projectIdChanged: function (oldValue, newValue) {
                 this.projects = [];
@@ -56,10 +55,6 @@
 
                 }
                 this.status = 'OK';
-            },
-            handleError: function (event, detail, source) {
-                this.error = detail;
-                this.status = 'ERROR';
             }
         });
     </script>

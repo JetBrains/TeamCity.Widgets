@@ -15,31 +15,26 @@
   -->
 
 <link rel="import" href="../bower_components/polymer/polymer.html">
-<link rel="import" href="../bower_components/core-ajax/core-ajax.html">
 <link rel="import" href="../bower_components/core-signals/core-signals.html">
+<link rel="import" href="teamcity-ajax.html">
+<link rel="import" href="context-prefix.html">
 <polymer-element name="build-data" attributes="locator data updated"  on-update="{{goAjax}}">
     <template>
-        <core-ajax
+        <teamcity-ajax
                 id="ajax"
-                url="/app/rest/builds/?locator={{locator}},start:0,count:5&fields=$long,build:(id,number,status,state,finishDate,webUrl,problemOccurrences,testOccurrences,snapshot-dependencies(build:(id,number,status,state,buildType,webUrl,problemOccurrences,testOccurrences)))"
                 body='{}'
                 method="get"
                 handleAs="json"
                 headers='{"Accept": "application/json"}'
+                baseUrl="/app/rest/builds/?locator={{locator}},start:0,count:5&fields=$long,build:(id,number,status,state,finishDate,webUrl,problemOccurrences,testOccurrences,snapshot-dependencies(build:(id,number,status,state,buildType,webUrl,problemOccurrences,testOccurrences)))"
                 contentType="application/json"
-                on-core-response="{{ handleResponse }}"
-                on-core-error="{{ handleError }}"></core-ajax>
+                on-core-response="{{ handleResponse }}"></teamcity-ajax>
 
     </template>
     <script>
         Polymer('build-data', {
-            domReady: function () {
-            },
-            goAjax: function () {
-                this.$.ajax.go();
-            },
             locatorChanged: function (oldValue, newValue) {
-                this.goAjax();
+                this.$.ajax.goAjax();
             },
             handleResponse: function (event, detail, source) {
                 if (event.detail.response == undefined || event.detail.response.build == undefined) {
@@ -56,12 +51,7 @@
                 }, 60 * 1000);
                 this.updated = new Date();
                 this.fire("core-signal", {name: "status-updated", data: this.updated});
-            },
-            handleError: function (event, detail, source) {
-                this.error = detail;
-                this.status = 'ERROR';
             }
-
         });
     </script>
 </polymer-element>
