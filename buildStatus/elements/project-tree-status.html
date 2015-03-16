@@ -15,25 +15,19 @@
   -->
 
 <link rel="import" href="../bower_components/polymer/polymer.html">
-<link rel="import" href="project-data.html">
-<link rel="import" href="project-status-compact.html">
+<link rel="import" href="project-tree-data.html">
+<link rel="import" href="project-status.html">
 <link rel="import" href="build-type-status.html">
-<polymer-element name="project-status" attributes="projectId project orientation dataLoad schema">
+<script src="../bower_components/uri.js/src/URI.min.js" type="text/javascript"></script>
+<polymer-element name="project-tree-status" attributes="projectId projects orientation">
     <template>
-        <template if="{{dataLoad}}">
-          <project-data projectId="{{projectId}}" project="{{project}}"></project-data>
+        <project-tree-data projectId="{{projectId}}" projects="{{projects}}"></project-tree-data>
+        <template repeat="{{p in projects}}">
+            <project-status project="{{p}}" dataLoad="false" schema="{{schema}}"></project-status>
         </template>
-        <h3>{{project.name}}</h3>
-            <div vertical?="{{orientation=='v'}}"
-                 horizontal?="{{orientation=='h'}}" layout wrap>
-                <template repeat="{{bt in project.buildTypes.buildType}}">
-                    <div style="margin: 5px;"><build-type-status locator="buildType:{{bt.id}}" schema="{{schema}}">{{bt.name}}</build-type-status></div>
-                </template>
-            </div>
     </template>
     <script>
-        Polymer('project-status', {
-            dataLoad: true,
+        Polymer('project-tree-status', {
             orientation: 'h',
             domReady: function(){
                 var url = new URI.parseQuery(new URI().query());
@@ -43,6 +37,9 @@
                 if (url != undefined && url.orientation!=undefined) {
                     this.orientation = url.orientation;
                 }
+            },
+            onSchemaChanged: function(oldValue, newValue){
+                this.schema = newValue;
             }
         });
     </script>

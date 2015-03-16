@@ -15,44 +15,68 @@
   -->
 
 <link rel="import" href="../bower_components/polymer/polymer.html">
-<link rel="import" href="../bower_components/core-signals/core-signals.html">
 <script src="../bower_components/uri.js/src/URI.min.js" type="text/javascript"></script>
+<script src="../bower_components/moment/min/moment.min.js" type="text/javascript"></script>
+<link rel="import" href="../bower_components/core-signals/core-signals.html">
 <link rel="import" href="build-data.html">
 <polymer-element name="build-status" attributes="locator data updated buildStatus buildStatusLevel branch">
     <template>
-        <core-signals on-core-signal-branch-changed="{{onBranchChanged}}"></core-signals>
         <build-data data="{{data}}" locator="{{locator}}" updated="{{updated}}"></build-data>
+        <core-signals on-core-signal-branch-changed="{{onBranchChanged}}"></core-signals>
+        <core-signals on-core-signal-color-schema-changed="{{onSchemaChanged}}"></core-signals>
+        <core-signals on-core-signal-ranges-changed="{{onRangesChanged}}"></core-signals>
     </template>
     <script>
         Polymer('build-status', {
             buildStatus: null,
             buildStatusLevel:0,
+            buildStatusLevelDate: null,
             branch: null,
             lastBuild: null,
             height: "100%",
-            sColors: ["green","green","green","green","green"],
-            fColors: [ "#ff0000", "#bf1b21", "#940a0e", "#5c0002", "#450003", "#35090b"],
+            ranges: [],
             domReady: function() {
-
             },
             dataChanged: function(oldValue, newValue){
+                var legend = document.querySelector('body /deep/ status-legend');
+                if (legend!=undefined){
+                    this.schema = legend.schema;
+                    this.ranges = legend.ranges;
+                } else {
+                    var before = moment({month: 0, day: 1, hour: 0}).add(-10, 'years');
+                    this.ranges = [
+                        {key: '', value: before}
+                    ];
+                }
                 if (this.data[0]==undefined){
                     this.buildStatus = 'no builds';
                     this.buildStatusLevel=0;
-                    this.color = "#959595";
                     this.lastBuild = null;
+                    this.buildStatusLevelDate = null;
                     return;
-                }
-                this.lastBuild = this.data[0];
-                this.buildStatus = this.data[0].status;
-                this.buildStatusLevel = -1;
-                var self = this;
-                this.data.forEach(function(d){
-                    if (d!=undefined && d.status==self.buildStatus){
-                        self.buildStatusLevel++;
+                } else {
+                    this.lastBuild = this.data[0];
+                    this.buildStatus = this.data[0].status;
+                    this.buildStatusLevel = -1;
+                    var self = this;
+                    this.data.forEach(function (d) {
+                        if (d != undefined && d.status == self.buildStatus) {
+                            self.buildStatusLevelDate = moment(d.finishDate, "YYYYMMDDTHHmmssZ");
+                        }
+                    });
+                    if (this.buildStatus == 'SUCCESS') {
+                        this.buildStatusLevelDate = moment(this.lastBuild.finishDate, "YYYYMMDDTHHmmssZ");
                     }
-                });
+                    for (var i = 0; i < this.ranges.length; i++) {
+                        var value = this.ranges[i].value;
+                        if (value.isBefore(this.buildStatusLevelDate)) {
+                            this.buildStatusLevel = i;
+                            break;
+                        }
+                    }
+                }
                 this.color = this.calculateColor();
+                this.tColor = this.calculateTColor();
             },
             updatedFormat: function(d){
                 if (d==undefined){
@@ -61,16 +85,34 @@
                 return d.getHours() + ":" + d.getMinutes();
             },
             calculateColor: function(){
-                if (this.buildStatus =='SUCCESS'){
-                    return this.sColors[this.buildStatusLevel];
+                if (this.schema==undefined){
+                    return;
                 }
-                return this.fColors[this.buildStatusLevel];
+                if (this.buildStatus =='SUCCESS'){
+                    return this.schema.sColors[this.buildStatusLevel];
+                }
+                return this.schema.fColors[this.buildStatusLevel];
+            },
+            calculateTColor: function(){
+                if (this.schema==undefined){
+                    return;
+                }
+                if (this.buildStatus =='SUCCESS'){
+                    return this.schema.sTColor;
+                }
+                return this.schema.fTColor;
             },
             onBranchChanged: function(event, detail, source){
                 this.branch = detail;
                 if (detail!=null) {
                     this.locator += ",branch:" + this.branch;
                 }
+            },
+            onSchemaChanged: function(event, detail, source){
+                this.schema = detail;
+            },
+            onRangesChanged: function(event, detail, source){
+                this.ranges = detail;
             },
             goToBuild: function(){
                 if (this.lastBuild!=undefined) {

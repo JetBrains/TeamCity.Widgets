@@ -40,9 +40,11 @@
     </style>
     <script>
         function buildStatus(buildStatus, lastBuild, parentNode){
+            console.log('buildStatus: ' + buildStatus);
+            console.log('build#: ' + lastBuild.id);
             var circle = this.getElementsByTagName('circle')[0];
             if (lastBuild.status  == 'SUCCESS') {
-                circle.style.fill = "#1236";
+                circle.style.fill = "green";
             }else{
                 circle.style.fill = "orange";
             }
@@ -58,14 +60,14 @@
 <build-type-status-custom locator="buildType:TC_Hajipur90x_Compile" onStatusChanged="buildStatus">
     <svg xmlns="http://www.w3.org/2000/svg"
          xmlns:xlink="http://www.w3.org/1999/xlink">
-        <circle id="123" class="bs" cx="40" cy="40" r="24" style="stroke:#006600; fill:#00cc00"/>
+        <circle id="123" class="bs" cx="40" cy="40" r="24" style="stroke:#006600; fill:#5a5a5a;"/>
     </svg>
 </build-type-status-custom>
 
 <build-type-status-custom locator="buildType:TC_Hajipur90x_IntegrationTests_FreeBSD" onStatusChanged="buildStatus">
     <svg xmlns="http://www.w3.org/2000/svg"
          xmlns:xlink="http://www.w3.org/1999/xlink">
-        <circle id="456" class="bs" cx="40" cy="40" r="24" style="stroke:#006600; fill:#00cc00"/>
+        <circle id="456" class="bs" cx="40" cy="40" r="24" style="stroke:#006600; fill:#5a5a5a;"/>
     </svg>
 </build-type-status-custom>
 

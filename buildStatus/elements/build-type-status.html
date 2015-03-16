@@ -21,7 +21,6 @@
         <style>
             :host {
                 display: block;
-                cursor: pointer;
             }
         </style>
         <div horizontal layout on-click="{{goToBuild}}">
@@ -30,7 +29,7 @@
             <div>
                 <template if="{{lastBuild!=null && lastBuild.problemOccurrences!=null && lastBuild.problemOccurrences.newFailed!=null}}">
                     <div style="text-align: right;padding-left: 5px;">
-                       <span style="font-weight:bolder; font-size:0.7em; color:black; background-color: #dfbc13; border-radius: 5px;">&nbsp;{{lastBuild.problemOccurrences.newFailed}}&nbsp;</span>
+                       <span style="font-size: 0.8em; color:{{color}}; background-color: white; border-radius: 10px;">&nbsp;{{lastBuild.problemOccurrences.newFailed}}&nbsp;</span>
                     </div>
                 </template>
             </div>
@@ -38,9 +37,16 @@
     </template>
     <script>
         Polymer('build-type-status', {
+            domReady: function(){
+                this.parentNode.style.padding = "10px";
+                this.parentNode.style.backgroundColor = "#959595";
+            },
             colorChanged: function(oldValue, newValue){
                 this.parentNode.style.backgroundColor = newValue;
-                this.parentNode.style.padding = "10px";
+                this.parentNode.style.cursor = "pointer";
+            },
+            tColorChanged: function(oldValue, newValue){
+                this.parentNode.style.color = newValue;
             }
         });
     </script>

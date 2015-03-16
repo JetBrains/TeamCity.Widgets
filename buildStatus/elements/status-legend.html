@@ -1,0 +1,94 @@
+<!--
+  ~ Copyright 2000-2015 JetBrains s.r.o.
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/core-signals/core-signals.html">
+<script src="../bower_components/uri.js/src/URI.min.js" type="text/javascript"></script>
+<polymer-element name="status-legend" attributes="ranges schema">
+    <template>
+        <style>
+            .box {
+                height: 1.5em;
+                color: #bdbdbd;
+                vertical-align: bottom;
+            }
+
+            .l {
+                width: 15px;
+            }
+        </style>
+        <div horizontal layout style="padding-right: 5px;">
+            <div horizontal layout end-justified flex self-end>
+                <div style="height: 1.3em; width: 1.2em; background-color:white; color: {{schema.fColors[1]}}; border-radius: 10px;">
+                    &nbsp;1&nbsp;</div>
+                <div class="box" style="margin-right: 1em; margin-left: 0.5em;">New Problems</div>
+            </div>
+            <div horizontal layout end-justified flex self-end>
+                <div class="box l" style="background-color:{{schema.nColor}}; width: 30px;">&nbsp;</div>
+                <div class="box" style="width:8em; margin-left: 0.5em; margin-right: 1em; text-align: left;">No Builds Yet</div>
+            </div>
+            <div vertical layout>
+                <div style="color:white;" self-end>Status</div>
+            <template repeat="{{r,i in ranges}}">
+                <div horizontal layout wrap>
+                    <div class="box" style="width:8em; margin-right: 0.5em; text-align: right;">{{r.key}}</div>
+                    <div class="box l" style="background-color:{{schema.fColors[i]}};">&nbsp;</div>
+                    <div class="box l" style="background-color:{{schema.sColors[i]}};">&nbsp;</div>
+                </div>
+            </template>
+            </div>
+        </div>
+    </template>
+    <script>
+        Polymer('status-legend', {
+            glamourSchema: {sColors: ["#a0d900", "#7ba700", "#465f00", "#324500"],
+                fColors: ["#ff358b", "#b32562", "#661638", "#330b1c"],
+                nColor: ["#333333"],
+                sTColor: 'black',
+                fTColor: 'white'},
+            standardSchema: {sColors: ["#3db00b", "#35940a", "#1c5c00", "#173509"],
+                fColors: ["#ff1c22", "#940a0e", "#5c0002", "#35090b"],
+                sTColor: 'white',
+                fTColor: 'white',
+                nColor: ["#5a5a5a"]},
+            domReady: function () {
+                this.ranges = this.createDateRanges();
+                this.fire("core-signal", {name: "ranges-changed", data: this.ranges});
+                var url = URI.parseQuery(new URI().query());
+                if (url != undefined && url.schema!=undefined && (url.schema=="glam" || url.schema=="glamour")) {
+                    this.schema = this.glamourSchema;
+                } else {
+                    this.schema = this.standardSchema;
+                }
+                this.fire("core-signal", {name: "color-schema-changed", data: this.schema});
+            },
+            createDateRanges: function () {
+                var today = moment(0, "HH");
+                var yesterday = moment(0, "HH").add(-1, 'd');
+                var last2days = moment(0, "HH").add(-2, 'd');
+                var last7days = moment(0, "HH").add(-7, 'd');
+                var lastMonth = moment(0, "HH").add(-1, 'M');
+                var before = moment({month: 0, day: 1, hour: 0}).add(-10, 'years');
+                return [
+                    {key: 'Today', value: today},
+                    {key: 'Yesterday', value: yesterday},
+                    {key: 'Last Week', value: last7days},
+                    {key: 'Ante Christum', value: before}
+                ];
+            }
+        });
+    </script>
+</polymer-element>

@@ -15,30 +15,59 @@
   -->
 
 <link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="status-legend.html">
 <link rel="import" href="../bower_components/core-signals/core-signals.html">
+<script src="../bower_components/moment/min/moment.min.js" type="text/javascript"></script>
 <polymer-element name="project-status-page">
     <template>
         <core-signals on-core-signal-status-updated="{{onStatusUpdated}}"></core-signals>
-        <div id="container" vertical layout>
-            <div flex>
+        <style>
+            #wrapper {
+                min-height: 100%;
+                position: relative;
+            }
+            #header {
+                height: 0;
+            }
+            #content {
+                padding-bottom: 180px;
+            }
+            #footer {
+                width: 100%;
+                height: 180px;
+                position: absolute;
+                bottom: 0;
+                left: 0;
+            }
+
+        </style>
+        <div id="wrapper">
+            <div id="content">
                 <content></content>
             </div>
-            <div style="color: #757575; font-size: smaller; width: 100%; text-align: right;">
-                <template if="{{updated!=null}}">
-                    last updated @ {{updated}}
-                </template>
+            <div id="footer">
+                <div horizontal justified layout style="color: #757575; font-size: smaller; padding-bottom: 10px;">
+                    <div flex self-end>
+                        <template if="{{updated!=null}}">
+                            {{updated | formatted}}
+                        </template>
+                    </div>
+                    <div><status-legend></status-legend></div>
+                </div>
             </div>
         </div>
     </template>
     <script>
         Polymer('project-status-page', {
             updated: null,
-            domReady: function(){
-                this.$.container.style.height = window.innerHeight + 'px';
+            domReady: function () {
             },
-            onStatusUpdated: function(event, details){
+            onStatusUpdated: function (event, details) {
                 this.updated = details;
-                console.log(this.updated)
+            },
+            formatted: function (updated) {
+                return "Last updated " + moment(updated).format('MMMM Do') + " @ "
+                        + moment(updated).format('HH:mm');
             }
         });
     </script>

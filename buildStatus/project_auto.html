@@ -18,29 +18,17 @@
 <html>
 <head> <!-- 1. Load platform support before any code that touches the DOM. -->
     <script src="bower_components/webcomponentsjs/webcomponents.min.js" type="text/javascript"></script>
+    <link href='http://fonts.googleapis.com/css?family=PT%20Sans:400,700' rel='stylesheet' type='text/css'>
 
     <!-- 2. Load the component using an HTML Import -->
-    <link rel="import" href="elements/project-status.html">
-    <style>
-        html, body{
-            font-family: Verdana;
-            font-size: 1.1em;
-            color: white;
-            background-color: black;
-        }
-        table tr td{
-            padding-bottom: 5px;
-        }
-        table tr th{
-            text-align: left;
-        }
-        h2{
-            margin: 5px;
-        }
-    </style>
+    <link rel="import" href="elements/project-status-page.html">
+    <link rel="import" href="elements/project-tree-status.html">
+    <link rel="stylesheet" href="main.css" type='text/css'>
 </head>
 <body>
-<project-status></project-status>
+<project-status-page>
+<project-tree-status></project-tree-status>
+</project-status-page>
 </body>
 </html>
 

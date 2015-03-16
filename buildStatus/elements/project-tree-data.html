@@ -16,11 +16,10 @@
 
 <link rel="import" href="../bower_components/polymer/polymer.html">
 <link rel="import" href="../bower_components/core-ajax/core-ajax.html">
-<polymer-element name="project-data" attributes="projectId project">
+<polymer-element name="project-tree-data" attributes="projectId projects">
     <template>
         <core-ajax
                 id="ajax"
-                url="/app/rest/projects/id:{{projectId}}"
                 body='{}'
                 method="get"
                 handleAs="json"
@@ -30,20 +29,32 @@
                 on-core-error="{{ handleError }}"></core-ajax>
     </template>
     <script>
-        Polymer('project-data', {
+        Polymer('project-tree-data', {
+            projects:[],
+            url:"/teamcity?url=/app/rest/projects/id:",
             domReady: function () {
+                //this.goAjax();
             },
-            goAjax: function () {
+            goAjax: function (pid) {
+                this.$.ajax.url = this.url + pid;
                 this.$.ajax.go();
             },
             projectIdChanged: function (oldValue, newValue) {
-                this.goAjax();
+                this.projects = [];
+                this.goAjax(newValue);
             },
             handleResponse: function (event, detail, source) {
                 if (event.detail.response==undefined){
                     return;
                 }
-                this.project = event.detail.response;
+                var project = event.detail.response;
+                this.projects.push(project);
+                if (project.projects!=null && project.projects.project!=null){
+                    for (var i=0;i<project.projects.project.length;i++){
+                        this.goAjax(project.projects.project[i].id);
+                    }
+
+                }
                 this.status = 'OK';
             },
             handleError: function (event, detail, source) {

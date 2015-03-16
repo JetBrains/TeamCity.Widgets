@@ -22,7 +22,7 @@
     </template>
     <script>
         Polymer('build-type-status-custom', {
-            colorChanged: function () {
+            buildStatusChanged: function () {
                 if (this.onStatusChanged != undefined) {
                     eval(this.onStatusChanged).call(this,this.buildStatus, this.lastBuild, this.parentNode);
                 } else {

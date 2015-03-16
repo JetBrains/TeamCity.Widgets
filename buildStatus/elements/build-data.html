@@ -16,11 +16,12 @@
 
 <link rel="import" href="../bower_components/polymer/polymer.html">
 <link rel="import" href="../bower_components/core-ajax/core-ajax.html">
+<link rel="import" href="../bower_components/core-signals/core-signals.html">
 <polymer-element name="build-data" attributes="locator data updated"  on-update="{{goAjax}}">
     <template>
         <core-ajax
                 id="ajax"
-                url="/app/rest/builds/?locator={{locator}},start:0,count:5&fields=$long,build:(id,number,status,state,webUrl,problemOccurrences,testOccurrences,snapshot-dependencies(build:(id,number,status,state,buildType,webUrl,problemOccurrences,testOccurrences)))"
+                url="/app/rest/builds/?locator={{locator}},start:0,count:5&fields=$long,build:(id,number,status,state,finishDate,webUrl,problemOccurrences,testOccurrences,snapshot-dependencies(build:(id,number,status,state,buildType,webUrl,problemOccurrences,testOccurrences)))"
                 body='{}'
                 method="get"
                 handleAs="json"
