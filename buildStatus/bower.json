@@ -1,6 +1,6 @@
 {
   "___comment___": "Run `bower install` from this directory to update components",
-  "name": "TeamCity.Widgets.BuildStatus",
+  "name": "TeamCity.Widgets",
   "version": "0.1.0-beta",
   "private": false,
   "ignore": [
@@ -8,7 +8,11 @@
     "node_modules",
     "bower_components",
     "test",
-    "tests"
+    "tests",
+    ".idea",
+    "*.iml",
+    "README.md",
+    "vulcanized/"
   ],
   "dependencies": {
     "moment": "~2.9.0",
