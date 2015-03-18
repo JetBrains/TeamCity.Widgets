@@ -10,13 +10,15 @@
     "bower_components",
     "test",
     "tests",
-    ".idea/",
+    ".idea",
     "*.iml",
     "README.md",
-    "vulcanized/",
+    "vulcanized",
     "investigations",
     "lastChanges",
-    "out/"
+    "out",
+    ".gitignore",
+    "bower.json"
   ],
   "dependencies": {
     "moment": "~2.9.0",
