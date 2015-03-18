@@ -21,18 +21,13 @@
 
     <!-- 2. Load the component using an HTML Import -->
     <link rel="import" href="elements/build-type-status-custom.html">
+    <link rel="import" href="elements/context-prefix.html">
     <style>
         html, body{
             font-family: Verdana;
             font-size: 1.1em;
             color: white;
-            background-color: black;
-        }
-        table tr td{
-            padding-bottom: 5px;
-        }
-        table tr th{
-            text-align: left;
+            background-color: #bdbdbd;
         }
         h2{
             margin: 5px;
@@ -44,29 +39,34 @@
             console.log('build#: ' + lastBuild.id);
             var circle = this.getElementsByTagName('circle')[0];
             if (lastBuild.status  == 'SUCCESS') {
-                circle.style.fill = "green";
+                circle.style.fill = "blue";
             }else{
-                circle.style.fill = "orange";
+                circle.style.fill = "yellow";
             }
         }
     </script>
 </head>
 <body>
-<h2>Custom elements:</h2>
-<build-type-status-custom locator="buildType:TC_Hajipur90x_Compile" onStatusChanged="buildStatus">
+<h3>Upsource</h3>
+<h4>compile - test db - test launcher</h4>
+<build-type-status-custom locator="buildType:Upsource_1_0_Compile" onStatusChanged="buildStatus">
     <svg xmlns="http://www.w3.org/2000/svg"
          xmlns:xlink="http://www.w3.org/1999/xlink">
-        <circle id="123" class="bs" cx="40" cy="40" r="24" style="stroke:#006600; fill:#5a5a5a;"/>
+        <circle cx="40" cy="40" r="24" style="stroke:#5a5a5a; fill:#5a5a5a;"/>
     </svg>
 </build-type-status-custom>
-
-<build-type-status-custom locator="buildType:TC_Hajipur90x_IntegrationTests_FreeBSD" onStatusChanged="buildStatus">
+<build-type-status-custom locator="buildType:Upsource_1_0_TestDatabaseUpgradeHypertable" onStatusChanged="buildStatus">
     <svg xmlns="http://www.w3.org/2000/svg"
          xmlns:xlink="http://www.w3.org/1999/xlink">
-        <circle id="456" class="bs" cx="40" cy="40" r="24" style="stroke:#006600; fill:#5a5a5a;"/>
+        <circle  cx="40" cy="40" r="24" style="stroke:#5a5a5a; fill:#5a5a5a;"/>
     </svg>
 </build-type-status-custom>
-
+<build-type-status-custom locator="buildType:Upsource_1_0_TestLocalLauncher" onStatusChanged="buildStatus">
+    <svg xmlns="http://www.w3.org/2000/svg"
+         xmlns:xlink="http://www.w3.org/1999/xlink">
+        <circle  cx="40" cy="40" r="24" style="stroke:#5a5a5a; fill:#5a5a5a;"/>
+    </svg>
+</build-type-status-custom>
 </body>
 </html>
 
