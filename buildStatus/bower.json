@@ -1,7 +1,8 @@
 {
-  "___comment___": "Run `bower install` from this directory to update components",
-  "name": "TeamCity.Widgets",
-  "version": "0.1.0-beta",
+  "name": "TeamCity.Widgets.BuildStatus",
+  "authors": [
+    { "name": "Kateryna Shlyakhovetska", "email": "shkate@jetbrains.com" }
+  ],
   "private": false,
   "ignore": [
     "**/.*",
@@ -9,10 +10,11 @@
     "bower_components",
     "test",
     "tests",
-    ".idea",
     "*.iml",
     "README.md",
-    "vulcanized/"
+    "vulcanized",
+    ".gitignore",
+    "bower.json"
   ],
   "dependencies": {
     "moment": "~2.9.0",
