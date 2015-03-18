@@ -1,7 +1,8 @@
 {
   "___comment___": "Run `bower install` from this directory to update components",
   "name": "TeamCity.Widgets.BuildStatus",
-  "private": true,
+  "version": "0.1.0-beta",
+  "private": false,
   "ignore": [
     "**/.*",
     "node_modules",
