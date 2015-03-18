@@ -19,6 +19,7 @@
 <script src="../bower_components/moment/min/moment.min.js" type="text/javascript"></script>
 <link rel="import" href="../bower_components/core-signals/core-signals.html">
 <link rel="import" href="build-data.html">
+<link rel="import" href="status-legend.html">
 <polymer-element name="build-status" attributes="locator data updated buildStatus buildStatusLevel branch">
     <template>
         <build-data data="{{data}}" locator="{{locator}}" updated="{{updated}}"></build-data>
@@ -39,15 +40,15 @@
             },
             dataChanged: function(oldValue, newValue){
                 var legend = document.querySelector('body /deep/ status-legend');
-                if (legend!=undefined){
-                    this.schema = legend.schema;
-                    this.ranges = legend.ranges;
-                } else {
-                    var before = moment({month: 0, day: 1, hour: 0}).add(-10, 'years');
-                    this.ranges = [
-                        {key: '', value: before}
-                    ];
+                if (legend==undefined){
+                    legend = document.createElement("status-legend");
+                    legend.hidden = true;
+                    legend.schema = legend.standardSchema;
+                    legend.domReady();
+                    document.querySelector('body').appendChild(legend);
                 }
+                this.schema = legend.schema;
+                this.ranges = legend.ranges;
                 if (this.data[0]==undefined){
                     this.buildStatus = 'no builds';
                     this.buildStatusLevel=0;
