@@ -13,8 +13,7 @@
     "*.iml",
     "README.md",
     "vulcanized",
-    ".gitignore",
-    "bower.json"
+    ".gitignore"
   ],
   "dependencies": {
     "moment": "~2.9.0",
