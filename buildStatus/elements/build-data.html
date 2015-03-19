@@ -18,7 +18,7 @@
 <link rel="import" href="../bower_components/core-signals/core-signals.html">
 <link rel="import" href="teamcity-ajax.html">
 <link rel="import" href="context-prefix.html">
-<polymer-element name="build-data" attributes="locator data updated"  on-update="{{goAjax}}">
+<polymer-element name="build-data" attributes="locator data updated"  on-update="{{onUpdate}}">
     <template>
         <teamcity-ajax
                 id="ajax"
@@ -34,6 +34,9 @@
     <script>
         Polymer('build-data', {
             locatorChanged: function (oldValue, newValue) {
+                this.$.ajax.goAjax();
+            },
+            onUpdate: function(){
                 this.$.ajax.goAjax();
             },
             handleResponse: function (event, detail, source) {
