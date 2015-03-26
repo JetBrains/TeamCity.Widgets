@@ -28,7 +28,9 @@
                 headers='{"Accept": "application/json"}'
                 baseUrl="/app/rest/builds/?locator={{locator}},start:0,count:5&fields=$long,build:(id,number,status,state,finishDate,webUrl,problemOccurrences,testOccurrences,snapshot-dependencies(build:(id,number,status,state,buildType,webUrl,problemOccurrences,testOccurrences)))"
                 contentType="application/json"
-                on-core-response="{{ handleResponse }}"></teamcity-ajax>
+                on-core-response="{{ handleResponse }}"
+                on-core-error="{{ handleError }}"
+                ></teamcity-ajax>
 
     </template>
     <script>
@@ -49,11 +51,19 @@
                     this.data[i] = event.detail.response.build[i];
                 }
                 this.status = 'OK';
-                this.job('build-status-update', function () {
-                    this.fire('update');
-                }, 60 * 1000);
+                this.scheduleUpdate(60*1000);
                 this.updated = new Date();
                 this.fire("core-signal", {name: "status-updated", data: this.updated});
+            },
+            handleError: function (event, detail, source) {
+                this.error = detail;
+                this.status = 'ERROR';
+                this.scheduleUpdate(5*60*1000);
+            },
+            scheduleUpdate:function(interval){
+                this.job('build-status-update', function () {
+                    this.fire('update');
+                }, interval);
             }
         });
     </script>
