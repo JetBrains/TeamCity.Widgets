@@ -32,7 +32,7 @@
                 </template>
             </template>
             <teamcity-builds builds="{{finishedBuilds}}" baseUrlComplete="{{buildTypeId!=null}}"
-                             baseUrl="/app/rest/builds/?locator={{buildTypeId | locator}},start:0,count:5&fields=$long,build:(id,number,buildTypeId,status,state,finishDate,webUrl,problemOccurrences,testOccurrences,buildType:(id,name))"></teamcity-builds>
+                             baseUrl="/app/rest/builds/?locator={{buildTypeId | locator}},start:0,count:7&fields=$long,build:(id,number,buildTypeId,status,state,finishDate,webUrl,problemOccurrences,testOccurrences,buildType:(id,name))"></teamcity-builds>
             <template repeat="{{build in finishedBuilds}}">
                 <build-chain build="{{build}}" branch="{{branch}}" projectId="{{projectTemplateId}}"></build-chain>
             </template>

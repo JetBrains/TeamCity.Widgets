@@ -25,22 +25,22 @@
         <style>
             .running.SUCCESS {
                 background-color: black;
-                border: 2px solid green;
+                border: 2px solid #3db00b;
             }
 
             .running.FAILURE {
                 background-color: black;
-                border: 2px solid red;
+                border: 2px solid #ff1c22;
             }
 
             .finished.SUCCESS {
-                background-color: green;
-                border: 2px solid green;
+                background-color: #3db00b;
+                border: 2px solid #3db00b;
             }
 
             .finished.FAILURE {
-                background-color: red;
-                border: 2px solid red;
+                background-color: #ff1c22;
+                border: 2px solid #ff1c22;
             }
 
             .queued {
@@ -50,10 +50,13 @@
 
             .status {
                 color: #ffffff;
-                padding: 5px;
                 margin: 5px;
                 min-width: 100px;
-                height: 2em;
+                min-height: 2em;
+                padding-top: 5px;
+                padding-left: 5px;
+                padding-right: 5px;
+                line-height: 1em;
                 cursor: pointer;
                 vertical-align: middle;
                 border: 2px solid grey;
@@ -61,6 +64,7 @@
 
             .buildNumber, .branch {
                 font-size: smaller;
+                padding-top: 2px;
             }
 
         </style>
@@ -70,9 +74,6 @@
                 <div horizontal="true" layout="true">
                     <div>
                         <content id="content"></content>
-                        <template if="{{build.state=='queued'}}">
-                            &nbsp;&#10710;
-                        </template>
                     </div>
                     <div>
                         <template
