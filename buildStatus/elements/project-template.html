@@ -21,20 +21,12 @@
 <polymer-element name="project-template" attributes="projectId data build branch">
     <template>
         <div id="buildChainPresenter">
-            <template if="{{projectId=='PhpStorm'}}">
-                <div layout horizontal wrap>
-                    <one-build-status buildTypeId="ijplatform_master_PhpStormTrunkNew_Compile">Compile</one-build-status>
-                    <one-build-status buildTypeId="ijplatform_master_PhpStormTrunkNew_PhpTestsOnly">Tests</one-build-status>
-                    <one-build-status buildTypeId="ijplatform_master_PhpStormTrunkNew_Installers">Installers</one-build-status>
-                    <one-build-status buildTypeId="ijplatform_master_PhpStormTrunkNew_Master">Master</one-build-status>
-                </div>
-            </template>
             <template if="{{projectId=='ReSharper'}}">
                 <rs-status branch="{{branch}}"></rs-status>
             </template>
             <template if="{{projectId!='ReSharper' && projectId!='PhpStorm'}}">
                 <div horizontal layout>
-                    <div style="width: 80%;"><one-build-status-by-project projectId="{{projectId}}"></one-build-status-by-project></div>
+                    <div style="max-width: 80%;"><one-build-status-by-project projectId="{{projectId}}"></one-build-status-by-project></div>
                     <div><one-build-status build="{{build}}">{{build.buildType.name}}</one-build-status></div>
                 </div>
             </template>

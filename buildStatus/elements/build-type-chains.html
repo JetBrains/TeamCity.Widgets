@@ -25,7 +25,7 @@
     <template>
             <core-signals on-core-signal-branch-changed="{{onBranchChanged}}"></core-signals>
             <teamcity-builds id="tcBuilds" builds="{{queuedBuilds}}"
-                             baseUrl="/app/rest/buildQueue?locator=buildType:{{buildTypeId}}" baseUrlComplete="{{buildTypeId!=null}}"></teamcity-builds>
+                             baseUrl="/app/rest/buildQueue?locator=buildType:{{buildTypeId}}&fields=$long,build:(id,number,state,buildTypeId,buildType:(id,name))" baseUrlComplete="{{buildTypeId!=null}}"></teamcity-builds>
             <template repeat="{{build in queuedBuilds}}">
                 <template if="{{branch==undefined || branch=='' || branch==build.branchName}}">
                     <build-chain build="{{build}}" branch="{{branch}}" projectId="{{projectTemplateId}}"></build-chain>
