@@ -20,10 +20,12 @@
 <link rel="import" href="../bower_components/core-signals/core-signals.html">
 <link rel="import" href="build-data.html">
 <link rel="import" href="status-legend.html">
-<polymer-element name="build-status" attributes="locator data updated buildStatus buildStatusLevel branch">
+<polymer-element name="build-status" attributes="locator data updated buildStatus buildStatusLevel branch externalData">
     <template>
-        <build-data data="{{data}}" locator="{{locator}}" updated="{{updated}}"></build-data>
-        <core-signals on-core-signal-branch-changed="{{onBranchChanged}}"></core-signals>
+        <template if="{{!externalData}}">
+            <build-data data="{{data}}" locator="{{locator}}" updated="{{updated}}"></build-data>
+            <core-signals on-core-signal-branch-changed="{{onBranchChanged}}"></core-signals>
+        </template>
         <core-signals on-core-signal-color-schema-changed="{{onSchemaChanged}}"></core-signals>
         <core-signals on-core-signal-ranges-changed="{{onRangesChanged}}"></core-signals>
     </template>

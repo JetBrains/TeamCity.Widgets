@@ -1,0 +1,46 @@
+<!--
+  ~ Copyright 2000-2015 JetBrains s.r.o.
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<!DOCTYPE html>
+<html>
+<head> <!-- 1. Load platform support before any code that touches the DOM. -->
+    <script src="bower_components/webcomponentsjs/webcomponents.min.js" type="text/javascript"></script>
+
+
+    <!-- 2. Load the component using an HTML Import -->
+    <meta charset="UTF-8">
+    <link rel="import" href="elements/context-prefix.html">
+    <link rel="import" href="elements/branch-name.html">
+    <link rel="import" href="elements/build-type-chains.html">
+    <link rel="stylesheet" href="main.css" type='text/css'>
+    <style>
+        html, body{
+            font-family: 'PT Sans Caption', serif;
+            font-size: 1.0em;
+            color: white;
+            background-color: black;
+            height:100%;
+        }
+
+    </style>
+</head>
+<body>
+<branch-name hide="true"></branch-name>
+<build-type-chains buildTypeId="DotNetDiv_Wave02_UeberAlles" projectTemplateId="ReSharper">
+</build-type-chains>
+</body>
+</html>
+

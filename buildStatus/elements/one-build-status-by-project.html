@@ -1,0 +1,72 @@
+<!--
+  ~ Copyright 2000-2015 JetBrains s.r.o.
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<script src="../bower_components/uri.js/src/URI.min.js" type="text/javascript"></script>
+<script src="../bower_components/moment/min/moment.min.js" type="text/javascript"></script>
+<link rel="import" href="../bower_components/core-signals/core-signals.html">
+<link rel="import" href="one-build-status.html">
+<link rel="import" href="project-tree-data.html">
+<polymer-element name="one-build-status-by-project" attributes="projectId builds">
+    <template>
+        <content></content>
+        <project-tree-data projectId="{{projectId}}" projects="{{projects}}"></project-tree-data>
+        <div id="presenter"></div>
+    </template>
+    <script>
+        Polymer('one-build-status-by-project', {
+            projectBuilds: [],
+            buildTypeIds: [],
+            domReady: function () {
+
+            },
+            projectsChanged: function () {
+                this.buildTypeIds = [];
+                var self = this;
+                this.projects.forEach(
+                        function (p) {
+                            p.buildTypes.buildType.forEach(function (b) {
+                                self.buildTypeIds.push(b.id);
+                            });
+                        }
+                );
+                this.buildsChanged();
+            },
+            buildsChanged: function () {
+                var self = this;
+                while (self.$.presenter.hasChildNodes()) {
+                    self.$.presenter.removeChild(self.$.presenter.lastChild);
+                }
+
+                if (this.buildTypeIds==undefined || this.builds==undefined){
+                    return;
+                }
+                this.builds.forEach(function (b) {
+                    var id = b.buildTypeId;
+                    if (self.buildTypeIds.indexOf(id)>-1) {
+                        var status = document.createElement("one-build-status");
+                        status.build = b;
+                        status.buildTypeId = b;
+                        var div = document.createElement("span");
+                        div.innerHTML = b.buildType.name;
+                        status.appendChild(div);
+                        self.$.presenter.appendChild(status);
+                    }
+                })
+            }
+        });
+    </script>
+</polymer-element>

@@ -15,18 +15,18 @@
   -->
 
 <link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/core-ajax/core-ajax.html">
 <link rel="import" href="../bower_components/core-signals/core-signals.html">
-<link rel="import" href="teamcity-ajax.html">
 <link rel="import" href="context-prefix.html">
-<polymer-element name="build-data" attributes="locator data updated"  on-update="{{onUpdate}}">
+<polymer-element name="teamcity-builds" extends="teamcity-ajax" attributes="baseUrl builds baseUrlComplete" on-update="{{onUpdate}}">
     <template>
         <teamcity-ajax
                 id="ajax"
                 body='{}'
                 method="get"
                 handleAs="json"
+                baseUrl="{{baseUrl}}"
                 headers='{"Accept": "application/json"}'
-                baseUrl="/app/rest/builds/?locator={{locator}},start:0,count:5&fields=$long,build:(id,number,status,state,finishDate,webUrl,problemOccurrences,testOccurrences)"
                 contentType="application/json"
                 on-core-response="{{ handleResponse }}"
                 on-core-error="{{ handleError }}"
@@ -34,33 +34,30 @@
 
     </template>
     <script>
-        Polymer('build-data', {
-            locatorChanged: function (oldValue, newValue) {
+        Polymer('teamcity-builds', {
+            baseUrlChanged: function (oldValue, newValue) {
+                if (!this.baseUrlComplete){
+                    return;
+                }
                 this.$.ajax.goAjax();
             },
-            onUpdate: function(){
+            onUpdate: function () {
                 this.$.ajax.goAjax();
             },
             handleResponse: function (event, detail, source) {
-                if (event.detail.response == undefined || event.detail.response.build == undefined) {
-                    this.data = [];
+                if (event.detail.response == undefined) {
+                    this.builds = [];
                     return;
                 }
-                this.data = [];
-                for (var i = 0; i < 5; i++) {
-                    this.data[i] = event.detail.response.build[i];
-                }
-                this.status = 'OK';
-                this.scheduleUpdate(60*1000);
-                this.updated = new Date();
-                this.fire("core-signal", {name: "status-updated", data: this.updated});
+                this.builds = event.detail.response.build;
+                this.scheduleUpdate(1*60*1000);
             },
             handleError: function (event, detail, source) {
                 this.error = detail;
                 this.status = 'ERROR';
                 this.scheduleUpdate(5*60*1000);
             },
-            scheduleUpdate:function(interval){
+            scheduleUpdate: function (interval) {
                 this.job('build-status-update', function () {
                     this.fire('update');
                 }, interval);

@@ -1,0 +1,115 @@
+<!--
+  ~ Copyright 2000-2015 JetBrains s.r.o.
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<script src="../bower_components/uri.js/src/URI.min.js" type="text/javascript"></script>
+<script src="../bower_components/moment/min/moment.min.js" type="text/javascript"></script>
+<link rel="import" href="../bower_components/core-signals/core-signals.html">
+<link rel="import" href="build-data.html">
+<link rel="import" href="status-legend.html">
+<polymer-element name="one-build-status" attributes="build buildTypeId showBranch">
+    <template>
+        <style>
+            .running.SUCCESS {
+                background-color: black;
+                border: 2px solid green;
+            }
+
+            .running.FAILURE {
+                background-color: black;
+                border: 2px solid red;
+            }
+
+            .finished.SUCCESS {
+                background-color: green;
+                border: 2px solid green;
+            }
+
+            .finished.FAILURE {
+                background-color: red;
+                border: 2px solid red;
+            }
+
+            .queued {
+                background-color: grey;
+                border: 2px solid grey;
+            }
+
+            .status {
+                color: #ffffff;
+                padding: 5px;
+                margin: 5px;
+                min-width: 100px;
+                height: 2em;
+                cursor: pointer;
+                vertical-align: middle;
+                border: 2px solid grey;
+            }
+
+            .buildNumber, .branch {
+                font-size: smaller;
+            }
+
+        </style>
+        <div class="status {{build.state}} {{build.status}}" on-click="{{goToBuild}}"
+             title="branch:{{build.branchName}}">
+            <div>
+                <div horizontal="true" layout="true">
+                    <div>
+                        <content id="content"></content>
+                        <template if="{{build.state=='queued'}}">
+                            &nbsp;&#10710;
+                        </template>
+                    </div>
+                    <div>
+                        <template
+                                if="{{build!=null && build.problemOccurrences!=null && build.problemOccurrences.newFailed!=null}}">
+                            <div style="text-align: right;padding-left: 5px;">
+                                <span style="font-size: 0.8em; color:black; background-color: white; border-radius: 10px;">&nbsp;{{build.problemOccurrences.newFailed}}&nbsp;</span>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+
+            </div>
+            <template if="{{build.number!=null}}">
+                <div class="buildNumber">#{{build.number}}</div>
+            </template>
+            <template if="{{build.branchName!=null && showBranch}}">
+                <div class="branch"><{{build.branchName}}></div>
+            </template>
+        </div>
+    </template>
+    <script>
+        Polymer('one-build-status', {
+            domReady: function () {
+
+            },
+            goToBuild: function () {
+                var contextChanger = document.getElementsByTagName("context-prefix")[0];
+                if (this.build != undefined) {
+                    var localUri = new URI();
+                    var uri = new URI(this.build.webUrl);
+                    var path = uri.path();
+                    var search = uri.search();
+                    var buildUri = (!contextChanger) ? localUri.path(path).search(search) : uri;
+                    var win = window.open(buildUri, '_blank');
+                    win.focus();
+                }
+            }
+        });
+    </script>
+</polymer-element>
