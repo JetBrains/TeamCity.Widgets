@@ -66,7 +66,13 @@
                 font-size: smaller;
                 padding-top: 2px;
             }
-
+            .noAgents{
+                font-size: smaller;
+                width: 100%;
+                text-align: right;
+                color: yellow;
+                font-family: "Courier New", serif;
+            }
         </style>
         <div class="status {{build.state}} {{build.status}}" on-click="{{goToBuild}}"
              title="branch:{{build.branchName}}">
@@ -74,6 +80,9 @@
                 <div horizontal="true" layout="true">
                     <div>
                         <content id="content"></content>
+                        <template if="{{build.state=='queued' && build.waitReason=='This build will not start because there are no compatible agents which can run it'}}">
+                            <div class="noAgents">== no agents ==</div>
+                        </template>
                     </div>
                     <div>
                         <template

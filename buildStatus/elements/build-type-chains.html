@@ -25,14 +25,14 @@
     <template>
             <core-signals on-core-signal-branch-changed="{{onBranchChanged}}"></core-signals>
             <teamcity-builds id="tcBuilds" builds="{{queuedBuilds}}"
-                             baseUrl="/app/rest/buildQueue?locator=buildType:{{buildTypeId}}&fields=$long,build:(id,number,webUrl,state,buildTypeId,buildType:(id,name))" baseUrlComplete="{{buildTypeId!=null}}"></teamcity-builds>
+                             baseUrl="/app/rest/buildQueue?locator=buildType:{{buildTypeId}}&fields=$long,build:(id,number,webUrl,state,compatibleAgents,percentageComplete,startEstimate,waitReason,buildTypeId,buildType:(id,name))" baseUrlComplete="{{buildTypeId!=null}}"></teamcity-builds>
             <template repeat="{{build in queuedBuilds}}">
                 <template if="{{branch==undefined || branch=='' || branch==build.branchName}}">
                     <build-chain build="{{build}}" branch="{{branch}}" projectId="{{projectTemplateId}}"></build-chain>
                 </template>
             </template>
             <teamcity-builds builds="{{finishedBuilds}}" baseUrlComplete="{{buildTypeId!=null}}"
-                             baseUrl="/app/rest/builds/?locator={{buildTypeId | locator}},start:0,count:7&fields=$long,build:(id,number,buildTypeId,status,state,finishDate,webUrl,problemOccurrences,testOccurrences,buildType:(id,name))"></teamcity-builds>
+                             baseUrl="/app/rest/builds/?locator={{buildTypeId | locator}},start:0,count:7&fields=$long,build:(id,number,buildTypeId,startEstimate,percentageComplete,compatibleAgents,waitReason,status,state,finishDate,webUrl,problemOccurrences,testOccurrences,buildType:(id,name))"></teamcity-builds>
             <template repeat="{{build in finishedBuilds}}">
                 <build-chain build="{{build}}" branch="{{branch}}" projectId="{{projectTemplateId}}"></build-chain>
             </template>
