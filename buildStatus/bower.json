@@ -17,6 +17,7 @@
   ],
   "dependencies": {
     "moment": "~2.9.0",
+    "moment.twitter": "0.2.0",
     "uri.js": "~1.14.2",
     "polymer": "Polymer/polymer#~0.5.5",
     "core-ajax": "Polymer/core-ajax#*",

@@ -17,11 +17,15 @@
 <link rel="import" href="../bower_components/polymer/polymer.html">
 <link rel="import" href="one-build-status.html">
 <link rel="import" href="one-build-status-by-project.html">
+<link rel="import" href="build-chain-summary.html">
 <script src="../bower_components/uri.js/src/URI.min.js" type="text/javascript"></script>
-<polymer-element name="rs-status" attributes="branch data">
+<script type="text/javascript" src="../bower_components/moment/moment.js"></script>
+<script type="text/javascript" src="../bower_components/moment.twitter/moment-twitter.js"></script>
+<polymer-element name="rs-status" attributes="branch data timing">
     <template>
-        <h3>DotNetDiv > Wave02 > Trigger All <template if="{{branch!=undefined}}"><span style="font-size: smaller;"><{{branch}}></span></template></h3>
-            <div horizontal layout>
+        <build-chain-summary timing="{{timing}}"></build-chain-summary>
+
+         <div horizontal layout>
                 <div class="bs"><one-build-status buildTypeId="DotNetDiv_Wave02_UeberAlles" showBranch="true">Trigger All</one-build-status></div>
                 <div class="bs"><one-build-status buildTypeId="DotNetDiv_Wave02_PostCompile_InstallerEmbedded" showBranch="true">Embedded Installer</one-build-status></div>
             </div>
@@ -96,7 +100,8 @@
                     <div class="bs"><one-build-status buildTypeId="DotNetDiv_Wave02_Tests_DotPeek">dotPeek</one-build-status></div>
                 </div>
                 <div style="width: 350px;">
-                    <one-build-status-by-project projectId="DotNetDiv_Wave02_TestsIntegration"><div class="title">Integration Tests</div></one-build-status-by-project>
+                    <div class="title">Integration Tests</div>
+                    <div class="bs"><one-build-status buildTypeId="DotNetDiv_Wave02_TestsIntegration_ReSharperWin81x64VS12UltU4NightlyAcceptanceWit">(*) Re# Win81x64+VS12UltU4 (NA)</one-build-status></div>
                 </div>
             </div>
         </div>

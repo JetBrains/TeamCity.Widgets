@@ -18,15 +18,16 @@
 <link rel="import" href="one-build-status.html">
 <link rel="import" href="rs-status.html">
 <script src="../bower_components/uri.js/src/URI.min.js" type="text/javascript"></script>
-<polymer-element name="project-template" attributes="projectId data build branch">
+<polymer-element name="project-template" attributes="projectId data build branch timing">
     <template>
-        <div id="buildChainPresenter">
+         <div id="buildChainPresenter">
             <template if="{{projectId=='ReSharper'}}">
-                <rs-status branch="{{branch}}"></rs-status>
+                <rs-status branch="{{branch}}" timing="{{timing}}"></rs-status>
             </template>
-            <template if="{{projectId!='ReSharper' && projectId!='PhpStorm'}}">
+            <template if="{{projectId!='ReSharper'}}">
                 <div horizontal layout>
-                    <div style="max-width: 80%;"><one-build-status-by-project projectId="{{projectId}}"></one-build-status-by-project></div>
+                    <div style="max-width: 80%;">
+                        <one-build-status-by-project projectId="{{projectId}}" showSummary="true" timing="{{timing}}"></one-build-status-by-project></div>
                     <div><one-build-status build="{{build}}">{{build.buildType.name}}</one-build-status></div>
                 </div>
             </template>

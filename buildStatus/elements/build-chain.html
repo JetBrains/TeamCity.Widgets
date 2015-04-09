@@ -16,17 +16,19 @@
 
 <link rel="import" href="../bower_components/polymer/polymer.html">
 <script type="text/javascript" src="../bower_components/uri.js/src/URI.min.js"></script>
+<script type="text/javascript" src="../bower_components/moment/moment.js"></script>
 <link rel="import" href="../bower_components/core-signals/core-signals.html">
 <link rel="import" href="chain-data.html">
 <link rel="import" href="build-type-status.html">
 <link rel="import" href="one-build-status.html">
 <link rel="import" href="build-status-placeholder.html">
 <link rel="import" href="project-template.html">
-<polymer-element name="build-chain" attributes="build projectId branch">
+<polymer-element name="build-chain" attributes="build projectId branch timing">
     <template>
         <div class="buildChain">
-        <chain-data data="{{data}}" build="{{build}}" updated="{{updated}}"></chain-data>
-        <project-template id="projectTemplate" projectId="{{projectId}}" data="{{data}}" build="{{build}}" branch="{{branch}}"></project-template>
+        <chain-data data="{{data}}" build="{{build}}" updated="{{updated}}" timing="{{timing}}"></chain-data>
+        <project-template id="projectTemplate" projectId="{{projectId}}" data="{{data}}" build="{{build}}" branch="{{branch}}" timing="{{timing}}">
+        </project-template>
         </div>
     </template>
     <script>

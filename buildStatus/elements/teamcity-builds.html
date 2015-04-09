@@ -18,14 +18,15 @@
 <link rel="import" href="../bower_components/core-ajax/core-ajax.html">
 <link rel="import" href="../bower_components/core-signals/core-signals.html">
 <link rel="import" href="context-prefix.html">
-<polymer-element name="teamcity-builds" extends="teamcity-ajax" attributes="baseUrl builds baseUrlComplete" on-update="{{onUpdate}}">
+<polymer-element name="teamcity-builds" extends="teamcity-ajax" attributes="baseUrl builds branch buildTypeId count"
+                 on-update="{{onUpdate}}">
     <template>
         <teamcity-ajax
                 id="ajax"
                 body='{}'
                 method="get"
                 handleAs="json"
-                baseUrl="{{baseUrl}}"
+                baseUrl="{{baseUrl}}?locator={{locator}},start:0,count:{{count}}&{{suffix}}"
                 headers='{"Accept": "application/json"}'
                 contentType="application/json"
                 on-core-response="{{ handleResponse }}"
@@ -35,13 +36,24 @@
     </template>
     <script>
         Polymer('teamcity-builds', {
-            baseUrlChanged: function (oldValue, newValue) {
-                if (!this.baseUrlComplete){
-                    return;
-                }
+            count: 5,
+            suffix: "fields=$long,build:(id,number,branchName,webUrl,state,status,startDate,finishDate,compatibleAgents,percentageComplete,startEstimate,waitReason,buildTypeId,buildType:(id,name))",
+            createLocator: function(){
+                return "buildType:" + this.buildTypeId + (this.branch != undefined ? ",branch:" + this.branch : "");
+            },
+            branchChanged: function(){
+                this.locator = this.createLocator();
                 this.$.ajax.goAjax();
             },
+            buildTypeIdChanged: function(){
+                this.locator = this.createLocator();
+                this.$.ajax.goAjax();
+            },
+            domReady: function(){
+                this.locator = this.createLocator();
+            },
             onUpdate: function () {
+                this.locator = this.createLocator();
                 this.$.ajax.goAjax();
             },
             handleResponse: function (event, detail, source) {

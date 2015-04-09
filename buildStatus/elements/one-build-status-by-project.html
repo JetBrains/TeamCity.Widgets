@@ -20,11 +20,29 @@
 <link rel="import" href="../bower_components/core-signals/core-signals.html">
 <link rel="import" href="one-build-status.html">
 <link rel="import" href="project-tree-data.html">
-<polymer-element name="one-build-status-by-project" attributes="projectId builds">
+<link rel="import" href="build-chain-summary.html">
+<polymer-element name="one-build-status-by-project" attributes="projectId builds timing showSummary">
     <template>
-        <content></content>
-        <project-tree-data projectId="{{projectId}}" projects="{{projects}}"></project-tree-data>
-        <div id="presenter"></div>
+        <style>
+            .summary {
+                font-size: smaller;
+                margin-top: 0.5em;
+                width: 100px;
+                white-space: normal;
+            }
+        </style>
+        <div layout horizontal wrap>
+            <div>
+                <content></content>
+            </div>
+            <div class="summary">
+                <build-chain-summary timing="{{timing}}" format="rel"></build-chain-summary>
+            </div>
+            <div>
+                <project-tree-data projectId="{{projectId}}" projects="{{projects}}"></project-tree-data>
+                <div id="presenter"></div>
+            </div>
+        </div>
     </template>
     <script>
         Polymer('one-build-status-by-project', {
@@ -51,12 +69,12 @@
                     self.$.presenter.removeChild(self.$.presenter.lastChild);
                 }
 
-                if (this.buildTypeIds==undefined || this.builds==undefined){
+                if (this.buildTypeIds == undefined || this.builds == undefined) {
                     return;
                 }
                 this.builds.forEach(function (b) {
                     var id = b.buildTypeId;
-                    if (self.buildTypeIds.indexOf(id)>-1) {
+                    if (self.buildTypeIds.indexOf(id) > -1) {
                         var status = document.createElement("one-build-status");
                         status.build = b;
                         status.buildTypeId = b;

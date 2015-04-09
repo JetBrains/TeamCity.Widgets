@@ -26,7 +26,7 @@
                 method="get"
                 handleAs="json"
                 headers='{"Accept": "application/json"}'
-                baseUrl="/app/rest/builds/?locator={{locator}},start:0,count:5&fields=$long,build:(id,number,status,state,finishDate,webUrl,problemOccurrences,testOccurrences)"
+                baseUrl="/app/rest/builds/?locator={{locator}},start:0,count:5&fields=$long,build:(id,number,status,state,startDate,finishDate,webUrl,problemOccurrences,testOccurrences)"
                 contentType="application/json"
                 on-core-response="{{ handleResponse }}"
                 on-core-error="{{ handleError }}"

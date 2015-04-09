@@ -18,7 +18,7 @@
 <link rel="import" href="../bower_components/core-signals/core-signals.html">
 <link rel="import" href="teamcity-ajax.html">
 <link rel="import" href="context-prefix.html">
-<polymer-element name="chain-data" attributes="build data updated"  on-update="{{onUpdate}}">
+<polymer-element name="chain-data" attributes="build data updated timing"  on-update="{{onUpdate}}">
     <template>
         <teamcity-ajax
                 id="ajax"
@@ -26,7 +26,7 @@
                 method="get"
                 handleAs="json"
                 headers='{"Accept": "application/json"}'
-                baseUrl="/app/rest/builds?locator=snapshotDependency:(to:(id:{{build.id}}),recursive:true),byPromotion:true&fields=$long,build:(id,number,buildTypeId,status,state,startEstimate,compatibleAgents,percentageComplete,waitReason,finishDate,webUrl,problemOccurrences,testOccurrences,buildType:(id,name))"
+                baseUrl="/app/rest/builds?locator=snapshotDependency:(to:(id:{{build.id}}),recursive:true),byPromotion:true&fields=$long,build:(id,number,buildTypeId,branchName,status,state,startEstimate,compatibleAgents,percentageComplete,waitReason,startDate,finishDate,webUrl,problemOccurrences,testOccurrences,buildType:(id,name))"
                 contentType="application/json"
                 on-core-response="{{ handleResponse }}"
                 on-core-error="{{ handleError }}"
@@ -47,10 +47,61 @@
                     return;
                 }
                 this.data = event.detail.response.build;   //list of builds in chain
+                this.calculateTiming();
                 this.status = 'OK';
                 this.scheduleUpdate(60*1000);
                 this.updated = new Date();
                 this.fire("core-signal", {name: "status-updated", data: this.updated});
+            },
+            calculateTiming: function(){
+                this.timing = this.initTiming();
+                for (var i=0; i<this.data.length;i++){
+                    var build = this.data[i];
+                    this.updateTiming("startDate",build,true);
+                    this.updateTiming("finishDate",build,false);
+                    this.updateTiming("startEstimate",build,false);
+                    this.updateSummary(build);
+                }
+            },
+            updateSummary: function(build){
+                if (build.state=='running'){
+                    this.timing.running++;
+                }
+                if (build.state=='finished'){
+                    this.timing.finished++;
+                }
+                if (build.state=='queued'){
+                    this.timing.queued++;
+                }
+                if (build.branchName!=undefined && this.timing.branchName.indexOf(build.branchName)==-1){
+                    this.timing.branchName.push(build.branchName);
+                }
+            },
+            updateTiming: function(name, build, min){
+                if (build==undefined){
+                    return;
+                }
+                var tmp = build[name]!=undefined ? moment(build[name], "YYYYMMDDTHHmmssZ").valueOf() : null;
+
+                if (tmp==null){
+                    return;
+                }
+
+                var current = this.timing[name];
+
+
+                if (current==null && min){
+                    current = Number.MAX_VALUE;
+                } else if (current==null && !min) {
+                    current = -Number.MAX_VALUE;
+                }
+
+                if ((tmp<current && min) || (tmp>current && !min)){
+                    this.timing[name] = tmp;
+                }
+            },
+            initTiming: function(){
+                return {startDate:null, finishDate: null, startEstimate: null, running:0, queued:0, finished:0, branchName:[]}
             },
             handleError: function (event, detail, source) {
                 this.error = detail;
