@@ -62,6 +62,10 @@
                     this.updateTiming("startEstimate",build,false);
                     this.updateSummary(build);
                 }
+                this.updateTiming("startDate",this.build,true);
+                this.updateTiming("finishDate",this.build,false);
+                this.updateTiming("startEstimate",this.build,false);
+                this.updateSummary(this.build);
             },
             updateSummary: function(build){
                 if (build.state=='running'){
