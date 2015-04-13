@@ -45,3 +45,6 @@ html /deep/ .title{
   padding-left: 0.5em;
   padding-top: 1em;
 }
+html /deep/ .core-tooltip{
+  font-size: 1em;
+}

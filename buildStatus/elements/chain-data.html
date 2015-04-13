@@ -80,6 +80,9 @@
                 if (build.branchName!=undefined && this.timing.branchName.indexOf(build.branchName)==-1){
                     this.timing.branchName.push(build.branchName);
                 }
+                if (build.waitReason!=undefined && this.timing.waitReason.indexOf(build.waitReason)==-1){
+                    this.timing.waitReason.push(build.waitReason);
+                }
             },
             updateTiming: function(name, build, min){
                 if (build==undefined){
@@ -105,7 +108,7 @@
                 }
             },
             initTiming: function(){
-                return {startDate:null, finishDate: null, startEstimate: null, running:0, queued:0, finished:0, branchName:[]}
+                return {startDate:null, finishDate: null, startEstimate: null, running:0, queued:0, finished:0, branchName:[], waitReason:[]}
             },
             handleError: function (event, detail, source) {
                 this.error = detail;

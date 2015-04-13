@@ -27,6 +27,11 @@
     <link rel="import" href="elements/build-type-chains.html">
     <link href='http://fonts.googleapis.com/css?family=PT%20Sans%20Caption:400,700' rel='stylesheet' type='text/css'>
     <link rel="stylesheet" href="main.css" type='text/css'>
+    <script type="text/javascript" src="bower_components/moment/moment.js"></script>
+    <script type="text/javascript" src="bower_components/moment.twitter/moment-twitter.js"></script>
+    <script type="text/javascript">
+        moment().twitter();
+    </script>
     <style>
         html, body{
             font-family: 'PT Sans Caption', serif;
@@ -39,7 +44,8 @@
     </style>
 </head>
 <body>
-<h3>DotNetDiv > Wave02 > Trigger All&nbsp;<branch-name hide="true"></branch-name></h3>
+<branch-name hide="true"></branch-name>
+<h3>DotNetDiv > Wave02 > Trigger All</h3>
 <build-type-chains buildTypeId="DotNetDiv_Wave02_UeberAlles" projectTemplateId="ReSharper">
 </build-type-chains>
 </body>

@@ -16,6 +16,7 @@
 
 <link rel="import" href="../bower_components/polymer/polymer.html">
 <link rel="import" href="../bower_components/core-signals/core-signals.html">
+<link rel="import" href="../bower_components/core-tooltip/core-tooltip.html">
 <script src="../bower_components/uri.js/src/URI.min.js" type="text/javascript"></script>
 <polymer-element name="build-chain-summary" attributes="timing format">
     <template>
@@ -32,6 +33,11 @@
             .summary {
                 padding-bottom: 10px;
             }
+
+            .info {
+                border-bottom: 1px dashed gray;
+                cursor: pointer;
+            }
         </style>
         <div class="summary">
             <template if="{{timing.running==0 && timing.queued==0}}">
@@ -47,8 +53,28 @@
                 running:&nbsp;{{timing.running}},
             </template>
             <template if="{{timing.queued>0}}">
-                queued:&nbsp;{{timing.queued}}
+                queued:&nbsp;{{timing.queued}}, <span class="info">
+                     <template if="{{timing.startEstimate!=undefined}}">
+                         <core-tooltip position="right" tipAttribute="htmltooltip">
+                             <span>starts&nbsp;in&nbsp;{{timing.startEstimate | dateFormat3}}</span>
+
+                             <div htmltooltip id="tooltip">
+                                 <template repeat="{{wr in timing.waitReason}}">
+                                     {{wr}};
+                                 </template>
+                                 <template if="{{timing.waitReason==undefined || timing.waitReason.length==0}}">No wait
+                                     reason is specified
+                                 </template>
+                             </div>
+                         </core-tooltip>
+                     </template></span>
             </template>
+            <template if="{{timing.startEstimate==undefined && timing.waitReason.length>0}}">
+                <template repeat="{{wr in timing.waitReason}}">
+                    {{wr}};
+                </template>
+            </template>
+
         </div>
     </template>
     <script>
@@ -100,8 +126,6 @@
                 }
                 return this.dateFormat2(d);
             }
-
-
         });
     </script>
 </polymer-element>
