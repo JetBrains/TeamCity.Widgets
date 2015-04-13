@@ -27,7 +27,7 @@ angular.module('investigationsApp.config', [])
           url: 'guestAuth/app/rest/investigations',
           /*url: '/investigations.json',*/
           /*url: '/guestAuth/app/rest/investigations?locator=state:TAKEN',*/
-          locator: "state:TAKEN",
+          locator: "state:taken",
           reload: 1000 * 5 * 60,
           modes: [
             { name: "top",
