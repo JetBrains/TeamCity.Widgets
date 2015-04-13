@@ -39,7 +39,7 @@
             count: 5,
             suffix: "fields=$long,build:(id,number,branchName,webUrl,state,status,startDate,finishDate,compatibleAgents,percentageComplete,startEstimate,waitReason,buildTypeId,buildType:(id,name))",
             createLocator: function(){
-                return "buildType:" + this.buildTypeId + (this.branch != undefined ? ",branch:" + this.branch : "");
+                return "buildType:" + this.buildTypeId + (this.branch != undefined ? ",branch:" + this.branch : ",branch:default:any");
             },
             branchChanged: function(){
                 this.locator = this.createLocator();
