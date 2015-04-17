@@ -48,3 +48,7 @@ html /deep/ .title{
 html /deep/ .core-tooltip{
   font-size: 1em;
 }
+html /deep/ button{
+    font-family: 'PT Sans Caption', serif;
+    font-size: 0.8em;
+}

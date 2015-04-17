@@ -22,6 +22,7 @@
     "polymer": "Polymer/polymer#~0.5.5",
     "core-ajax": "Polymer/core-ajax#*",
     "core-signals": "Polymer/core-signals#*",
-    "core-tooltip": "Polymer/core-tooltip#*"
+    "core-tooltip": "Polymer/core-tooltip#*",
+    "core-menu-button": "Polymer/core-menu-button#*"
   }
 }

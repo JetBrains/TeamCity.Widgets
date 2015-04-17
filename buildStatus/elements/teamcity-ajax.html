@@ -2,7 +2,7 @@
 <link rel="import" href="../bower_components/core-ajax/core-ajax.html">
 <link rel="import" href="../bower_components/core-signals/core-signals.html">
 <link rel="import" href="context-prefix.html">
-<polymer-element name="teamcity-ajax" extends="core-ajax" attributes="baseUrl" on-core-error="{{ handleError }}">
+<polymer-element name="teamcity-ajax" extends="core-ajax" attributes="baseUrl status" on-core-error="{{ handleError }}" on-core-response="{{ handleResponse }}">
     <template>
     </template>
     <script>
@@ -16,12 +16,16 @@
                     this.contextPrefix = cp.data;
                 }
                 this.url = this.contextPrefix + this.baseUrl;
+                this.status = "LOADING";
                 this.go();
             },
             handleError: function (event, detail, source) {
                 this.error = detail;
                 this.status = 'ERROR';
                 console.log('------');
+            },
+            handleResponse: function (event, detail, source) {
+                this.status = 'OK';
             }
         });
     </script>

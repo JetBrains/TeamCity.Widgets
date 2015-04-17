@@ -46,8 +46,10 @@
             <template if="{{timing.running>0 && timing.queued>0}}">
                 <span title="Chain started">{{timing.startDate | dateFormat }}</span>
             </template>
-            <template repeat="{{b in timing.branchName}}">
-                <span class="branchName">{{b}}</span>
+            <template if="{{timing.branchName.length>1}}">
+                <template repeat="{{b in timing.branchName}}">
+                    <span class="branchName">{{b}}</span>
+                </template>
             </template>
             <template if="{{timing.running>0}}">
                 running:&nbsp;{{timing.running}},

@@ -24,6 +24,7 @@
     <meta charset="UTF-8">
     <link rel="import" href="elements/context-prefix.html">
     <link rel="import" href="elements/branch-name.html">
+    <link rel="import" href="elements/build-run.html">
     <link rel="import" href="elements/build-type-chains.html">
     <link href='http://fonts.googleapis.com/css?family=PT%20Sans%20Caption:400,700' rel='stylesheet' type='text/css'>
     <link rel="stylesheet" href="main.css" type='text/css'>
@@ -40,12 +41,14 @@
             background-color: black;
             height:100%;
         }
-
+        build-run{
+            margin-left: 50px;
+        }
     </style>
 </head>
 <body>
 <branch-name hide="true"></branch-name>
-<h3>DotNetDiv > Wave02 > Trigger All</h3>
+<h3>DotNetDiv > Wave02 > Trigger All&nbsp;<build-run buildTypeId="DotNetDiv_Wave02_UeberAlles">run...</build-run></h3>
 <build-type-chains buildTypeId="DotNetDiv_Wave02_UeberAlles" projectTemplateId="ReSharper">
 </build-type-chains>
 </body>

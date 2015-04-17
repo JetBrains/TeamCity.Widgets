@@ -18,7 +18,7 @@
 <link rel="import" href="../bower_components/core-ajax/core-ajax.html">
 <link rel="import" href="../bower_components/core-signals/core-signals.html">
 <link rel="import" href="context-prefix.html">
-<polymer-element name="teamcity-builds" extends="teamcity-ajax" attributes="baseUrl builds branch buildTypeId count"
+<polymer-element name="teamcity-builds" extends="teamcity-ajax" attributes="baseUrl builds branch buildTypeId count canceled"
                  on-update="{{onUpdate}}">
     <template>
         <teamcity-ajax
@@ -36,10 +36,23 @@
     </template>
     <script>
         Polymer('teamcity-builds', {
+            branchSupported: false,
             count: 5,
             suffix: "fields=$long,build:(id,number,branchName,webUrl,state,status,startDate,finishDate,compatibleAgents,percentageComplete,startEstimate,waitReason,buildTypeId,buildType:(id,name))",
             createLocator: function(){
-                return "buildType:" + this.buildTypeId + (this.branch != undefined ? ",branch:" + this.branch : ",branch:default:any");
+                return "buildType:" + this.buildTypeId + this.branchLocator() + this.canceledLocator();
+            },
+            branchLocator: function(){
+                if (!this.branchSupported){
+                    return "";
+                }
+              return (this.branch != undefined ? ",branch:" + this.branch : ",branch:(default:any)");
+            },
+            canceledLocator: function(){
+                if (!this.canceled){
+                    return "";
+                }
+                return ",canceled:any";
             },
             branchChanged: function(){
                 this.locator = this.createLocator();

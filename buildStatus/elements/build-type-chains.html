@@ -24,15 +24,15 @@
 <polymer-element name="build-type-chains" attributes="buildTypeId data projectTemplateId">
     <template>
             <core-signals on-core-signal-branch-changed="{{onBranchChanged}}"></core-signals>
-            <teamcity-builds id="tcQBuilds" builds="{{queuedBuilds}}"
+            <teamcity-builds id="tcQBuilds" builds="{{queuedBuilds}}" branchSupported="false"
                              baseUrl="/app/rest/buildQueue" buildTypeId="{{buildTypeId}}" count="100"></teamcity-builds>
             <template repeat="{{build in queuedBuilds}}">
                 <template if="{{branch==undefined || branch=='' || branch==build.branchName}}">
                   <build-chain build="{{build}}" branch="{{branch}}" projectId="{{projectTemplateId}}"></build-chain>
                 </template>
             </template>
-            <teamcity-builds id="tcBuilds" builds="{{finishedBuilds}}"
-                             branch="{{branch}}" baseUrl="/app/rest/builds" buildTypeId="{{buildTypeId}}" count="5"></teamcity-builds>
+            <teamcity-builds id="tcBuilds" builds="{{finishedBuilds}}" branchSupported="true"
+                             branch="{{branch}}" baseUrl="/app/rest/builds" buildTypeId="{{buildTypeId}}" count="5" canceled="true"></teamcity-builds>
             <template repeat="{{build in finishedBuilds}}">
                 <build-chain build="{{build}}" branch="{{branch}}" projectId="{{projectTemplateId}}"></build-chain>
             </template>
