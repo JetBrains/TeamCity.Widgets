@@ -21,7 +21,7 @@
 <link rel="import" href="one-build-status.html">
 <link rel="import" href="project-tree-data.html">
 <link rel="import" href="build-chain-summary.html">
-<polymer-element name="one-build-status-native" attributes="projectId builds timing showSummary">
+<polymer-element name="one-build-status-native" attributes="projectId builds build timing showSummary">
     <template>
         <style>
             .summary {
@@ -39,6 +39,9 @@
                 <template repeat="{{b in builds}}">
                     <one-build-status build="{{b}}" buildTypeId="{{b.buildTypeId}}">{{b.buildType.name}}</one-build-status>
                 </template>
+            </div>
+            <div>
+                <one-build-status build="{{build}}" buildTypeId="{{build.buildTypeId}}">{{build.buildType.name}}</one-build-status>
             </div>
         </div>
     </template>

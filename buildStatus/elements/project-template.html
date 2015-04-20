@@ -23,11 +23,7 @@
     <template>
          <div id="buildChainPresenter">
              <template if="{{projectId==undefined}}">
-                 <div horizontal layout>
-                     <div style="max-width: 80%;">
-                         <one-build-status-native showSummary="true" timing="{{timing}}" builds="{{data}}"></one-build-status-native></div>
-                     <div><one-build-status build="{{build}}">{{build.buildType.name}}</one-build-status></div>
-                 </div>
+                 <one-build-status-native showSummary="true" timing="{{timing}}" builds="{{data}}" build="{{build}}"></one-build-status-native>
              </template>
             <template if="{{projectId=='ReSharper'}}">
                 <rs-status branch="{{branch}}" timing="{{timing}}"></rs-status>

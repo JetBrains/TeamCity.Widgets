@@ -32,8 +32,9 @@
         if (bs.length > 0) {
             return;
         }
-        bsc.innerHTML += '<iframe style="width: 100%; height: 370px;" src="' + __widgetUrl() + '">';
-        bsc.innerHTML += '<div class="__widgetLink" onclick="__removeIframe(this);">Close</div>';
+        bsc.innerHTML += '<div class="__widgetLink __widgetClose" onclick="__removeIframe(this);">Close</div>';
+        bsc.innerHTML += '<iframe class="__widgetIframe" src="' + __widgetUrl() + '">';
+
     }
     function __openNewWidgetPage() {
         var win = window.open(__widgetUrl(), '_blank');
@@ -51,17 +52,24 @@
 </script>
 <style>
     .__widgetContainer {
-        width: 95%;
-        height: 370px;
-        border: none;
+        color: #a7a7a7;
     }
 
     .__widgetLink {
         cursor: pointer;
         text-decoration: underline;
     }
+
+    .__widgetClose {
+        float: right;
+    }
+    .__widgetIframe{
+        width: 100%;
+        height: 350px;
+        border: none;
+    }
 </style>
-<div class="__widgetContainer" style="width: 95%; height: 370px; border:none;">
+<div class="__widgetContainer">
     <span class="__widgetLink" onclick="__showIframe(this);">View</span> build status widget in place or <span
         class="__widgetLink" onclick="__openNewWidgetPage(this);">open</span> it in new page
 </div>
