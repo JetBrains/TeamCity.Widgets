@@ -1,0 +1,143 @@
+<!--
+  ~ Copyright 2000-2015 JetBrains s.r.o.
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<!DOCTYPE html>
+<html>
+<head> <!-- 1. Load platform support before any code that touches the DOM. -->
+    <script src="bower_components/webcomponentsjs/webcomponents.min.js" type="text/javascript"></script>
+
+
+    <!-- 2. Load the component using an HTML Import -->
+    <meta charset="UTF-8">
+    <link rel="import" href="elements/context-prefix.html">
+    <link rel="import" href="elements/build-type-status.html">
+    <link rel="import" href="elements/project-status-compact.html">
+    <link rel="import" href="elements/branch-name.html">
+    <link rel="import" href="elements/project-status-page.html">
+    <link rel="import" href="elements/project-tree-status.html">
+
+    <style>
+        html, body {
+            font-family: Verdana;
+            font-size: 1.0em;
+            color: white;
+            background-color: black;
+        }
+
+        table tr td {
+            padding-bottom: 5px;
+        }
+
+        table tr th {
+            text-align: left;
+        }
+
+        h2 {
+            margin: 5px;
+        }
+
+        .bs {
+            margin: 5px;
+        }
+
+        .branchName {
+            font-size: 0.5em;
+        }
+    </style>
+</head>
+
+<body>
+
+<!--
+<project-status-page>
+    <project-tree-status projectId="ijplatform_master_PyCharm"></project-tree-status>
+</project-status-page>
+-->
+
+<project-status-page>
+
+    <!-- <project-status projectId="ijplatform_master_PyCharm"></project-status>
+ -->
+    <div layout horizontal>
+        <div>
+            <h2>PyCharm Trunk</h2>
+
+            <div layout horizontal>
+                <div style="margin: 5px;">
+                    <build-type-status locator="buildType:bt824">Installers</build-type-status>
+                </div>
+                <div style="margin: 5px;">
+                    <build-type-status locator="buildType:bt664">Gant Tests</build-type-status>
+                </div>
+            </div>
+            <div layout horizontal>
+                <div style="margin: 5px;">
+                    <build-type-status locator="buildType:PyCharmTrunk_EnvTestsLinux">Env Tests (Linux)
+                    </build-type-status>
+                </div>
+                <div style="margin: 5px;">
+                    <build-type-status locator="buildType:bt1460">Env Tests (Win)</build-type-status>
+                </div>
+                <div style="margin: 5px;">
+                    <build-type-status locator="buildType:PyCharmTrunk_RemoteEnvTests">Env Tests (Remote)
+                    </build-type-status>
+                </div>
+            </div>
+            <div>
+                <project-status-compact projectId="ijplatform_master_PyCharm_Django">Django</project-status-compact>
+            </div>
+        </div>
+        <div style="margin-left: 20px;">
+
+            <h2>PyCharm 4.5</h2>
+
+            <div layout horizontal>
+                <div style="margin: 5px;">
+                    <build-type-status locator="buildType:ijplatform_IjPlatform141_PyCharm45_Installers">Installers
+                    </build-type-status>
+                </div>
+                <div style="margin: 5px;">
+                    <build-type-status locator="buildType:ijplatform_IjPlatform141_PyCharmTrunk_GantTests">Gant Tests
+                    </build-type-status>
+                </div>
+            </div>
+            <div layout horizontal>
+                <div style="margin: 5px;">
+                    <build-type-status locator="buildType:ijplatform_IjPlatform141_PyCharmTrunk_EnvTestsLinux">Env Tests
+                        (Linux)
+                    </build-type-status>
+                </div>
+                <div style="margin: 5px;">
+                    <build-type-status locator="buildType:ijplatform_IjPlatform141_PyCharmTrunk_EnvTestsWin">Env Tests
+                        (Win)
+                    </build-type-status>
+                </div>
+                <div style="margin: 5px;">
+                    <build-type-status locator="buildType:ijplatform_IjPlatform141_PyCharmTrunk_RemoteEnvTests">Env
+                        Tests (Remote)
+                    </build-type-status>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--<project-status-compact projectId="ijplatform_master_PyCharm_Django">Django</project-status-compact>
+    <project-status-compact projectId="ijplatform_master_PyCharm_Deployment">Deployment</project-status-compact>-->
+    <!--<context-prefix data="/teamcity?url="/>-->
+</project-status-page>
+
+</body>
+</html>
+
