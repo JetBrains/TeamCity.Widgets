@@ -50,6 +50,42 @@ To handle easily data update during development you don't need to add compiled p
 Check JsonResponseWrapper class and configure access to the TeamCity you want grab data from. You can use the data comes from real TeamCity under /teamcity path directly on your local server. It helps to avoid all cross-path related issue during development stage.
 When you widget is ready - package the plugin (use 'Build artifact - plugin.zip' option) and add to your real TeamCity installation.
 
+Custom Build Status Page
+========================
+
+Pre requisites - install 'bower' to your system
+1. Create your 'application folder'
+2. Create <you page>.html 
+2. Add bower.json
+
+```javascript
+{
+    "___comment___": "Run `bower install` from this directory to update components",
+    "name": "TeamCity.LocalWidgets",
+    "private": true,
+    "ignore": [
+      "**/.*",
+      "node_modules",
+      "bower_components",
+      "test",
+      "tests"
+    ],
+    "dependencies": {
+      "teamcity-widgets": "teamcity-widgets#*"
+    }
+  }
+```
+3. run ``bower install`` in current folder
+4. run ``bower install`` in /bower_components/teamcity-widgets/buildsStatus folder  
+5. Edit <you page>.html 
+  Add link to main 'web components' support (not necessary for latest browsers, e.g. Chrome > 0.36)
+  <script src="bower_components/teamcity-widgets/buildStatus/bower_components/webcomponentsjs/webcomponents.min.js" type="text/javascript"></script>
+6. Any html element in your page can be transformed into build status presentation if you place inside it our build-type-status component
+ ``<build-type-status locator="buildType:DotNetDiv_Wave02_Compile_PlatformCore">Platform Core</build-type-status>``
+  Background color for enclosing parent component will be changed every 60 sek depending on last build status in the set of build retriving according to locator specified
+  
+
+
 
 License:
 ========
