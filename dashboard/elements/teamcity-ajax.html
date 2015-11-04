@@ -1,0 +1,56 @@
+<link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
+<dom-module id="teamcity-ajax">
+    <template>
+        <iron-ajax id="ajax"
+                   with-credentials="true"
+                   method="GET"
+                   headers='{"Accept": "application/json"}'
+                   handle-as="json"
+                   on-response="handleResponse"
+                   on-error="handleError"></iron-ajax>
+    </template>
+    <script>
+        // element registration
+        Polymer({
+            is: "teamcity-ajax",
+            properties: {
+                server: {
+                    type: String
+                },
+                loginUrl: {
+                    type: String
+                },
+                restUrl: {
+                    type: String
+                },
+                restObjectName: {
+                    type: String //name of the property to be retrived form request
+                },
+                state:{
+                    type: Object,
+                    notify: true
+                },
+                data: {
+                    type: Object,
+                    notify: true
+                }
+            },
+            ready: function(){
+                this.$.ajax.url = this.server + this.restUrl;
+                this.goAjax();
+            },
+            handleResponse: function (event, detail){
+                this.data = this.$.ajax.lastResponse[this.restObjectName];
+                this.state = {name:'OK'};
+            },
+            handleError: function (event, detail){
+                this.state = {name:'ERROR', detail: event.detail};
+                this.async(this.goAjax, 5000);
+            },
+            goAjax: function(){
+                this.$.ajax.generateRequest();
+            }
+
+        });
+    </script>
+</dom-module>

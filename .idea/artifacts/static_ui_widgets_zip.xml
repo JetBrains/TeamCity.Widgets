@@ -23,6 +23,10 @@
       </element>
       <element id="directory" name="buildStatus">
         <element id="dir-copy" path="$PROJECT_DIR$/buildStatus/vulcanized" />
+        <element id="dir-copy" path="$PROJECT_DIR$/../TeamCity.LocalWidgets/buildStatus" />
+      </element>
+      <element id="directory" name="dashboard">
+        <element id="dir-copy" path="$PROJECT_DIR$/dashboard/vulcanized" />
       </element>
     </root>
   </artifact>

@@ -1,0 +1,99 @@
+<!--
+  ~ Copyright 2000-2015 JetBrains s.r.o.
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<link rel="import" href="tree-node.html">
+<link rel="import" href="expanded-behavior.html">
+<link rel="import" href="../bower_components/iron-flex-layout/classes/iron-flex-layout.html">
+<link rel="import" href="../bower_components/iron-input/iron-input.html">
+<link rel="import" href="../bower_components/iron-signals/iron-signals.html">
+<dom-module id="teamcity-search">
+    <style>
+        :host{
+        }
+        input:focus{
+            outline: none !important;
+        }
+        input[is=iron-input]:focus{
+            border:1px solid gray !important;
+        }
+        input[type=button]{
+            background-color: #00b0ff;
+            -moz-border-radius: 10px;
+            -webkit-border-radius: 10px;
+            border-radius:10px;
+            color: #fff;
+            text-decoration: none;
+            cursor: pointer;
+            border:none;
+            line-height: 2em;
+            padding: 3px;
+            width: 100px;
+        }
+        input[is=iron-input]{
+            width: 40%;
+            margin-right: 10px;
+            line-height: 2em;
+            -webkit-appearance:textfield;
+            box-sizing: content-box;
+            border:1px solid lightgray;
+            padding: 2px;
+        }
+        .logo {
+            background: url('icons/logo64x64.png') no-repeat;
+            display: inline-block;
+            background-size: 64px 64px;
+            height: 64px;
+            padding-left: 74px;
+        }
+    </style>
+    <template>
+        <div id="search" class="fullbleed layout horizontal center-center" style="padding-top: 50px;">
+            <span class="logo"></span>
+            <input type="search" bind-value="{{terms}}" is="iron-input" on-keydown="checkEnter"/>
+            <input type="button" value="SEARCH" on-click="submitSearch"/>
+        </div>
+    </template>
+    <script>
+        // element registration
+        Polymer({
+            is: "teamcity-search",
+            properties: {
+                terms:{
+                    type: String,
+                    notify: true,
+                    observer: '_termsChanged'
+                }
+            },
+            submitSearch: function(){
+                this.fire('iron-signal', {name: "terms", data: this.terms});
+            },
+            checkEnter: function(e){
+                if (e.keyCode==13){
+                   this.fireTermsChanged();
+                }
+            },
+            fireTermsChanged: function(){
+                this.fire('iron-signal', {name: "terms", data: this.terms});
+            },
+            _termsChanged: function(value, oldValue){
+                if (value=='' && oldValue!='') {
+                   this.fireTermsChanged();
+                }
+            }
+
+        });
+    </script>
+</dom-module>

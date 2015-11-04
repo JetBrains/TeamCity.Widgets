@@ -1,0 +1,56 @@
+<dom-module id="flat-to-nested">
+    <script>
+        // element registration
+        Polymer({
+            is: "flat-to-nested",
+            properties: {
+                data: {
+                    type: Object,
+                    observer: "_dataChanged"
+                },
+                dataTree: {
+                    type: Object,
+                    notify: true
+                }
+            },
+            _dataChanged: function (newValue, oldValue){
+                this.projects = this.data;
+                var dataMap = this.projects.reduce(function(map, node) {
+                    map[node.id] = node;
+                    return map;
+                }, {});
+
+                var dataTree = [];
+                for (var i=0; i<this.projects.length; i++){
+                    var node = this.projects[i];
+                    // add to parent
+                    node.text = node.name;
+                    var bts = node.buildTypes!=undefined ? node.buildTypes.buildType : undefined;
+                    node.href = node.webUrl;
+                    var parent = dataMap[node.parentProjectId];
+                    if (parent) {
+                        // create child array if it doesn't exist
+                        var pp = (parent.children || (parent.children = []));
+                        pp.push(node);
+                        if (bts != undefined && bts.length>0){
+                            var ppp = (node.children || (node.children = []));
+                            for (var z=0; z<bts.length; z++) {
+                                var bt = {
+                                    text: bts[z].name,
+                                    href: bts[z].webUrl,
+                                    isBuildType: true,
+                                    parentProjectId: node.id
+                                };
+                                ppp.push(bt);
+                            }
+                        }
+                    } else {
+                        // parent is null or missing
+                        dataTree.push(node);
+                    }
+                }
+                this.dataTree = dataTree;
+            }
+        });
+    </script>
+</dom-module>

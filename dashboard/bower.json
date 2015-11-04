@@ -1,0 +1,26 @@
+{
+  "name": "TeamCity.Widgets.BuildStatus",
+  "authors": [
+    { "name": "Kateryna Shlyakhovetska", "email": "shkate@jetbrains.com" }
+  ],
+  "private": false,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests",
+    "*.iml",
+    "README.md",
+    "vulcanized",
+    ".gitignore"
+  ],
+  "dependencies": {
+    "moment": "~2.9.0",
+    "moment.twitter": "0.2.0",
+    "uri.js": "~1.14.2",
+    "polymer": "Polymer/polymer#~1.1",
+    "polymerelements": "polymerelements/iron-elements#*",
+    "paper": "polymerelements/paper-elements#*"
+  }
+}

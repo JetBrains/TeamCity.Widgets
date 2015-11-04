@@ -1,0 +1,80 @@
+<!--
+  ~ Copyright 2000-2015 JetBrains s.r.o.
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<link rel="import" href="expanded-behavior.html">
+<link rel="import" href="tree-icon.html">
+<dom-module id="tree-node">
+    <style>
+        .btIcon{
+            background: transparent url('icons/build-configuration-neutral.png') no-repeat 0 0 ;
+            width: 16px;
+            height: 16px;
+            line-height: 1.5em;
+            display: inline-block;
+        }
+        .pIcon{
+            background: transparent url('icons/project-neutral.png') no-repeat 0 0 ;
+            width: 16px;
+            height: 16px;
+            line-height: 1.5em;
+            display: inline-block;
+        }
+        .node {
+            height: 1.5em;
+            display: inline-block;
+            width: 300px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        a {
+            text-decoration: none;
+            color: black;
+            height: 100%;
+            vertical-align: top;
+        }
+        a:hover{
+            text-decoration: underline;
+        }
+
+    </style>
+    <template>
+        <div class="node">
+            <tree-icon is-expanded="{{isExpanded}}" data="{{data}}"></tree-icon>
+            <template is="dom-if" if="{{data.isBuildType}}">
+                <span class="btIcon"></span>
+            </template>
+            <template is="dom-if" if="{{!data.isBuildType}}">
+                <span class="pIcon"></span>
+            </template>
+            <a href="{{data.href}}">{{data.text}}</a>
+        </div>
+    </template>
+    <script>
+        // element registration
+        Polymer({
+            is: "tree-node",
+            properties: {
+                data:{
+                    type: Object,
+                    notify: true,
+                    observer: "_dataChanged"
+                }
+            },
+            behaviors: [ExpandedBehavior]
+        });
+    </script>
+</dom-module>
