@@ -27,7 +27,9 @@
       </element>
       <element id="directory" name="dashboard">
         <element id="dir-copy" path="$PROJECT_DIR$/dashboard/vulcanized" />
-        <element id="dir-copy" path="$PROJECT_DIR$/dashboard/elements" />
+        <element id="directory" name="elements">
+          <element id="dir-copy" path="$PROJECT_DIR$/dashboard/elements" />
+        </element>
       </element>
     </root>
   </artifact>
