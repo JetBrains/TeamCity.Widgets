@@ -71,10 +71,9 @@
 
             },
             _isNotAuthorized: function(state){
-                return this.state == 'not-auth';
+                return state == 'not-auth';
             },
             ready: function(){
-                this.state = 'not-auth';
             },
             _serverStateChanged: function(value){
                 this.state = value.name == 'OK' ? "auth" : "not-auth";

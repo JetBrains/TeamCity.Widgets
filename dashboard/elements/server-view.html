@@ -39,9 +39,7 @@
     </style>
     <template>
         <div id="container">
-            <div id="auth"><server-auth server="{{server}}" rest-url="{{restUrl}}" login-url="{{loginUrl}}"  server-state="{{state}}"></server-auth></div>
-            <teamcity-ajax server="{{server}}" rest-url="{{restUrl}}" rest-object-name="{{restObjectName}}" data="{{data}}" state="{{state}}"></teamcity-ajax>
-            <flat-to-nested data="{{data}}" data-tree="{{dataTree}}"/>
+            <div id="auth"><teamcity-request server="{{server}}" data-tree="{{dataTree}}"></teamcity-request></div>
             <projects-presenter data-tree="{{dataTree}}"></projects-presenter>
         </div>
     </template>
@@ -52,19 +50,6 @@
             properties: {
                 server: {
                     type: String
-                },
-                restUrl: {
-                    type: String
-                },
-                loginUrl: {
-                    type: String
-                },
-                restObjectName:{
-                    type: String
-                },
-                state: {
-                    type: Object,
-                    notify: true
                 }
             }
         });

@@ -1,4 +1,5 @@
 <link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
+<script type="text/javascript" src="../bower_components/uri.js/src/URI.min.js"></script>
 <dom-module id="teamcity-ajax">
     <template>
         <iron-ajax id="ajax"
@@ -45,7 +46,7 @@
             },
             handleError: function (event, detail){
                 this.state = {name:'ERROR', detail: event.detail};
-                this.async(this.goAjax, 5000);
+                this.async(this.goAjax, 1000 * 20);
             },
             goAjax: function(){
                 this.$.ajax.generateRequest();

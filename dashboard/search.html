@@ -16,15 +16,10 @@
 <!DOCTYPE html>
 <html>
 <head> <!-- 1. Load platform support before any code that touches the DOM. -->
-    <link href='//fonts.googleapis.com/css?family=PT%20Sans%20Caption:400,700' rel='stylesheet' type='text/css'>
     <link href='http://fonts.googleapis.com/css?family=Roboto Condensed:400,700,900' rel='stylesheet' type='text/css'>
     <script src="bower_components/webcomponentsjs/webcomponents.min.js"></script>
     <link rel="import" href="bower_components/polymer/polymer.html">
-    <link rel="import" href="elements/server-view.html">
-    <link rel="import" href="elements/teamcity-search.html">
-    <link rel="import" href="bower_components/iron-flex-layout/classes/iron-flex-layout.html">
-    <link rel="import" href="bower_components/paper-button/paper-button.html">
-
+    <link rel="import" href="elements/search-container.html">
     <style>
         html, body{
             padding: 0;
@@ -35,21 +30,7 @@
     </style>
 </head>
 <body>
-<teamcity-search></teamcity-search>
-<div class="horizontal layout wrap center-justified">
-    <div style="align-self: flex-start;">
-           <server-view server="https://teamcity.jetbrains.com"
-                     rest-object-name="project"  login-url="login.html"
-                     rest-url="/app/rest/projects?fields=project%28id,name,parentProjectId,webUrl,buildTypes%28buildType%28id,name,webUrl%29%29%29">
-           </server-view>
-    </div>
-    <div style="align-self: flex-start;">
-           <server-view server="http://buildserver.labs.intellij.net"
-                                 rest-object-name="project" login-url="login.html"
-                                 rest-url="/app/rest/projects?fields=project%28id,name,parentProjectId,webUrl,buildTypes%28buildType%28id,name,webUrl%29%29%29">
-           </server-view>
-    </div>
-</div>
+<search-container servers='["http://buildserver.labs.intellij.net","https://teamcity.jetbrains.com"]'></search-container>
 </body>
 </html>
 

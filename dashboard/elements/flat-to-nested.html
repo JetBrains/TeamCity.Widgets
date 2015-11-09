@@ -10,8 +10,12 @@
                 },
                 dataTree: {
                     type: Object,
-                    notify: true
+                    notify: true,
+                    observer: "_dataTreeChanged"
                 }
+            },
+            _dataTreeChanged: function (value){
+                this.fire('dataTreeChanged', {dataTree: value});
             },
             _dataChanged: function (newValue, oldValue){
                 this.projects = this.data;
