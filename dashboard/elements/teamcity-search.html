@@ -14,7 +14,6 @@
   ~ limitations under the License.
   -->
 
-<link rel="import" href="tree-node.html">
 <link rel="import" href="teamcity-search-input.html">
 <link rel="import" href="../bower_components/iron-flex-layout/classes/iron-flex-layout.html">
 <link rel="import" href="../bower_components/iron-input/iron-input.html">
@@ -39,18 +38,24 @@
             padding: 3px;
             width: 100px;
         }
-        .logo {
-            background: url('icons/logo64x64.png') no-repeat;
+        #logo {
+            /*background: url('icons/logo64x64.png') no-repeat;*/
             display: inline-block;
             background-size: 64px 64px;
             height: 64px;
             padding-left: 74px;
+            border: 1px solid lightgray;
+            background-color: lightgray;
+        }
+        #inputContainer{
+            width: 40vw;
+            padding: 0 20px 0 10px;
         }
     </style>
     <template>
         <div id="search" class="fullbleed layout horizontal center-center" style="padding-top: 50px;">
-            <span class="logo"></span>
-            <teaamcity-search-input></teaamcity-search-input>
+            <span id="logo"></span>
+            <span id="inputContainer"><teamcity-search-input></teamcity-search-input></span>
             <input type="button" value="SEARCH" on-click="submitSearch"/>
         </div>
     </template>

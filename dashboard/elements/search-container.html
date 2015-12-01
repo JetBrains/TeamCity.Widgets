@@ -1,6 +1,6 @@
-<link rel="import" href="server-view.html">
 <link rel="import" href="teamcity-search.html">
-<link rel="import" href="multi-server-view.html">
+<link rel="import" href="teamcity-server.html">
+<link rel="import" href="project-list-wrapper.html">
 <link rel="import" href="../bower_components/iron-flex-layout/classes/iron-flex-layout.html">
 <link rel="import" href="../bower_components/iron-input/iron-input.html">
 <script type="text/javascript" src="../bower_components/uri.js/src/URI.min.js"></script>
@@ -10,25 +10,32 @@
             label{
                 cursor: pointer;
             }
+            #serversHolder{
+                background-color: white;
+                width: 300px;
+                min-height: 100px;
+                margin-left: 20px;
+                padding-left: 10px;
+                padding-top: 5px;
+            }
+            #resultsHolder{
+                width: 413px;
+            }
         </style>
-        <teamcity-search></teamcity-search>
-        <div style="width: 100%; text-align: center;">
-            <input id="aggregateDataSetting" is="iron-input" type="checkbox" checked="{{aggregateData}}" on-change="_aggregateDataChanged"/>
-            <label for="aggregateDataSetting">Show data from all servers in one tree</label>
+
+        <div style="width: 100%; text-align: center; margin-bottom: 25px;">
+            <teamcity-search></teamcity-search>
         </div>
-        <template is="dom-if" if="{{!aggregateData}}">
-                <div class="horizontal layout wrap center-justified">
-                    <template is="dom-repeat" items="{{servers}}" as="server">
-                        <div style="align-self: flex-start;">
-                            <server-view server="{{server}}"></server-view>
-                        </div>
-                    </template>
-                </div>
-        </template>
-        <template is="dom-if" if="{{aggregateData}}">
-                <multi-server-view servers="{{servers}}"></multi-server-view>
-        </template>
+        <div class="horizontal layout wrap center-justified">
+            <div id="resultsHolder">
+                <project-list-wrapper></project-list-wrapper>
+            </div>
+            <div id="serversHolder" class="vertical layout">
+
+            </div>
+        </div>
     </template>
+
     <script>
         Polymer({
             is: "search-container",
@@ -44,18 +51,30 @@
                     notify: true
                 }
             },
+            behaviors: [LoggingBehavior],
             ready: function(){
-                console.log(this.servers);
                 var params = URI(document.location.href).search(true);
                 var servers = params["server"];
 
-                if (servers == undefined && this.servers.length > 0){
-                    return;
+                if (servers != undefined){
+                    this._applyDataFromUrl(servers);
                 }
-                if (servers == undefined && this.servers.length){
-                    console.log("No servers URL are provided. Ensure you pass the parameters to the URL, e.g. server=http://server1.com&server=http://server2.com");
-                    return;
-                }
+
+                var serversHolder = this.$.serversHolder;
+
+                this.debug('servers: ' + this.servers);
+                this.debug('serversHolder: ' + serversHolder);
+
+                var self = this;
+                this.servers.forEach(function(s){
+                    var ts = document.createElement("teamcity-server");
+                    ts.server = s;
+                    self.debug('teamcity-server will be added for: ' + s);
+                    serversHolder.appendChild(ts);
+                });
+            },
+            _applyDataFromUrl: function(servers){
+                this.debug('Data from URL will be applied: ' + servers);
                 if (Array.isArray(servers)){
                     this.servers = servers;
                 } else {

@@ -6916,6 +6916,1821 @@ this._insertChildren();
 this.fire('dom-change');
 }
 });</script>
+<script type="text/javascript">
+    ExpandedBehavior = {
+        properties: {
+            /*isExpanded: {
+                type: Boolean,
+                value: false,
+                notify: true,
+                observer: '_expandedChanged'
+            }*/
+            data: {
+                type: Object,
+                notify: true,
+                observer: "_dataChanged"
+            }
+        },
+        listeners: {
+            //click: '_toggleExpanded'
+        },
+        created: function() {
+            //this.toggleClass('expanded', false);
+        },
+        _toggleExpanded: function() {
+            this.data.isExpanded = !this.data.isExpanded;
+            this.toggleClass('expanded', this.data.isExpanded);
+            this.fire('expand', {state: this.data.isExpanded});
+        },
+        _dataChanged: function(){
+            //console.log(this.data);
+            //console.log(this.data.isExpanded);
+        }
+
+    };
+</script>
+
+<script>
+
+  (function() {
+
+    // monostate data
+    var metaDatas = {};
+    var metaArrays = {};
+    var singleton = null;
+
+    Polymer.IronMeta = Polymer({
+
+      is: 'iron-meta',
+
+      properties: {
+
+        /**
+         * The type of meta-data.  All meta-data of the same type is stored
+         * together.
+         */
+        type: {
+          type: String,
+          value: 'default',
+          observer: '_typeChanged'
+        },
+
+        /**
+         * The key used to store `value` under the `type` namespace.
+         */
+        key: {
+          type: String,
+          observer: '_keyChanged'
+        },
+
+        /**
+         * The meta-data to store or retrieve.
+         */
+        value: {
+          type: Object,
+          notify: true,
+          observer: '_valueChanged'
+        },
+
+        /**
+         * If true, `value` is set to the iron-meta instance itself.
+         */
+         self: {
+          type: Boolean,
+          observer: '_selfChanged'
+        },
+
+        /**
+         * Array of all meta-data values for the given type.
+         */
+        list: {
+          type: Array,
+          notify: true
+        }
+
+      },
+
+      hostAttributes: {
+        hidden: true
+      },
+
+      /**
+       * Only runs if someone invokes the factory/constructor directly
+       * e.g. `new Polymer.IronMeta()`
+       *
+       * @param {{type: (string|undefined), key: (string|undefined), value}=} config
+       */
+      factoryImpl: function(config) {
+        if (config) {
+          for (var n in config) {
+            switch(n) {
+              case 'type':
+              case 'key':
+              case 'value':
+                this[n] = config[n];
+                break;
+            }
+          }
+        }
+      },
+
+      created: function() {
+        // TODO(sjmiles): good for debugging?
+        this._metaDatas = metaDatas;
+        this._metaArrays = metaArrays;
+      },
+
+      _keyChanged: function(key, old) {
+        this._resetRegistration(old);
+      },
+
+      _valueChanged: function(value) {
+        this._resetRegistration(this.key);
+      },
+
+      _selfChanged: function(self) {
+        if (self) {
+          this.value = this;
+        }
+      },
+
+      _typeChanged: function(type) {
+        this._unregisterKey(this.key);
+        if (!metaDatas[type]) {
+          metaDatas[type] = {};
+        }
+        this._metaData = metaDatas[type];
+        if (!metaArrays[type]) {
+          metaArrays[type] = [];
+        }
+        this.list = metaArrays[type];
+        this._registerKeyValue(this.key, this.value);
+      },
+
+      /**
+       * Retrieves meta data value by key.
+       *
+       * @method byKey
+       * @param {string} key The key of the meta-data to be returned.
+       * @return {*}
+       */
+      byKey: function(key) {
+        return this._metaData && this._metaData[key];
+      },
+
+      _resetRegistration: function(oldKey) {
+        this._unregisterKey(oldKey);
+        this._registerKeyValue(this.key, this.value);
+      },
+
+      _unregisterKey: function(key) {
+        this._unregister(key, this._metaData, this.list);
+      },
+
+      _registerKeyValue: function(key, value) {
+        this._register(key, value, this._metaData, this.list);
+      },
+
+      _register: function(key, value, data, list) {
+        if (key && data && value !== undefined) {
+          data[key] = value;
+          list.push(value);
+        }
+      },
+
+      _unregister: function(key, data, list) {
+        if (key && data) {
+          if (key in data) {
+            var value = data[key];
+            delete data[key];
+            this.arrayDelete(list, value);
+          }
+        }
+      }
+
+    });
+
+    Polymer.IronMeta.getIronMeta = function getIronMeta() {
+       if (singleton === null) {
+         singleton = new Polymer.IronMeta();
+       }
+       return singleton;
+     };
+
+    /**
+    `iron-meta-query` can be used to access infomation stored in `iron-meta`.
+
+    Examples:
+
+    If I create an instance like this:
+
+        <iron-meta key="info" value="foo/bar"></iron-meta>
+
+    Note that value="foo/bar" is the metadata I've defined. I could define more
+    attributes or use child nodes to define additional metadata.
+
+    Now I can access that element (and it's metadata) from any `iron-meta-query` instance:
+
+         var value = new Polymer.IronMetaQuery({key: 'info'}).value;
+
+    @group Polymer Iron Elements
+    @element iron-meta-query
+    */
+    Polymer.IronMetaQuery = Polymer({
+
+      is: 'iron-meta-query',
+
+      properties: {
+
+        /**
+         * The type of meta-data.  All meta-data of the same type is stored
+         * together.
+         */
+        type: {
+          type: String,
+          value: 'default',
+          observer: '_typeChanged'
+        },
+
+        /**
+         * Specifies a key to use for retrieving `value` from the `type`
+         * namespace.
+         */
+        key: {
+          type: String,
+          observer: '_keyChanged'
+        },
+
+        /**
+         * The meta-data to store or retrieve.
+         */
+        value: {
+          type: Object,
+          notify: true,
+          readOnly: true
+        },
+
+        /**
+         * Array of all meta-data values for the given type.
+         */
+        list: {
+          type: Array,
+          notify: true
+        }
+
+      },
+
+      /**
+       * Actually a factory method, not a true constructor. Only runs if
+       * someone invokes it directly (via `new Polymer.IronMeta()`);
+       *
+       * @param {{type: (string|undefined), key: (string|undefined)}=} config
+       */
+      factoryImpl: function(config) {
+        if (config) {
+          for (var n in config) {
+            switch(n) {
+              case 'type':
+              case 'key':
+                this[n] = config[n];
+                break;
+            }
+          }
+        }
+      },
+
+      created: function() {
+        // TODO(sjmiles): good for debugging?
+        this._metaDatas = metaDatas;
+        this._metaArrays = metaArrays;
+      },
+
+      _keyChanged: function(key) {
+        this._setValue(this._metaData && this._metaData[key]);
+      },
+
+      _typeChanged: function(type) {
+        this._metaData = metaDatas[type];
+        this.list = metaArrays[type];
+        if (this.key) {
+          this._keyChanged(this.key);
+        }
+      },
+
+      /**
+       * Retrieves meta data value by key.
+       * @param {string} key The key of the meta-data to be returned.
+       * @return {*}
+       */
+      byKey: function(key) {
+        return this._metaData && this._metaData[key];
+      }
+
+    });
+
+  })();
+</script>
+
+
+<style>
+  /* IE 10 support for HTML5 hidden attr */
+  [hidden] {
+    display: none !important;
+  }
+</style>
+
+<style is="custom-style">
+  :root {
+
+    --layout: {
+      display: -ms-flexbox;
+      display: -webkit-flex;
+      display: flex;
+    };
+
+    --layout-inline: {
+      display: -ms-inline-flexbox;
+      display: -webkit-inline-flex;
+      display: inline-flex;
+    };
+
+    --layout-horizontal: {
+      /* @apply(--layout); */
+      display: -ms-flexbox;
+      display: -webkit-flex;
+      display: flex;
+
+      -ms-flex-direction: row;
+      -webkit-flex-direction: row;
+      flex-direction: row;
+    };
+
+    --layout-horizontal-reverse: {
+      -ms-flex-direction: row-reverse;
+      -webkit-flex-direction: row-reverse;
+      flex-direction: row-reverse;
+    };
+
+    --layout-vertical: {
+      /* @apply(--layout); */
+      display: -ms-flexbox;
+      display: -webkit-flex;
+      display: flex;
+
+      -ms-flex-direction: column;
+      -webkit-flex-direction: column;
+      flex-direction: column;
+    };
+
+    --layout-vertical-reverse: {
+      -ms-flex-direction: column-reverse;
+      -webkit-flex-direction: column-reverse;
+      flex-direction: column-reverse;
+    };
+
+    --layout-wrap: {
+      -ms-flex-wrap: wrap;
+      -webkit-flex-wrap: wrap;
+      flex-wrap: wrap;
+    };
+
+    --layout-wrap-reverse: {
+      -ms-flex-wrap: wrap-reverse;
+      -webkit-flex-wrap: wrap-reverse;
+      flex-wrap: wrap-reverse;
+    };
+
+    --layout-flex-auto: {
+      -ms-flex: 1 1 auto;
+      -webkit-flex: 1 1 auto;
+      flex: 1 1 auto;
+    };
+
+    --layout-flex-none: {
+      -ms-flex: none;
+      -webkit-flex: none;
+      flex: none;
+    };
+
+    --layout-flex: {
+      -ms-flex: 1 1 0.000000001px;
+      -webkit-flex: 1;
+      flex: 1;
+      -webkit-flex-basis: 0.000000001px;
+      flex-basis: 0.000000001px;
+    };
+
+    --layout-flex-2: {
+      -ms-flex: 2;
+      -webkit-flex: 2;
+      flex: 2;
+    };
+
+    --layout-flex-3: {
+      -ms-flex: 3;
+      -webkit-flex: 3;
+      flex: 3;
+    };
+
+    --layout-flex-4: {
+      -ms-flex: 4;
+      -webkit-flex: 4;
+      flex: 4;
+    };
+
+    --layout-flex-5: {
+      -ms-flex: 5;
+      -webkit-flex: 5;
+      flex: 5;
+    };
+
+    --layout-flex-6: {
+      -ms-flex: 6;
+      -webkit-flex: 6;
+      flex: 6;
+    };
+
+    --layout-flex-7: {
+      -ms-flex: 7;
+      -webkit-flex: 7;
+      flex: 7;
+    };
+
+    --layout-flex-8: {
+      -ms-flex: 8;
+      -webkit-flex: 8;
+      flex: 8;
+    };
+
+    --layout-flex-9: {
+      -ms-flex: 9;
+      -webkit-flex: 9;
+      flex: 9;
+    };
+
+    --layout-flex-10: {
+      -ms-flex: 10;
+      -webkit-flex: 10;
+      flex: 10;
+    };
+
+    --layout-flex-11: {
+      -ms-flex: 11;
+      -webkit-flex: 11;
+      flex: 11;
+    };
+
+    --layout-flex-12: {
+      -ms-flex: 12;
+      -webkit-flex: 12;
+      flex: 12;
+    };
+
+    /* alignment in cross axis */
+
+    --layout-start: {
+      -ms-flex-align: start;
+      -webkit-align-items: flex-start;
+      align-items: flex-start;
+    };
+
+    --layout-center: {
+      -ms-flex-align: center;
+      -webkit-align-items: center;
+      align-items: center;
+    };
+
+    --layout-end: {
+      -ms-flex-align: end;
+      -webkit-align-items: flex-end;
+      align-items: flex-end;
+    };
+
+    /* alignment in main axis */
+
+    --layout-start-justified: {
+      -ms-flex-pack: start;
+      -webkit-justify-content: flex-start;
+      justify-content: flex-start;
+    };
+
+    --layout-center-justified: {
+      -ms-flex-pack: center;
+      -webkit-justify-content: center;
+      justify-content: center;
+    };
+
+    --layout-end-justified: {
+      -ms-flex-pack: end;
+      -webkit-justify-content: flex-end;
+      justify-content: flex-end;
+    };
+
+    --layout-around-justified: {
+      -ms-flex-pack: around;
+      -webkit-justify-content: space-around;
+      justify-content: space-around;
+    };
+
+    --layout-justified: {
+      -ms-flex-pack: justify;
+      -webkit-justify-content: space-between;
+      justify-content: space-between;
+    };
+
+    --layout-center-center: {
+      /* @apply(--layout-center --layout-center-justified); */
+      -ms-flex-align: center;
+      -webkit-align-items: center;
+      align-items: center;
+      -ms-flex-pack: center;
+      -webkit-justify-content: center;
+      justify-content: center;
+    };
+
+    /* self alignment */
+
+    --layout-self-start: {
+      -ms-align-self: flex-start;
+      -webkit-align-self: flex-start;
+      align-self: flex-start;
+    };
+
+    --layout-self-center: {
+      -ms-align-self: center;
+      -webkit-align-self: center;
+      align-self: center;
+    };
+
+    --layout-self-end: {
+      -ms-align-self: flex-end;
+      -webkit-align-self: flex-end;
+      align-self: flex-end;
+    };
+
+    --layout-self-stretch: {
+      -ms-align-self: stretch;
+      -webkit-align-self: stretch;
+      align-self: stretch;
+    };
+
+    /*******************************
+              Other Layout
+    *******************************/
+
+    --layout-block: {
+      display: block;
+    };
+
+    --layout-invisible: {
+      visibility: hidden !important;
+    };
+
+    --layout-relative: {
+      position: relative;
+    };
+
+    --layout-fit: {
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+    };
+
+    --layout-scroll: {
+      -webkit-overflow-scrolling: touch;
+      overflow: auto;
+    };
+
+    /* fixed position */
+
+    --layout-fixed-top: {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+    };
+
+    --layout-fixed-right: {
+      position: fixed;
+      top: 0;
+      right: 0;
+      bottom: 0;
+    };
+
+    --layout-fixed-bottom: {
+      position: fixed;
+      right: 0;
+      bottom: 0;
+      left: 0;
+    };
+
+    --layout-fixed-left: {
+      position: fixed;
+      top: 0;
+      bottom: 0;
+      left: 0;
+    };
+
+  }
+
+</style>
+
+
+<script>
+  /**
+   * The `iron-iconset-svg` element allows users to define their own icon sets
+   * that contain svg icons. The svg icon elements should be children of the
+   * `iron-iconset-svg` element. Multiple icons should be given distinct id's.
+   *
+   * Using svg elements to create icons has a few advantages over traditional
+   * bitmap graphics like jpg or png. Icons that use svg are vector based so
+   * they are resolution independent and should look good on any device. They
+   * are stylable via css. Icons can be themed, colorized, and even animated.
+   *
+   * Example:
+   *
+   *     <iron-iconset-svg name="my-svg-icons" size="24">
+   *       <svg>
+   *         <defs>
+   *           <g id="shape">
+   *             <rect x="12" y="0" width="12" height="24" />
+   *             <circle cx="12" cy="12" r="12" />
+   *           </g>
+   *         </defs>
+   *       </svg>
+   *     </iron-iconset-svg>
+   *
+   * This will automatically register the icon set "my-svg-icons" to the iconset
+   * database.  To use these icons from within another element, make a
+   * `iron-iconset` element and call the `byId` method
+   * to retrieve a given iconset. To apply a particular icon inside an
+   * element use the `applyIcon` method. For example:
+   *
+   *     iconset.applyIcon(iconNode, 'car');
+   *
+   * @element iron-iconset-svg
+   * @demo demo/index.html
+   * @implements {Polymer.Iconset}
+   */
+  Polymer({
+    is: 'iron-iconset-svg',
+
+    properties: {
+
+      /**
+       * The name of the iconset.
+       */
+      name: {
+        type: String,
+        observer: '_nameChanged'
+      },
+
+      /**
+       * The size of an individual icon. Note that icons must be square.
+       */
+      size: {
+        type: Number,
+        value: 24
+      }
+
+    },
+
+    attached: function() {
+      this.style.display = 'none';
+    },
+
+    /**
+     * Construct an array of all icon names in this iconset.
+     *
+     * @return {!Array} Array of icon names.
+     */
+    getIconNames: function() {
+      this._icons = this._createIconMap();
+      return Object.keys(this._icons).map(function(n) {
+        return this.name + ':' + n;
+      }, this);
+    },
+
+    /**
+     * Applies an icon to the given element.
+     *
+     * An svg icon is prepended to the element's shadowRoot if it exists,
+     * otherwise to the element itself.
+     *
+     * @method applyIcon
+     * @param {Element} element Element to which the icon is applied.
+     * @param {string} iconName Name of the icon to apply.
+     * @return {?Element} The svg element which renders the icon.
+     */
+    applyIcon: function(element, iconName) {
+      // insert svg element into shadow root, if it exists
+      element = element.root || element;
+      // Remove old svg element
+      this.removeIcon(element);
+      // install new svg element
+      var svg = this._cloneIcon(iconName);
+      if (svg) {
+        var pde = Polymer.dom(element);
+        pde.insertBefore(svg, pde.childNodes[0]);
+        return element._svgIcon = svg;
+      }
+      return null;
+    },
+
+    /**
+     * Remove an icon from the given element by undoing the changes effected
+     * by `applyIcon`.
+     *
+     * @param {Element} element The element from which the icon is removed.
+     */
+    removeIcon: function(element) {
+      // Remove old svg element
+      if (element._svgIcon) {
+        Polymer.dom(element).removeChild(element._svgIcon);
+        element._svgIcon = null;
+      }
+    },
+
+    /**
+     *
+     * When name is changed, register iconset metadata
+     *
+     */
+    _nameChanged: function() {
+      new Polymer.IronMeta({type: 'iconset', key: this.name, value: this});
+      this.async(function() {
+        this.fire('iron-iconset-added', this, {node: window});
+      });
+    },
+
+    /**
+     * Create a map of child SVG elements by id.
+     *
+     * @return {!Object} Map of id's to SVG elements.
+     */
+    _createIconMap: function() {
+      // Objects chained to Object.prototype (`{}`) have members. Specifically,
+      // on FF there is a `watch` method that confuses the icon map, so we
+      // need to use a null-based object here.
+      var icons = Object.create(null);
+      Polymer.dom(this).querySelectorAll('[id]')
+        .forEach(function(icon) {
+          icons[icon.id] = icon;
+        });
+      return icons;
+    },
+
+    /**
+     * Produce installable clone of the SVG element matching `id` in this
+     * iconset, or `undefined` if there is no matching element.
+     *
+     * @return {Element} Returns an installable clone of the SVG element
+     * matching `id`.
+     */
+    _cloneIcon: function(id) {
+      // create the icon map on-demand, since the iconset itself has no discrete
+      // signal to know when it's children are fully parsed
+      this._icons = this._icons || this._createIconMap();
+      return this._prepareSvgClone(this._icons[id], this.size);
+    },
+
+    /**
+     * @param {Element} sourceSvg
+     * @param {number} size
+     * @return {Element}
+     */
+    _prepareSvgClone: function(sourceSvg, size) {
+      if (sourceSvg) {
+        var content = sourceSvg.cloneNode(true),
+            svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg'),
+            viewBox = content.getAttribute('viewBox') || '0 0 ' + size + ' ' + size;
+        svg.setAttribute('viewBox', viewBox);
+        svg.setAttribute('preserveAspectRatio', 'xMidYMid meet');
+        // TODO(dfreedm): `pointer-events: none` works around https://crbug.com/370136
+        // TODO(sjmiles): inline style may not be ideal, but avoids requiring a shadow-root
+        svg.style.cssText = 'pointer-events: none; display: block; width: 100%; height: 100%;';
+        svg.appendChild(content).removeAttribute('id');
+        return svg;
+      }
+      return null;
+    }
+
+  });
+</script>
+<script>
+
+  /**
+   * `Use Polymer.IronValidatableBehavior` to implement an element that validates user input.
+   * Use the related `Polymer.IronValidatorBehavior` to add custom validation logic to an iron-input.
+   *
+   * By default, an `<iron-form>` element validates its fields when the user presses the submit button.
+   * To validate a form imperatively, call the form's `validate()` method, which in turn will
+   * call `validate()` on all its children. By using `Polymer.IronValidatableBehavior`, your
+   * custom element will get a public `validate()`, which
+   * will return the validity of the element, and a corresponding `invalid` attribute,
+   * which can be used for styling.
+   *
+   * To implement the custom validation logic of your element, you must override
+   * the protected `_getValidity()` method of this behaviour, rather than `validate()`.
+   * See [this](https://github.com/PolymerElements/iron-form/blob/master/demo/simple-element.html)
+   * for an example.
+   *
+   * ### Accessibility
+   *
+   * Changing the `invalid` property, either manually or by calling `validate()` will update the
+   * `aria-invalid` attribute.
+   *
+   * @demo demo/index.html
+   * @polymerBehavior
+   */
+  Polymer.IronValidatableBehavior = {
+
+    properties: {
+
+      /**
+       * Namespace for this validator.
+       */
+      validatorType: {
+        type: String,
+        value: 'validator'
+      },
+
+      /**
+       * Name of the validator to use.
+       */
+      validator: {
+        type: String
+      },
+
+      /**
+       * True if the last call to `validate` is invalid.
+       */
+      invalid: {
+        notify: true,
+        reflectToAttribute: true,
+        type: Boolean,
+        value: false
+      },
+
+      _validatorMeta: {
+        type: Object
+      }
+
+    },
+
+    observers: [
+      '_invalidChanged(invalid)'
+    ],
+
+    get _validator() {
+      return this._validatorMeta && this._validatorMeta.byKey(this.validator);
+    },
+
+    ready: function() {
+      this._validatorMeta = new Polymer.IronMeta({type: this.validatorType});
+    },
+
+    _invalidChanged: function() {
+      if (this.invalid) {
+        this.setAttribute('aria-invalid', 'true');
+      } else {
+        this.removeAttribute('aria-invalid');
+      }
+    },
+
+    /**
+     * @return {boolean} True if the validator `validator` exists.
+     */
+    hasValidator: function() {
+      return this._validator != null;
+    },
+
+    /**
+     * Returns true if the `value` is valid, and updates `invalid`. If you want
+     * your element to have custom validation logic, do not override this method;
+     * override `_getValidity(value)` instead.
+
+     * @param {Object} value The value to be validated. By default, it is passed
+     * to the validator's `validate()` function, if a validator is set.
+     * @return {boolean} True if `value` is valid.
+     */
+    validate: function(value) {
+      this.invalid = !this._getValidity(value);
+      return !this.invalid;
+    },
+
+    /**
+     * Returns true if `value` is valid.  By default, it is passed
+     * to the validator's `validate()` function, if a validator is set. You
+     * should override this method if you want to implement custom validity
+     * logic for your element.
+     *
+     * @param {Object} value The value to be validated.
+     * @return {boolean} True if `value` is valid.
+     */
+
+    _getValidity: function(value) {
+      if (this.hasValidator()) {
+        return this._validator.validate(value);
+      }
+      return true;
+    }
+  };
+
+</script>
+<script>
+
+/*
+`<iron-input>` adds two-way binding and custom validators using `Polymer.IronValidatorBehavior`
+to `<input>`.
+
+### Two-way binding
+
+By default you can only get notified of changes to an `input`'s `value` due to user input:
+
+    <input value="{{myValue::input}}">
+
+`iron-input` adds the `bind-value` property that mirrors the `value` property, and can be used
+for two-way data binding. `bind-value` will notify if it is changed either by user input or by script.
+
+    <input is="iron-input" bind-value="{{myValue}}">
+
+### Custom validators
+
+You can use custom validators that implement `Polymer.IronValidatorBehavior` with `<iron-input>`.
+
+    <input is="iron-input" validator="my-custom-validator">
+
+### Stopping invalid input
+
+It may be desirable to only allow users to enter certain characters. You can use the
+`prevent-invalid-input` and `allowed-pattern` attributes together to accomplish this. This feature
+is separate from validation, and `allowed-pattern` does not affect how the input is validated.
+
+    <!-- only allow characters that match [0-9] -->
+    <input is="iron-input" prevent-invalid-input allowed-pattern="[0-9]">
+
+@hero hero.svg
+@demo demo/index.html
+*/
+
+  Polymer({
+
+    is: 'iron-input',
+
+    extends: 'input',
+
+    behaviors: [
+      Polymer.IronValidatableBehavior
+    ],
+
+    properties: {
+
+      /**
+       * Use this property instead of `value` for two-way data binding.
+       */
+      bindValue: {
+        observer: '_bindValueChanged',
+        type: String
+      },
+
+      /**
+       * Set to true to prevent the user from entering invalid input. The new input characters are
+       * matched with `allowedPattern` if it is set, otherwise it will use the `pattern` attribute if
+       * set, or the `type` attribute (only supported for `type=number`).
+       */
+      preventInvalidInput: {
+        type: Boolean
+      },
+
+      /**
+       * Regular expression to match valid input characters.
+       */
+      allowedPattern: {
+        type: String
+      },
+
+      _previousValidInput: {
+        type: String,
+        value: ''
+      },
+
+      _patternAlreadyChecked: {
+        type: Boolean,
+        value: false
+      }
+
+    },
+
+    listeners: {
+      'input': '_onInput',
+      'keypress': '_onKeypress'
+    },
+
+    get _patternRegExp() {
+      var pattern;
+      if (this.allowedPattern) {
+        pattern = new RegExp(this.allowedPattern);
+      } else if (this.pattern) {
+        pattern = new RegExp(this.pattern);
+      } else {
+        switch (this.type) {
+          case 'number':
+            pattern = /[0-9.,e-]/;
+            break;
+        }
+      }
+      return pattern;
+    },
+
+    ready: function() {
+      this.bindValue = this.value;
+    },
+
+    /**
+     * @suppress {checkTypes}
+     */
+    _bindValueChanged: function() {
+      if (this.value !== this.bindValue) {
+        this.value = !(this.bindValue || this.bindValue === 0) ? '' : this.bindValue;
+      }
+      // manually notify because we don't want to notify until after setting value
+      this.fire('bind-value-changed', {value: this.bindValue});
+    },
+
+    _onInput: function() {
+      // Need to validate each of the characters pasted if they haven't
+      // been validated inside `_onKeypress` already.
+      if (this.preventInvalidInput && !this._patternAlreadyChecked) {
+        var valid = this._checkPatternValidity();
+        if (!valid) {
+          this.value = this._previousValidInput;
+        }
+      }
+
+      this.bindValue = this.value;
+      this._previousValidInput = this.value;
+      this._patternAlreadyChecked = false;
+    },
+
+    _isPrintable: function(event) {
+      // What a control/printable character is varies wildly based on the browser.
+      // - most control characters (arrows, backspace) do not send a `keypress` event
+      //   in Chrome, but the *do* on Firefox
+      // - in Firefox, when they do send a `keypress` event, control chars have
+      //   a charCode = 0, keyCode = xx (for ex. 40 for down arrow)
+      // - printable characters always send a keypress event.
+      // - in Firefox, printable chars always have a keyCode = 0. In Chrome, the keyCode
+      //   always matches the charCode.
+      // None of this makes any sense.
+
+      // For these keys, ASCII code == browser keycode.
+      var anyNonPrintable =
+        (event.keyCode == 8)   ||  // backspace
+        (event.keyCode == 9)   ||  // tab
+        (event.keyCode == 13)  ||  // enter
+        (event.keyCode == 27);     // escape
+
+      // For these keys, make sure it's a browser keycode and not an ASCII code.
+      var mozNonPrintable =
+        (event.keyCode == 19)  ||  // pause
+        (event.keyCode == 20)  ||  // caps lock
+        (event.keyCode == 45)  ||  // insert
+        (event.keyCode == 46)  ||  // delete
+        (event.keyCode == 144) ||  // num lock
+        (event.keyCode == 145) ||  // scroll lock
+        (event.keyCode > 32 && event.keyCode < 41)   || // page up/down, end, home, arrows
+        (event.keyCode > 111 && event.keyCode < 124); // fn keys
+
+      return !anyNonPrintable && !(event.charCode == 0 && mozNonPrintable);
+    },
+
+    _onKeypress: function(event) {
+      if (!this.preventInvalidInput && this.type !== 'number') {
+        return;
+      }
+      var regexp = this._patternRegExp;
+      if (!regexp) {
+        return;
+      }
+
+      // Handle special keys and backspace
+      if (event.metaKey || event.ctrlKey || event.altKey)
+        return;
+
+      // Check the pattern either here or in `_onInput`, but not in both.
+      this._patternAlreadyChecked = true;
+
+      var thisChar = String.fromCharCode(event.charCode);
+      if (this._isPrintable(event) && !regexp.test(thisChar)) {
+        event.preventDefault();
+      }
+    },
+
+    _checkPatternValidity: function() {
+      var regexp = this._patternRegExp;
+      if (!regexp) {
+        return true;
+      }
+      for (var i = 0; i < this.value.length; i++) {
+        if (!regexp.test(this.value[i])) {
+          return false;
+        }
+      }
+      return true;
+    },
+
+    /**
+     * Returns true if `value` is valid. The validator provided in `validator` will be used first,
+     * then any constraints.
+     * @return {boolean} True if the value is valid.
+     */
+    validate: function() {
+      // Empty, non-required input is valid.
+      if (!this.required && this.value == '') {
+        this.invalid = false;
+        return true;
+      }
+
+      var valid;
+      if (this.hasValidator()) {
+        valid = Polymer.IronValidatableBehavior.validate.call(this, this.value);
+      } else {
+        this.invalid = !this.validity.valid;
+        valid = this.validity.valid;
+      }
+      this.fire('iron-input-validate');
+      return valid;
+    }
+
+  });
+
+  /*
+  The `iron-input-validate` event is fired whenever `validate()` is called.
+  @event iron-input-validate
+  */
+
+</script>
+<script>
+(function(){
+/**
+`iron-signals` provides basic publish-subscribe functionality.
+
+Note: avoid using `iron-signals` whenever you can use
+a controller (parent element) to mediate communication
+instead.
+
+To send a signal, fire a custom event of type `iron-signal`, with
+a detail object containing `name` and `data` fields.
+
+    this.fire('iron-signal', {name: 'hello', data: null});
+
+To receive a signal, listen for `iron-signal-<name>` event on a
+`iron-signals` element.
+
+  <iron-signals on-iron-signal-hello="{{helloSignal}}">
+
+You can fire a signal event from anywhere, and all
+`iron-signals` elements will receive the event, regardless
+of where they are in DOM.
+
+@demo demo/index.html
+*/
+  Polymer({
+    is: 'iron-signals',
+
+    attached: function() {
+      signals.push(this);
+    },
+    detached: function() {
+      var i = signals.indexOf(this);
+      if (i >= 0) {
+        signals.splice(i, 1);
+      }
+    }
+  });
+
+  // private shared database
+  var signals = [];
+
+  // signal dispatcher
+  function notify(name, data) {
+    // convert generic-signal event to named-signal event
+    var signal = new CustomEvent('iron-signal-' + name, {
+      // if signals bubble, it's easy to get confusing duplicates
+      // (1) listen on a container on behalf of local child
+      // (2) some deep child ignores the event and it bubbles
+      //     up to said container
+      // (3) local child event bubbles up to container
+      // also, for performance, we avoid signals flying up the
+      // tree from all over the place
+      bubbles: false,
+      detail: data
+    });
+    // dispatch named-signal to all 'signals' instances,
+    // only interested listeners will react
+    signals.forEach(function(s) {
+      s.dispatchEvent(signal);
+    });
+  }
+
+  // signal listener at document
+  document.addEventListener('iron-signal', function(e) {
+    notify(e.detail.name, e.detail.data);
+  });
+
+})();
+</script>
+<style>
+
+  /*******************************
+            Flex Layout
+  *******************************/
+
+  html /deep/ .layout.horizontal,
+  html /deep/ .layout.horizontal-reverse,
+  html /deep/ .layout.vertical,
+  html /deep/ .layout.vertical-reverse {
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex;
+  }
+
+  html /deep/ .layout.inline {
+    display: -ms-inline-flexbox;
+    display: -webkit-inline-flex;
+    display: inline-flex;
+  }
+
+  html /deep/ .layout.horizontal {
+    -ms-flex-direction: row;
+    -webkit-flex-direction: row;
+    flex-direction: row;
+  }
+
+  html /deep/ .layout.horizontal-reverse {
+    -ms-flex-direction: row-reverse;
+    -webkit-flex-direction: row-reverse;
+    flex-direction: row-reverse;
+  }
+
+  html /deep/ .layout.vertical {
+    -ms-flex-direction: column;
+    -webkit-flex-direction: column;
+    flex-direction: column;
+  }
+
+  html /deep/ .layout.vertical-reverse {
+    -ms-flex-direction: column-reverse;
+    -webkit-flex-direction: column-reverse;
+    flex-direction: column-reverse;
+  }
+
+  html /deep/ .layout.wrap {
+    -ms-flex-wrap: wrap;
+    -webkit-flex-wrap: wrap;
+    flex-wrap: wrap;
+  }
+
+  html /deep/ .layout.wrap-reverse {
+    -ms-flex-wrap: wrap-reverse;
+    -webkit-flex-wrap: wrap-reverse;
+    flex-wrap: wrap-reverse;
+  }
+
+  html /deep/ .flex-auto {
+    -ms-flex: 1 1 auto;
+    -webkit-flex: 1 1 auto;
+    flex: 1 1 auto;
+  }
+
+  html /deep/ .flex-none {
+    -ms-flex: none;
+    -webkit-flex: none;
+    flex: none;
+  }
+
+  html /deep/ .flex,
+  html /deep/ .flex-1 {
+    -ms-flex: 1;
+    -webkit-flex: 1;
+    flex: 1;
+  }
+
+  html /deep/ .flex-2 {
+    -ms-flex: 2;
+    -webkit-flex: 2;
+    flex: 2;
+  }
+
+  html /deep/ .flex-3 {
+    -ms-flex: 3;
+    -webkit-flex: 3;
+    flex: 3;
+  }
+
+  html /deep/ .flex-4 {
+    -ms-flex: 4;
+    -webkit-flex: 4;
+    flex: 4;
+  }
+
+  html /deep/ .flex-5 {
+    -ms-flex: 5;
+    -webkit-flex: 5;
+    flex: 5;
+  }
+
+  html /deep/ .flex-6 {
+    -ms-flex: 6;
+    -webkit-flex: 6;
+    flex: 6;
+  }
+
+  html /deep/ .flex-7 {
+    -ms-flex: 7;
+    -webkit-flex: 7;
+    flex: 7;
+  }
+
+  html /deep/ .flex-8 {
+    -ms-flex: 8;
+    -webkit-flex: 8;
+    flex: 8;
+  }
+
+  html /deep/ .flex-9 {
+    -ms-flex: 9;
+    -webkit-flex: 9;
+    flex: 9;
+  }
+
+  html /deep/ .flex-10 {
+    -ms-flex: 10;
+    -webkit-flex: 10;
+    flex: 10;
+  }
+
+  html /deep/ .flex-11 {
+    -ms-flex: 11;
+    -webkit-flex: 11;
+    flex: 11;
+  }
+
+  html /deep/ .flex-12 {
+    -ms-flex: 12;
+    -webkit-flex: 12;
+    flex: 12;
+  }
+
+  /* alignment in cross axis */
+
+  html /deep/ .layout.start {
+    -ms-flex-align: start;
+    -webkit-align-items: flex-start;
+    align-items: flex-start;
+  }
+
+  html /deep/ .layout.center,
+  html /deep/ .layout.center-center {
+    -ms-flex-align: center;
+    -webkit-align-items: center;
+    align-items: center;
+  }
+
+  html /deep/ .layout.end {
+    -ms-flex-align: end;
+    -webkit-align-items: flex-end;
+    align-items: flex-end;
+  }
+
+  /* alignment in main axis */
+
+  html /deep/ .layout.start-justified {
+    -ms-flex-pack: start;
+    -webkit-justify-content: flex-start;
+    justify-content: flex-start;
+  }
+
+  html /deep/ .layout.center-justified,
+  html /deep/ .layout.center-center {
+    -ms-flex-pack: center;
+    -webkit-justify-content: center;
+    justify-content: center;
+  }
+
+  html /deep/ .layout.end-justified {
+    -ms-flex-pack: end;
+    -webkit-justify-content: flex-end;
+    justify-content: flex-end;
+  }
+
+  html /deep/ .layout.around-justified {
+    -ms-flex-pack: around;
+    -webkit-justify-content: space-around;
+    justify-content: space-around;
+  }
+
+  html /deep/ .layout.justified {
+    -ms-flex-pack: justify;
+    -webkit-justify-content: space-between;
+    justify-content: space-between;
+  }
+
+  /* self alignment */
+
+  html /deep/ .self-start {
+    -ms-align-self: flex-start;
+    -webkit-align-self: flex-start;
+    align-self: flex-start;
+  }
+
+  html /deep/ .self-center {
+    -ms-align-self: center;
+    -webkit-align-self: center;
+    align-self: center;
+  }
+
+  html /deep/ .self-end {
+    -ms-align-self: flex-end;
+    -webkit-align-self: flex-end;
+    align-self: flex-end;
+  }
+
+  html /deep/ .self-stretch {
+    -ms-align-self: stretch;
+    -webkit-align-self: stretch;
+    align-self: stretch;
+  }
+
+  /*******************************
+            Other Layout
+  *******************************/
+
+  html /deep/ .block {
+    display: block;
+  }
+
+  /* IE 10 support for HTML5 hidden attr */
+  html /deep/ [hidden] {
+    display: none !important;
+  }
+
+  html /deep/ .invisible {
+    visibility: hidden !important;
+  }
+
+  html /deep/ .relative {
+    position: relative;
+  }
+
+  html /deep/ .fit {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+  }
+
+  body.fullbleed {
+    margin: 0;
+    height: 100vh;
+  }
+
+  html /deep/ .scroll {
+    -webkit-overflow-scrolling: touch;
+    overflow: auto;
+  }
+
+  .fixed-bottom,
+  .fixed-left,
+  .fixed-right,
+  .fixed-top {
+    position: fixed;
+  }
+
+  html /deep/ .fixed-top {
+    top: 0;
+    left: 0;
+    right: 0;
+  }
+
+  html /deep/ .fixed-right {
+    top: 0;
+    right: 0;
+    botttom: 0;
+  }
+
+  html /deep/ .fixed-bottom {
+    right: 0;
+    bottom: 0;
+    left: 0;
+  }
+
+  html /deep/ .fixed-left {
+    top: 0;
+    botttom: 0;
+    left: 0;
+  }
+
+</style>
+<style>
+
+  /*******************************
+            Flex Layout
+  *******************************/
+
+  .layout.horizontal,
+  .layout.horizontal-reverse,
+  .layout.vertical,
+  .layout.vertical-reverse {
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex;
+  }
+
+  .layout.inline {
+    display: -ms-inline-flexbox;
+    display: -webkit-inline-flex;
+    display: inline-flex;
+  }
+
+  .layout.horizontal {
+    -ms-flex-direction: row;
+    -webkit-flex-direction: row;
+    flex-direction: row;
+  }
+
+  .layout.horizontal-reverse {
+    -ms-flex-direction: row-reverse;
+    -webkit-flex-direction: row-reverse;
+    flex-direction: row-reverse;
+  }
+
+  .layout.vertical {
+    -ms-flex-direction: column;
+    -webkit-flex-direction: column;
+    flex-direction: column;
+  }
+
+  .layout.vertical-reverse {
+    -ms-flex-direction: column-reverse;
+    -webkit-flex-direction: column-reverse;
+    flex-direction: column-reverse;
+  }
+
+  .layout.wrap {
+    -ms-flex-wrap: wrap;
+    -webkit-flex-wrap: wrap;
+    flex-wrap: wrap;
+  }
+
+  .layout.wrap-reverse {
+    -ms-flex-wrap: wrap-reverse;
+    -webkit-flex-wrap: wrap-reverse;
+    flex-wrap: wrap-reverse;
+  }
+
+  .flex-auto {
+    -ms-flex: 1 1 auto;
+    -webkit-flex: 1 1 auto;
+    flex: 1 1 auto;
+  }
+
+  .flex-none {
+    -ms-flex: none;
+    -webkit-flex: none;
+    flex: none;
+  }
+
+  .flex,
+  .flex-1 {
+    -ms-flex: 1;
+    -webkit-flex: 1;
+    flex: 1;
+  }
+
+  .flex-2 {
+    -ms-flex: 2;
+    -webkit-flex: 2;
+    flex: 2;
+  }
+
+  .flex-3 {
+    -ms-flex: 3;
+    -webkit-flex: 3;
+    flex: 3;
+  }
+
+  .flex-4 {
+    -ms-flex: 4;
+    -webkit-flex: 4;
+    flex: 4;
+  }
+
+  .flex-5 {
+    -ms-flex: 5;
+    -webkit-flex: 5;
+    flex: 5;
+  }
+
+  .flex-6 {
+    -ms-flex: 6;
+    -webkit-flex: 6;
+    flex: 6;
+  }
+
+  .flex-7 {
+    -ms-flex: 7;
+    -webkit-flex: 7;
+    flex: 7;
+  }
+
+  .flex-8 {
+    -ms-flex: 8;
+    -webkit-flex: 8;
+    flex: 8;
+  }
+
+  .flex-9 {
+    -ms-flex: 9;
+    -webkit-flex: 9;
+    flex: 9;
+  }
+
+  .flex-10 {
+    -ms-flex: 10;
+    -webkit-flex: 10;
+    flex: 10;
+  }
+
+  .flex-11 {
+    -ms-flex: 11;
+    -webkit-flex: 11;
+    flex: 11;
+  }
+
+  .flex-12 {
+    -ms-flex: 12;
+    -webkit-flex: 12;
+    flex: 12;
+  }
+
+  /* alignment in cross axis */
+
+  .layout.start {
+    -ms-flex-align: start;
+    -webkit-align-items: flex-start;
+    align-items: flex-start;
+  }
+
+  .layout.center,
+  .layout.center-center {
+    -ms-flex-align: center;
+    -webkit-align-items: center;
+    align-items: center;
+  }
+
+  .layout.end {
+    -ms-flex-align: end;
+    -webkit-align-items: flex-end;
+    align-items: flex-end;
+  }
+
+  /* alignment in main axis */
+
+  .layout.start-justified {
+    -ms-flex-pack: start;
+    -webkit-justify-content: flex-start;
+    justify-content: flex-start;
+  }
+
+  .layout.center-justified,
+  .layout.center-center {
+    -ms-flex-pack: center;
+    -webkit-justify-content: center;
+    justify-content: center;
+  }
+
+  .layout.end-justified {
+    -ms-flex-pack: end;
+    -webkit-justify-content: flex-end;
+    justify-content: flex-end;
+  }
+
+  .layout.around-justified {
+    -ms-flex-pack: around;
+    -webkit-justify-content: space-around;
+    justify-content: space-around;
+  }
+
+  .layout.justified {
+    -ms-flex-pack: justify;
+    -webkit-justify-content: space-between;
+    justify-content: space-between;
+  }
+
+  /* self alignment */
+
+  .self-start {
+    -ms-align-self: flex-start;
+    -webkit-align-self: flex-start;
+    align-self: flex-start;
+  }
+
+  .self-center {
+    -ms-align-self: center;
+    -webkit-align-self: center;
+    align-self: center;
+  }
+
+  .self-end {
+    -ms-align-self: flex-end;
+    -webkit-align-self: flex-end;
+    align-self: flex-end;
+  }
+
+  .self-stretch {
+    -ms-align-self: stretch;
+    -webkit-align-self: stretch;
+    align-self: stretch;
+  }
+
+  /*******************************
+            Other Layout
+  *******************************/
+
+  .block {
+    display: block;
+  }
+
+  /* IE 10 support for HTML5 hidden attr */
+  [hidden] {
+    display: none !important;
+  }
+
+  .invisible {
+    visibility: hidden !important;
+  }
+
+  .relative {
+    position: relative;
+  }
+
+  .fit {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+  }
+
+  body.fullbleed {
+    margin: 0;
+    height: 100vh;
+  }
+
+  .scroll {
+    -webkit-overflow-scrolling: touch;
+    overflow: auto;
+  }
+
+  /* fixed position */
+
+  .fixed-bottom,
+  .fixed-left,
+  .fixed-right,
+  .fixed-top {
+    position: fixed;
+  }
+
+  .fixed-top {
+    top: 0;
+    left: 0;
+    right: 0;
+  }
+
+  .fixed-right {
+    top: 0;
+    right: 0;
+    bottom: 0;
+  }
+
+  .fixed-bottom {
+    right: 0;
+    bottom: 0;
+    left: 0;
+  }
+
+  .fixed-left {
+    top: 0;
+    bottom: 0;
+    left: 0;
+  }
+
+</style>
 <script>function MakePromise (asap) {
   function Promise(fn) {
 		if (typeof this !== 'object' || typeof fn !== 'function') throw new TypeError();
@@ -8027,810 +9842,88 @@ g={type:0,val:[],encode:[],encodeReserved:[]},l;if(void 0!==this.cache[b])return
 l)&&void 0!==f[l]&&null!==f[l]&&g.val.push([l,String(f[l])]);g.val.length&&(g.type=2)}else g.type=1,g.val.push([void 0,String(f)]);return g};f.expand=function(b,k){var l=(new g(b)).expand(k);return new f(l)};return g});
 </script>
 <script type="text/javascript">
-    ExpandedBehavior = {
+    LoggingBehavior = {
         properties: {
-            isExpanded: {
-                type: Boolean,
-                value: false,
-                notify: true,
-                observer: '_expandedChanged'
+            level: {
+                type: String,
+                value: 0,
+                notify: true
+            },
+            levels: {
+                type: Array,
+                value: ['debug', 'info', 'error']
             }
         },
-
-        listeners: {
-            //click: '_toggleExpanded'
-        },
-
-        created: function() {
-            //console.log('Expanded for ', this, 'enabled!');
-        },
-
-        _toggleExpanded: function() {
-            this.isExpanded = !this.isExpanded;
-        },
-
-        _expandedChanged: function(value) {
-            this.toggleClass('expanded', value);
-        },
-
-        _dataChanged: function(){
-            this.isExpanded = this.data.isExpanded != undefined ? this.data.isExpanded : false;
-        }
-
-
-    };
-</script>
-
-<script>
-
-  (function() {
-
-    // monostate data
-    var metaDatas = {};
-    var metaArrays = {};
-    var singleton = null;
-
-    Polymer.IronMeta = Polymer({
-
-      is: 'iron-meta',
-
-      properties: {
-
-        /**
-         * The type of meta-data.  All meta-data of the same type is stored
-         * together.
-         */
-        type: {
-          type: String,
-          value: 'default',
-          observer: '_typeChanged'
-        },
-
-        /**
-         * The key used to store `value` under the `type` namespace.
-         */
-        key: {
-          type: String,
-          observer: '_keyChanged'
-        },
-
-        /**
-         * The meta-data to store or retrieve.
-         */
-        value: {
-          type: Object,
-          notify: true,
-          observer: '_valueChanged'
-        },
-
-        /**
-         * If true, `value` is set to the iron-meta instance itself.
-         */
-         self: {
-          type: Boolean,
-          observer: '_selfChanged'
-        },
-
-        /**
-         * Array of all meta-data values for the given type.
-         */
-        list: {
-          type: Array,
-          notify: true
-        }
-
-      },
-
-      hostAttributes: {
-        hidden: true
-      },
-
-      /**
-       * Only runs if someone invokes the factory/constructor directly
-       * e.g. `new Polymer.IronMeta()`
-       *
-       * @param {{type: (string|undefined), key: (string|undefined), value}=} config
-       */
-      factoryImpl: function(config) {
-        if (config) {
-          for (var n in config) {
-            switch(n) {
-              case 'type':
-              case 'key':
-              case 'value':
-                this[n] = config[n];
-                break;
+        _log: function(level, message){
+            if (level >= this.level){
+                var el = this.id != undefined && this.id.length > 0 ? this.id : this.tagName;
+                console.log('['+ this.levels[level] + '] ' + el + " -> " + message);
+                if (!(typeof message == 'string')){
+                    console.log(message);
+                }
             }
-          }
-        }
-      },
-
-      created: function() {
-        // TODO(sjmiles): good for debugging?
-        this._metaDatas = metaDatas;
-        this._metaArrays = metaArrays;
-      },
-
-      _keyChanged: function(key, old) {
-        this._resetRegistration(old);
-      },
-
-      _valueChanged: function(value) {
-        this._resetRegistration(this.key);
-      },
-
-      _selfChanged: function(self) {
-        if (self) {
-          this.value = this;
-        }
-      },
-
-      _typeChanged: function(type) {
-        this._unregisterKey(this.key);
-        if (!metaDatas[type]) {
-          metaDatas[type] = {};
-        }
-        this._metaData = metaDatas[type];
-        if (!metaArrays[type]) {
-          metaArrays[type] = [];
-        }
-        this.list = metaArrays[type];
-        this._registerKeyValue(this.key, this.value);
-      },
-
-      /**
-       * Retrieves meta data value by key.
-       *
-       * @method byKey
-       * @param {string} key The key of the meta-data to be returned.
-       * @return {*}
-       */
-      byKey: function(key) {
-        return this._metaData && this._metaData[key];
-      },
-
-      _resetRegistration: function(oldKey) {
-        this._unregisterKey(oldKey);
-        this._registerKeyValue(this.key, this.value);
-      },
-
-      _unregisterKey: function(key) {
-        this._unregister(key, this._metaData, this.list);
-      },
-
-      _registerKeyValue: function(key, value) {
-        this._register(key, value, this._metaData, this.list);
-      },
-
-      _register: function(key, value, data, list) {
-        if (key && data && value !== undefined) {
-          data[key] = value;
-          list.push(value);
-        }
-      },
-
-      _unregister: function(key, data, list) {
-        if (key && data) {
-          if (key in data) {
-            var value = data[key];
-            delete data[key];
-            this.arrayDelete(list, value);
-          }
-        }
-      }
-
-    });
-
-    Polymer.IronMeta.getIronMeta = function getIronMeta() {
-       if (singleton === null) {
-         singleton = new Polymer.IronMeta();
-       }
-       return singleton;
-     };
-
-    /**
-    `iron-meta-query` can be used to access infomation stored in `iron-meta`.
-
-    Examples:
-
-    If I create an instance like this:
-
-        <iron-meta key="info" value="foo/bar"></iron-meta>
-
-    Note that value="foo/bar" is the metadata I've defined. I could define more
-    attributes or use child nodes to define additional metadata.
-
-    Now I can access that element (and it's metadata) from any `iron-meta-query` instance:
-
-         var value = new Polymer.IronMetaQuery({key: 'info'}).value;
-
-    @group Polymer Iron Elements
-    @element iron-meta-query
-    */
-    Polymer.IronMetaQuery = Polymer({
-
-      is: 'iron-meta-query',
-
-      properties: {
-
-        /**
-         * The type of meta-data.  All meta-data of the same type is stored
-         * together.
-         */
-        type: {
-          type: String,
-          value: 'default',
-          observer: '_typeChanged'
         },
-
-        /**
-         * Specifies a key to use for retrieving `value` from the `type`
-         * namespace.
-         */
-        key: {
-          type: String,
-          observer: '_keyChanged'
+        info: function(message){
+            this._log(1,  message);
         },
-
-        /**
-         * The meta-data to store or retrieve.
-         */
-        value: {
-          type: Object,
-          notify: true,
-          readOnly: true
+        debug: function(message){
+            this._log(0, message);
         },
-
-        /**
-         * Array of all meta-data values for the given type.
-         */
-        list: {
-          type: Array,
-          notify: true
+        error: function(message){
+            this._log(2, message);
         }
+    };
+</script><script type="text/javascript">
+    ConverterBehavior = {
+            flatToNested: function (data){
+                var dataMap = data.reduce(function(map, node) {
+                    map[node.id] = node;
+                    return map;
+                }, {});
 
-      },
+                console.log(dataMap);
 
-      /**
-       * Actually a factory method, not a true constructor. Only runs if
-       * someone invokes it directly (via `new Polymer.IronMeta()`);
-       *
-       * @param {{type: (string|undefined), key: (string|undefined)}=} config
-       */
-      factoryImpl: function(config) {
-        if (config) {
-          for (var n in config) {
-            switch(n) {
-              case 'type':
-              case 'key':
-                this[n] = config[n];
-                break;
+                var dataTree = [];
+                for (var i=0; i<data.length; i++){
+                    var node = data[i];
+                    // add to parent
+                    node.text = node.name;
+                    node.isExpanded = false;
+                    var bts = node.buildTypes!=undefined ? node.buildTypes.buildType : undefined;
+                    node.href = node.webUrl;
+                    if (node.id == '_Root'){
+                        var serverName = node.webUrl.replace('/project.html?projectId=_Root','');
+                        node.text = serverName;
+                        node.name = serverName;
+                        node.isExpanded = true;
+                    }
+                    var parent = dataMap[node.parentProjectId];
+                    if (parent) {
+                        // create child array if it doesn't exist
+                        var pp = (parent.children || (parent.children = []));
+                        pp.push(node);
+                        if (bts != undefined && bts.length>0){
+                            var ppp = (node.children || (node.children = []));
+                            for (var z=0; z<bts.length; z++) {
+                                var bt = {
+                                    text: bts[z].name,
+                                    href: bts[z].webUrl,
+                                    isBuildType: true,
+                                    parentProjectId: node.id,
+                                    isExpanded: false
+                                };
+                                ppp.push(bt);
+                            }
+                        }
+                    } else {
+                        // parent is null or missing
+                        dataTree.push(node);
+                    }
+                }
+                return dataTree;
             }
-          }
-        }
-      },
-
-      created: function() {
-        // TODO(sjmiles): good for debugging?
-        this._metaDatas = metaDatas;
-        this._metaArrays = metaArrays;
-      },
-
-      _keyChanged: function(key) {
-        this._setValue(this._metaData && this._metaData[key]);
-      },
-
-      _typeChanged: function(type) {
-        this._metaData = metaDatas[type];
-        this.list = metaArrays[type];
-        if (this.key) {
-          this._keyChanged(this.key);
-        }
-      },
-
-      /**
-       * Retrieves meta data value by key.
-       * @param {string} key The key of the meta-data to be returned.
-       * @return {*}
-       */
-      byKey: function(key) {
-        return this._metaData && this._metaData[key];
-      }
-
-    });
-
-  })();
-</script>
-
-
-<style>
-  /* IE 10 support for HTML5 hidden attr */
-  [hidden] {
-    display: none !important;
-  }
-</style>
-
-<style is="custom-style">
-  :root {
-
-    --layout: {
-      display: -ms-flexbox;
-      display: -webkit-flex;
-      display: flex;
     };
-
-    --layout-inline: {
-      display: -ms-inline-flexbox;
-      display: -webkit-inline-flex;
-      display: inline-flex;
-    };
-
-    --layout-horizontal: {
-      /* @apply(--layout); */
-      display: -ms-flexbox;
-      display: -webkit-flex;
-      display: flex;
-
-      -ms-flex-direction: row;
-      -webkit-flex-direction: row;
-      flex-direction: row;
-    };
-
-    --layout-horizontal-reverse: {
-      -ms-flex-direction: row-reverse;
-      -webkit-flex-direction: row-reverse;
-      flex-direction: row-reverse;
-    };
-
-    --layout-vertical: {
-      /* @apply(--layout); */
-      display: -ms-flexbox;
-      display: -webkit-flex;
-      display: flex;
-
-      -ms-flex-direction: column;
-      -webkit-flex-direction: column;
-      flex-direction: column;
-    };
-
-    --layout-vertical-reverse: {
-      -ms-flex-direction: column-reverse;
-      -webkit-flex-direction: column-reverse;
-      flex-direction: column-reverse;
-    };
-
-    --layout-wrap: {
-      -ms-flex-wrap: wrap;
-      -webkit-flex-wrap: wrap;
-      flex-wrap: wrap;
-    };
-
-    --layout-wrap-reverse: {
-      -ms-flex-wrap: wrap-reverse;
-      -webkit-flex-wrap: wrap-reverse;
-      flex-wrap: wrap-reverse;
-    };
-
-    --layout-flex-auto: {
-      -ms-flex: 1 1 auto;
-      -webkit-flex: 1 1 auto;
-      flex: 1 1 auto;
-    };
-
-    --layout-flex-none: {
-      -ms-flex: none;
-      -webkit-flex: none;
-      flex: none;
-    };
-
-    --layout-flex: {
-      -ms-flex: 1 1 0.000000001px;
-      -webkit-flex: 1;
-      flex: 1;
-      -webkit-flex-basis: 0.000000001px;
-      flex-basis: 0.000000001px;
-    };
-
-    --layout-flex-2: {
-      -ms-flex: 2;
-      -webkit-flex: 2;
-      flex: 2;
-    };
-
-    --layout-flex-3: {
-      -ms-flex: 3;
-      -webkit-flex: 3;
-      flex: 3;
-    };
-
-    --layout-flex-4: {
-      -ms-flex: 4;
-      -webkit-flex: 4;
-      flex: 4;
-    };
-
-    --layout-flex-5: {
-      -ms-flex: 5;
-      -webkit-flex: 5;
-      flex: 5;
-    };
-
-    --layout-flex-6: {
-      -ms-flex: 6;
-      -webkit-flex: 6;
-      flex: 6;
-    };
-
-    --layout-flex-7: {
-      -ms-flex: 7;
-      -webkit-flex: 7;
-      flex: 7;
-    };
-
-    --layout-flex-8: {
-      -ms-flex: 8;
-      -webkit-flex: 8;
-      flex: 8;
-    };
-
-    --layout-flex-9: {
-      -ms-flex: 9;
-      -webkit-flex: 9;
-      flex: 9;
-    };
-
-    --layout-flex-10: {
-      -ms-flex: 10;
-      -webkit-flex: 10;
-      flex: 10;
-    };
-
-    --layout-flex-11: {
-      -ms-flex: 11;
-      -webkit-flex: 11;
-      flex: 11;
-    };
-
-    --layout-flex-12: {
-      -ms-flex: 12;
-      -webkit-flex: 12;
-      flex: 12;
-    };
-
-    /* alignment in cross axis */
-
-    --layout-start: {
-      -ms-flex-align: start;
-      -webkit-align-items: flex-start;
-      align-items: flex-start;
-    };
-
-    --layout-center: {
-      -ms-flex-align: center;
-      -webkit-align-items: center;
-      align-items: center;
-    };
-
-    --layout-end: {
-      -ms-flex-align: end;
-      -webkit-align-items: flex-end;
-      align-items: flex-end;
-    };
-
-    /* alignment in main axis */
-
-    --layout-start-justified: {
-      -ms-flex-pack: start;
-      -webkit-justify-content: flex-start;
-      justify-content: flex-start;
-    };
-
-    --layout-center-justified: {
-      -ms-flex-pack: center;
-      -webkit-justify-content: center;
-      justify-content: center;
-    };
-
-    --layout-end-justified: {
-      -ms-flex-pack: end;
-      -webkit-justify-content: flex-end;
-      justify-content: flex-end;
-    };
-
-    --layout-around-justified: {
-      -ms-flex-pack: around;
-      -webkit-justify-content: space-around;
-      justify-content: space-around;
-    };
-
-    --layout-justified: {
-      -ms-flex-pack: justify;
-      -webkit-justify-content: space-between;
-      justify-content: space-between;
-    };
-
-    --layout-center-center: {
-      /* @apply(--layout-center --layout-center-justified); */
-      -ms-flex-align: center;
-      -webkit-align-items: center;
-      align-items: center;
-      -ms-flex-pack: center;
-      -webkit-justify-content: center;
-      justify-content: center;
-    };
-
-    /* self alignment */
-
-    --layout-self-start: {
-      -ms-align-self: flex-start;
-      -webkit-align-self: flex-start;
-      align-self: flex-start;
-    };
-
-    --layout-self-center: {
-      -ms-align-self: center;
-      -webkit-align-self: center;
-      align-self: center;
-    };
-
-    --layout-self-end: {
-      -ms-align-self: flex-end;
-      -webkit-align-self: flex-end;
-      align-self: flex-end;
-    };
-
-    --layout-self-stretch: {
-      -ms-align-self: stretch;
-      -webkit-align-self: stretch;
-      align-self: stretch;
-    };
-
-    /*******************************
-              Other Layout
-    *******************************/
-
-    --layout-block: {
-      display: block;
-    };
-
-    --layout-invisible: {
-      visibility: hidden !important;
-    };
-
-    --layout-relative: {
-      position: relative;
-    };
-
-    --layout-fit: {
-      position: absolute;
-      top: 0;
-      right: 0;
-      bottom: 0;
-      left: 0;
-    };
-
-    --layout-scroll: {
-      -webkit-overflow-scrolling: touch;
-      overflow: auto;
-    };
-
-    /* fixed position */
-
-    --layout-fixed-top: {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-    };
-
-    --layout-fixed-right: {
-      position: fixed;
-      top: 0;
-      right: 0;
-      bottom: 0;
-    };
-
-    --layout-fixed-bottom: {
-      position: fixed;
-      right: 0;
-      bottom: 0;
-      left: 0;
-    };
-
-    --layout-fixed-left: {
-      position: fixed;
-      top: 0;
-      bottom: 0;
-      left: 0;
-    };
-
-  }
-
-</style>
-
-
-<script>
-  /**
-   * The `iron-iconset-svg` element allows users to define their own icon sets
-   * that contain svg icons. The svg icon elements should be children of the
-   * `iron-iconset-svg` element. Multiple icons should be given distinct id's.
-   *
-   * Using svg elements to create icons has a few advantages over traditional
-   * bitmap graphics like jpg or png. Icons that use svg are vector based so
-   * they are resolution independent and should look good on any device. They
-   * are stylable via css. Icons can be themed, colorized, and even animated.
-   *
-   * Example:
-   *
-   *     <iron-iconset-svg name="my-svg-icons" size="24">
-   *       <svg>
-   *         <defs>
-   *           <g id="shape">
-   *             <rect x="12" y="0" width="12" height="24" />
-   *             <circle cx="12" cy="12" r="12" />
-   *           </g>
-   *         </defs>
-   *       </svg>
-   *     </iron-iconset-svg>
-   *
-   * This will automatically register the icon set "my-svg-icons" to the iconset
-   * database.  To use these icons from within another element, make a
-   * `iron-iconset` element and call the `byId` method
-   * to retrieve a given iconset. To apply a particular icon inside an
-   * element use the `applyIcon` method. For example:
-   *
-   *     iconset.applyIcon(iconNode, 'car');
-   *
-   * @element iron-iconset-svg
-   * @demo demo/index.html
-   * @implements {Polymer.Iconset}
-   */
-  Polymer({
-    is: 'iron-iconset-svg',
-
-    properties: {
-
-      /**
-       * The name of the iconset.
-       */
-      name: {
-        type: String,
-        observer: '_nameChanged'
-      },
-
-      /**
-       * The size of an individual icon. Note that icons must be square.
-       */
-      size: {
-        type: Number,
-        value: 24
-      }
-
-    },
-
-    attached: function() {
-      this.style.display = 'none';
-    },
-
-    /**
-     * Construct an array of all icon names in this iconset.
-     *
-     * @return {!Array} Array of icon names.
-     */
-    getIconNames: function() {
-      this._icons = this._createIconMap();
-      return Object.keys(this._icons).map(function(n) {
-        return this.name + ':' + n;
-      }, this);
-    },
-
-    /**
-     * Applies an icon to the given element.
-     *
-     * An svg icon is prepended to the element's shadowRoot if it exists,
-     * otherwise to the element itself.
-     *
-     * @method applyIcon
-     * @param {Element} element Element to which the icon is applied.
-     * @param {string} iconName Name of the icon to apply.
-     * @return {?Element} The svg element which renders the icon.
-     */
-    applyIcon: function(element, iconName) {
-      // insert svg element into shadow root, if it exists
-      element = element.root || element;
-      // Remove old svg element
-      this.removeIcon(element);
-      // install new svg element
-      var svg = this._cloneIcon(iconName);
-      if (svg) {
-        var pde = Polymer.dom(element);
-        pde.insertBefore(svg, pde.childNodes[0]);
-        return element._svgIcon = svg;
-      }
-      return null;
-    },
-
-    /**
-     * Remove an icon from the given element by undoing the changes effected
-     * by `applyIcon`.
-     *
-     * @param {Element} element The element from which the icon is removed.
-     */
-    removeIcon: function(element) {
-      // Remove old svg element
-      if (element._svgIcon) {
-        Polymer.dom(element).removeChild(element._svgIcon);
-        element._svgIcon = null;
-      }
-    },
-
-    /**
-     *
-     * When name is changed, register iconset metadata
-     *
-     */
-    _nameChanged: function() {
-      new Polymer.IronMeta({type: 'iconset', key: this.name, value: this});
-      this.async(function() {
-        this.fire('iron-iconset-added', this, {node: window});
-      });
-    },
-
-    /**
-     * Create a map of child SVG elements by id.
-     *
-     * @return {!Object} Map of id's to SVG elements.
-     */
-    _createIconMap: function() {
-      // Objects chained to Object.prototype (`{}`) have members. Specifically,
-      // on FF there is a `watch` method that confuses the icon map, so we
-      // need to use a null-based object here.
-      var icons = Object.create(null);
-      Polymer.dom(this).querySelectorAll('[id]')
-        .forEach(function(icon) {
-          icons[icon.id] = icon;
-        });
-      return icons;
-    },
-
-    /**
-     * Produce installable clone of the SVG element matching `id` in this
-     * iconset, or `undefined` if there is no matching element.
-     *
-     * @return {Element} Returns an installable clone of the SVG element
-     * matching `id`.
-     */
-    _cloneIcon: function(id) {
-      // create the icon map on-demand, since the iconset itself has no discrete
-      // signal to know when it's children are fully parsed
-      this._icons = this._icons || this._createIconMap();
-      return this._prepareSvgClone(this._icons[id], this.size);
-    },
-
-    /**
-     * @param {Element} sourceSvg
-     * @param {number} size
-     * @return {Element}
-     */
-    _prepareSvgClone: function(sourceSvg, size) {
-      if (sourceSvg) {
-        var content = sourceSvg.cloneNode(true),
-            svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg'),
-            viewBox = content.getAttribute('viewBox') || '0 0 ' + size + ' ' + size;
-        svg.setAttribute('viewBox', viewBox);
-        svg.setAttribute('preserveAspectRatio', 'xMidYMid meet');
-        // TODO(dfreedm): `pointer-events: none` works around https://crbug.com/370136
-        // TODO(sjmiles): inline style may not be ideal, but avoids requiring a shadow-root
-        svg.style.cssText = 'pointer-events: none; display: block; width: 100%; height: 100%;';
-        svg.appendChild(content).removeAttribute('id');
-        return svg;
-      }
-      return null;
-    }
-
-  });
-</script>
-<script>
+</script><script>
   /**
    * `IronResizableBehavior` is a behavior that can be used in Polymer elements to
    * coordinate the flow of resize events between "resizers" (elements that control the
@@ -9013,1018 +10106,6 @@ l)&&void 0!==f[l]&&null!==f[l]&&g.val.push([l,String(f[l])]);g.val.length&&(g.ty
 
 
 
-<script>
-(function(){
-/**
-`iron-signals` provides basic publish-subscribe functionality.
-
-Note: avoid using `iron-signals` whenever you can use
-a controller (parent element) to mediate communication
-instead.
-
-To send a signal, fire a custom event of type `iron-signal`, with
-a detail object containing `name` and `data` fields.
-
-    this.fire('iron-signal', {name: 'hello', data: null});
-
-To receive a signal, listen for `iron-signal-<name>` event on a
-`iron-signals` element.
-
-  <iron-signals on-iron-signal-hello="{{helloSignal}}">
-
-You can fire a signal event from anywhere, and all
-`iron-signals` elements will receive the event, regardless
-of where they are in DOM.
-
-@demo demo/index.html
-*/
-  Polymer({
-    is: 'iron-signals',
-
-    attached: function() {
-      signals.push(this);
-    },
-    detached: function() {
-      var i = signals.indexOf(this);
-      if (i >= 0) {
-        signals.splice(i, 1);
-      }
-    }
-  });
-
-  // private shared database
-  var signals = [];
-
-  // signal dispatcher
-  function notify(name, data) {
-    // convert generic-signal event to named-signal event
-    var signal = new CustomEvent('iron-signal-' + name, {
-      // if signals bubble, it's easy to get confusing duplicates
-      // (1) listen on a container on behalf of local child
-      // (2) some deep child ignores the event and it bubbles
-      //     up to said container
-      // (3) local child event bubbles up to container
-      // also, for performance, we avoid signals flying up the
-      // tree from all over the place
-      bubbles: false,
-      detail: data
-    });
-    // dispatch named-signal to all 'signals' instances,
-    // only interested listeners will react
-    signals.forEach(function(s) {
-      s.dispatchEvent(signal);
-    });
-  }
-
-  // signal listener at document
-  document.addEventListener('iron-signal', function(e) {
-    notify(e.detail.name, e.detail.data);
-  });
-
-})();
-</script>
-<style>
-
-  /*******************************
-            Flex Layout
-  *******************************/
-
-  html /deep/ .layout.horizontal,
-  html /deep/ .layout.horizontal-reverse,
-  html /deep/ .layout.vertical,
-  html /deep/ .layout.vertical-reverse {
-    display: -ms-flexbox;
-    display: -webkit-flex;
-    display: flex;
-  }
-
-  html /deep/ .layout.inline {
-    display: -ms-inline-flexbox;
-    display: -webkit-inline-flex;
-    display: inline-flex;
-  }
-
-  html /deep/ .layout.horizontal {
-    -ms-flex-direction: row;
-    -webkit-flex-direction: row;
-    flex-direction: row;
-  }
-
-  html /deep/ .layout.horizontal-reverse {
-    -ms-flex-direction: row-reverse;
-    -webkit-flex-direction: row-reverse;
-    flex-direction: row-reverse;
-  }
-
-  html /deep/ .layout.vertical {
-    -ms-flex-direction: column;
-    -webkit-flex-direction: column;
-    flex-direction: column;
-  }
-
-  html /deep/ .layout.vertical-reverse {
-    -ms-flex-direction: column-reverse;
-    -webkit-flex-direction: column-reverse;
-    flex-direction: column-reverse;
-  }
-
-  html /deep/ .layout.wrap {
-    -ms-flex-wrap: wrap;
-    -webkit-flex-wrap: wrap;
-    flex-wrap: wrap;
-  }
-
-  html /deep/ .layout.wrap-reverse {
-    -ms-flex-wrap: wrap-reverse;
-    -webkit-flex-wrap: wrap-reverse;
-    flex-wrap: wrap-reverse;
-  }
-
-  html /deep/ .flex-auto {
-    -ms-flex: 1 1 auto;
-    -webkit-flex: 1 1 auto;
-    flex: 1 1 auto;
-  }
-
-  html /deep/ .flex-none {
-    -ms-flex: none;
-    -webkit-flex: none;
-    flex: none;
-  }
-
-  html /deep/ .flex,
-  html /deep/ .flex-1 {
-    -ms-flex: 1;
-    -webkit-flex: 1;
-    flex: 1;
-  }
-
-  html /deep/ .flex-2 {
-    -ms-flex: 2;
-    -webkit-flex: 2;
-    flex: 2;
-  }
-
-  html /deep/ .flex-3 {
-    -ms-flex: 3;
-    -webkit-flex: 3;
-    flex: 3;
-  }
-
-  html /deep/ .flex-4 {
-    -ms-flex: 4;
-    -webkit-flex: 4;
-    flex: 4;
-  }
-
-  html /deep/ .flex-5 {
-    -ms-flex: 5;
-    -webkit-flex: 5;
-    flex: 5;
-  }
-
-  html /deep/ .flex-6 {
-    -ms-flex: 6;
-    -webkit-flex: 6;
-    flex: 6;
-  }
-
-  html /deep/ .flex-7 {
-    -ms-flex: 7;
-    -webkit-flex: 7;
-    flex: 7;
-  }
-
-  html /deep/ .flex-8 {
-    -ms-flex: 8;
-    -webkit-flex: 8;
-    flex: 8;
-  }
-
-  html /deep/ .flex-9 {
-    -ms-flex: 9;
-    -webkit-flex: 9;
-    flex: 9;
-  }
-
-  html /deep/ .flex-10 {
-    -ms-flex: 10;
-    -webkit-flex: 10;
-    flex: 10;
-  }
-
-  html /deep/ .flex-11 {
-    -ms-flex: 11;
-    -webkit-flex: 11;
-    flex: 11;
-  }
-
-  html /deep/ .flex-12 {
-    -ms-flex: 12;
-    -webkit-flex: 12;
-    flex: 12;
-  }
-
-  /* alignment in cross axis */
-
-  html /deep/ .layout.start {
-    -ms-flex-align: start;
-    -webkit-align-items: flex-start;
-    align-items: flex-start;
-  }
-
-  html /deep/ .layout.center,
-  html /deep/ .layout.center-center {
-    -ms-flex-align: center;
-    -webkit-align-items: center;
-    align-items: center;
-  }
-
-  html /deep/ .layout.end {
-    -ms-flex-align: end;
-    -webkit-align-items: flex-end;
-    align-items: flex-end;
-  }
-
-  /* alignment in main axis */
-
-  html /deep/ .layout.start-justified {
-    -ms-flex-pack: start;
-    -webkit-justify-content: flex-start;
-    justify-content: flex-start;
-  }
-
-  html /deep/ .layout.center-justified,
-  html /deep/ .layout.center-center {
-    -ms-flex-pack: center;
-    -webkit-justify-content: center;
-    justify-content: center;
-  }
-
-  html /deep/ .layout.end-justified {
-    -ms-flex-pack: end;
-    -webkit-justify-content: flex-end;
-    justify-content: flex-end;
-  }
-
-  html /deep/ .layout.around-justified {
-    -ms-flex-pack: around;
-    -webkit-justify-content: space-around;
-    justify-content: space-around;
-  }
-
-  html /deep/ .layout.justified {
-    -ms-flex-pack: justify;
-    -webkit-justify-content: space-between;
-    justify-content: space-between;
-  }
-
-  /* self alignment */
-
-  html /deep/ .self-start {
-    -ms-align-self: flex-start;
-    -webkit-align-self: flex-start;
-    align-self: flex-start;
-  }
-
-  html /deep/ .self-center {
-    -ms-align-self: center;
-    -webkit-align-self: center;
-    align-self: center;
-  }
-
-  html /deep/ .self-end {
-    -ms-align-self: flex-end;
-    -webkit-align-self: flex-end;
-    align-self: flex-end;
-  }
-
-  html /deep/ .self-stretch {
-    -ms-align-self: stretch;
-    -webkit-align-self: stretch;
-    align-self: stretch;
-  }
-
-  /*******************************
-            Other Layout
-  *******************************/
-
-  html /deep/ .block {
-    display: block;
-  }
-
-  /* IE 10 support for HTML5 hidden attr */
-  html /deep/ [hidden] {
-    display: none !important;
-  }
-
-  html /deep/ .invisible {
-    visibility: hidden !important;
-  }
-
-  html /deep/ .relative {
-    position: relative;
-  }
-
-  html /deep/ .fit {
-    position: absolute;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-  }
-
-  body.fullbleed {
-    margin: 0;
-    height: 100vh;
-  }
-
-  html /deep/ .scroll {
-    -webkit-overflow-scrolling: touch;
-    overflow: auto;
-  }
-
-  .fixed-bottom,
-  .fixed-left,
-  .fixed-right,
-  .fixed-top {
-    position: fixed;
-  }
-
-  html /deep/ .fixed-top {
-    top: 0;
-    left: 0;
-    right: 0;
-  }
-
-  html /deep/ .fixed-right {
-    top: 0;
-    right: 0;
-    botttom: 0;
-  }
-
-  html /deep/ .fixed-bottom {
-    right: 0;
-    bottom: 0;
-    left: 0;
-  }
-
-  html /deep/ .fixed-left {
-    top: 0;
-    botttom: 0;
-    left: 0;
-  }
-
-</style>
-<style>
-
-  /*******************************
-            Flex Layout
-  *******************************/
-
-  .layout.horizontal,
-  .layout.horizontal-reverse,
-  .layout.vertical,
-  .layout.vertical-reverse {
-    display: -ms-flexbox;
-    display: -webkit-flex;
-    display: flex;
-  }
-
-  .layout.inline {
-    display: -ms-inline-flexbox;
-    display: -webkit-inline-flex;
-    display: inline-flex;
-  }
-
-  .layout.horizontal {
-    -ms-flex-direction: row;
-    -webkit-flex-direction: row;
-    flex-direction: row;
-  }
-
-  .layout.horizontal-reverse {
-    -ms-flex-direction: row-reverse;
-    -webkit-flex-direction: row-reverse;
-    flex-direction: row-reverse;
-  }
-
-  .layout.vertical {
-    -ms-flex-direction: column;
-    -webkit-flex-direction: column;
-    flex-direction: column;
-  }
-
-  .layout.vertical-reverse {
-    -ms-flex-direction: column-reverse;
-    -webkit-flex-direction: column-reverse;
-    flex-direction: column-reverse;
-  }
-
-  .layout.wrap {
-    -ms-flex-wrap: wrap;
-    -webkit-flex-wrap: wrap;
-    flex-wrap: wrap;
-  }
-
-  .layout.wrap-reverse {
-    -ms-flex-wrap: wrap-reverse;
-    -webkit-flex-wrap: wrap-reverse;
-    flex-wrap: wrap-reverse;
-  }
-
-  .flex-auto {
-    -ms-flex: 1 1 auto;
-    -webkit-flex: 1 1 auto;
-    flex: 1 1 auto;
-  }
-
-  .flex-none {
-    -ms-flex: none;
-    -webkit-flex: none;
-    flex: none;
-  }
-
-  .flex,
-  .flex-1 {
-    -ms-flex: 1;
-    -webkit-flex: 1;
-    flex: 1;
-  }
-
-  .flex-2 {
-    -ms-flex: 2;
-    -webkit-flex: 2;
-    flex: 2;
-  }
-
-  .flex-3 {
-    -ms-flex: 3;
-    -webkit-flex: 3;
-    flex: 3;
-  }
-
-  .flex-4 {
-    -ms-flex: 4;
-    -webkit-flex: 4;
-    flex: 4;
-  }
-
-  .flex-5 {
-    -ms-flex: 5;
-    -webkit-flex: 5;
-    flex: 5;
-  }
-
-  .flex-6 {
-    -ms-flex: 6;
-    -webkit-flex: 6;
-    flex: 6;
-  }
-
-  .flex-7 {
-    -ms-flex: 7;
-    -webkit-flex: 7;
-    flex: 7;
-  }
-
-  .flex-8 {
-    -ms-flex: 8;
-    -webkit-flex: 8;
-    flex: 8;
-  }
-
-  .flex-9 {
-    -ms-flex: 9;
-    -webkit-flex: 9;
-    flex: 9;
-  }
-
-  .flex-10 {
-    -ms-flex: 10;
-    -webkit-flex: 10;
-    flex: 10;
-  }
-
-  .flex-11 {
-    -ms-flex: 11;
-    -webkit-flex: 11;
-    flex: 11;
-  }
-
-  .flex-12 {
-    -ms-flex: 12;
-    -webkit-flex: 12;
-    flex: 12;
-  }
-
-  /* alignment in cross axis */
-
-  .layout.start {
-    -ms-flex-align: start;
-    -webkit-align-items: flex-start;
-    align-items: flex-start;
-  }
-
-  .layout.center,
-  .layout.center-center {
-    -ms-flex-align: center;
-    -webkit-align-items: center;
-    align-items: center;
-  }
-
-  .layout.end {
-    -ms-flex-align: end;
-    -webkit-align-items: flex-end;
-    align-items: flex-end;
-  }
-
-  /* alignment in main axis */
-
-  .layout.start-justified {
-    -ms-flex-pack: start;
-    -webkit-justify-content: flex-start;
-    justify-content: flex-start;
-  }
-
-  .layout.center-justified,
-  .layout.center-center {
-    -ms-flex-pack: center;
-    -webkit-justify-content: center;
-    justify-content: center;
-  }
-
-  .layout.end-justified {
-    -ms-flex-pack: end;
-    -webkit-justify-content: flex-end;
-    justify-content: flex-end;
-  }
-
-  .layout.around-justified {
-    -ms-flex-pack: around;
-    -webkit-justify-content: space-around;
-    justify-content: space-around;
-  }
-
-  .layout.justified {
-    -ms-flex-pack: justify;
-    -webkit-justify-content: space-between;
-    justify-content: space-between;
-  }
-
-  /* self alignment */
-
-  .self-start {
-    -ms-align-self: flex-start;
-    -webkit-align-self: flex-start;
-    align-self: flex-start;
-  }
-
-  .self-center {
-    -ms-align-self: center;
-    -webkit-align-self: center;
-    align-self: center;
-  }
-
-  .self-end {
-    -ms-align-self: flex-end;
-    -webkit-align-self: flex-end;
-    align-self: flex-end;
-  }
-
-  .self-stretch {
-    -ms-align-self: stretch;
-    -webkit-align-self: stretch;
-    align-self: stretch;
-  }
-
-  /*******************************
-            Other Layout
-  *******************************/
-
-  .block {
-    display: block;
-  }
-
-  /* IE 10 support for HTML5 hidden attr */
-  [hidden] {
-    display: none !important;
-  }
-
-  .invisible {
-    visibility: hidden !important;
-  }
-
-  .relative {
-    position: relative;
-  }
-
-  .fit {
-    position: absolute;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-  }
-
-  body.fullbleed {
-    margin: 0;
-    height: 100vh;
-  }
-
-  .scroll {
-    -webkit-overflow-scrolling: touch;
-    overflow: auto;
-  }
-
-  /* fixed position */
-
-  .fixed-bottom,
-  .fixed-left,
-  .fixed-right,
-  .fixed-top {
-    position: fixed;
-  }
-
-  .fixed-top {
-    top: 0;
-    left: 0;
-    right: 0;
-  }
-
-  .fixed-right {
-    top: 0;
-    right: 0;
-    bottom: 0;
-  }
-
-  .fixed-bottom {
-    right: 0;
-    bottom: 0;
-    left: 0;
-  }
-
-  .fixed-left {
-    top: 0;
-    bottom: 0;
-    left: 0;
-  }
-
-</style>
-<script>
-
-  /**
-   * `Use Polymer.IronValidatableBehavior` to implement an element that validates user input.
-   * Use the related `Polymer.IronValidatorBehavior` to add custom validation logic to an iron-input.
-   *
-   * By default, an `<iron-form>` element validates its fields when the user presses the submit button.
-   * To validate a form imperatively, call the form's `validate()` method, which in turn will
-   * call `validate()` on all its children. By using `Polymer.IronValidatableBehavior`, your
-   * custom element will get a public `validate()`, which
-   * will return the validity of the element, and a corresponding `invalid` attribute,
-   * which can be used for styling.
-   *
-   * To implement the custom validation logic of your element, you must override
-   * the protected `_getValidity()` method of this behaviour, rather than `validate()`.
-   * See [this](https://github.com/PolymerElements/iron-form/blob/master/demo/simple-element.html)
-   * for an example.
-   *
-   * ### Accessibility
-   *
-   * Changing the `invalid` property, either manually or by calling `validate()` will update the
-   * `aria-invalid` attribute.
-   *
-   * @demo demo/index.html
-   * @polymerBehavior
-   */
-  Polymer.IronValidatableBehavior = {
-
-    properties: {
-
-      /**
-       * Namespace for this validator.
-       */
-      validatorType: {
-        type: String,
-        value: 'validator'
-      },
-
-      /**
-       * Name of the validator to use.
-       */
-      validator: {
-        type: String
-      },
-
-      /**
-       * True if the last call to `validate` is invalid.
-       */
-      invalid: {
-        notify: true,
-        reflectToAttribute: true,
-        type: Boolean,
-        value: false
-      },
-
-      _validatorMeta: {
-        type: Object
-      }
-
-    },
-
-    observers: [
-      '_invalidChanged(invalid)'
-    ],
-
-    get _validator() {
-      return this._validatorMeta && this._validatorMeta.byKey(this.validator);
-    },
-
-    ready: function() {
-      this._validatorMeta = new Polymer.IronMeta({type: this.validatorType});
-    },
-
-    _invalidChanged: function() {
-      if (this.invalid) {
-        this.setAttribute('aria-invalid', 'true');
-      } else {
-        this.removeAttribute('aria-invalid');
-      }
-    },
-
-    /**
-     * @return {boolean} True if the validator `validator` exists.
-     */
-    hasValidator: function() {
-      return this._validator != null;
-    },
-
-    /**
-     * Returns true if the `value` is valid, and updates `invalid`. If you want
-     * your element to have custom validation logic, do not override this method;
-     * override `_getValidity(value)` instead.
-
-     * @param {Object} value The value to be validated. By default, it is passed
-     * to the validator's `validate()` function, if a validator is set.
-     * @return {boolean} True if `value` is valid.
-     */
-    validate: function(value) {
-      this.invalid = !this._getValidity(value);
-      return !this.invalid;
-    },
-
-    /**
-     * Returns true if `value` is valid.  By default, it is passed
-     * to the validator's `validate()` function, if a validator is set. You
-     * should override this method if you want to implement custom validity
-     * logic for your element.
-     *
-     * @param {Object} value The value to be validated.
-     * @return {boolean} True if `value` is valid.
-     */
-
-    _getValidity: function(value) {
-      if (this.hasValidator()) {
-        return this._validator.validate(value);
-      }
-      return true;
-    }
-  };
-
-</script>
-<script>
-
-/*
-`<iron-input>` adds two-way binding and custom validators using `Polymer.IronValidatorBehavior`
-to `<input>`.
-
-### Two-way binding
-
-By default you can only get notified of changes to an `input`'s `value` due to user input:
-
-    <input value="{{myValue::input}}">
-
-`iron-input` adds the `bind-value` property that mirrors the `value` property, and can be used
-for two-way data binding. `bind-value` will notify if it is changed either by user input or by script.
-
-    <input is="iron-input" bind-value="{{myValue}}">
-
-### Custom validators
-
-You can use custom validators that implement `Polymer.IronValidatorBehavior` with `<iron-input>`.
-
-    <input is="iron-input" validator="my-custom-validator">
-
-### Stopping invalid input
-
-It may be desirable to only allow users to enter certain characters. You can use the
-`prevent-invalid-input` and `allowed-pattern` attributes together to accomplish this. This feature
-is separate from validation, and `allowed-pattern` does not affect how the input is validated.
-
-    <!-- only allow characters that match [0-9] -->
-    <input is="iron-input" prevent-invalid-input allowed-pattern="[0-9]">
-
-@hero hero.svg
-@demo demo/index.html
-*/
-
-  Polymer({
-
-    is: 'iron-input',
-
-    extends: 'input',
-
-    behaviors: [
-      Polymer.IronValidatableBehavior
-    ],
-
-    properties: {
-
-      /**
-       * Use this property instead of `value` for two-way data binding.
-       */
-      bindValue: {
-        observer: '_bindValueChanged',
-        type: String
-      },
-
-      /**
-       * Set to true to prevent the user from entering invalid input. The new input characters are
-       * matched with `allowedPattern` if it is set, otherwise it will use the `pattern` attribute if
-       * set, or the `type` attribute (only supported for `type=number`).
-       */
-      preventInvalidInput: {
-        type: Boolean
-      },
-
-      /**
-       * Regular expression to match valid input characters.
-       */
-      allowedPattern: {
-        type: String
-      },
-
-      _previousValidInput: {
-        type: String,
-        value: ''
-      },
-
-      _patternAlreadyChecked: {
-        type: Boolean,
-        value: false
-      }
-
-    },
-
-    listeners: {
-      'input': '_onInput',
-      'keypress': '_onKeypress'
-    },
-
-    get _patternRegExp() {
-      var pattern;
-      if (this.allowedPattern) {
-        pattern = new RegExp(this.allowedPattern);
-      } else if (this.pattern) {
-        pattern = new RegExp(this.pattern);
-      } else {
-        switch (this.type) {
-          case 'number':
-            pattern = /[0-9.,e-]/;
-            break;
-        }
-      }
-      return pattern;
-    },
-
-    ready: function() {
-      this.bindValue = this.value;
-    },
-
-    /**
-     * @suppress {checkTypes}
-     */
-    _bindValueChanged: function() {
-      if (this.value !== this.bindValue) {
-        this.value = !(this.bindValue || this.bindValue === 0) ? '' : this.bindValue;
-      }
-      // manually notify because we don't want to notify until after setting value
-      this.fire('bind-value-changed', {value: this.bindValue});
-    },
-
-    _onInput: function() {
-      // Need to validate each of the characters pasted if they haven't
-      // been validated inside `_onKeypress` already.
-      if (this.preventInvalidInput && !this._patternAlreadyChecked) {
-        var valid = this._checkPatternValidity();
-        if (!valid) {
-          this.value = this._previousValidInput;
-        }
-      }
-
-      this.bindValue = this.value;
-      this._previousValidInput = this.value;
-      this._patternAlreadyChecked = false;
-    },
-
-    _isPrintable: function(event) {
-      // What a control/printable character is varies wildly based on the browser.
-      // - most control characters (arrows, backspace) do not send a `keypress` event
-      //   in Chrome, but the *do* on Firefox
-      // - in Firefox, when they do send a `keypress` event, control chars have
-      //   a charCode = 0, keyCode = xx (for ex. 40 for down arrow)
-      // - printable characters always send a keypress event.
-      // - in Firefox, printable chars always have a keyCode = 0. In Chrome, the keyCode
-      //   always matches the charCode.
-      // None of this makes any sense.
-
-      // For these keys, ASCII code == browser keycode.
-      var anyNonPrintable =
-        (event.keyCode == 8)   ||  // backspace
-        (event.keyCode == 9)   ||  // tab
-        (event.keyCode == 13)  ||  // enter
-        (event.keyCode == 27);     // escape
-
-      // For these keys, make sure it's a browser keycode and not an ASCII code.
-      var mozNonPrintable =
-        (event.keyCode == 19)  ||  // pause
-        (event.keyCode == 20)  ||  // caps lock
-        (event.keyCode == 45)  ||  // insert
-        (event.keyCode == 46)  ||  // delete
-        (event.keyCode == 144) ||  // num lock
-        (event.keyCode == 145) ||  // scroll lock
-        (event.keyCode > 32 && event.keyCode < 41)   || // page up/down, end, home, arrows
-        (event.keyCode > 111 && event.keyCode < 124); // fn keys
-
-      return !anyNonPrintable && !(event.charCode == 0 && mozNonPrintable);
-    },
-
-    _onKeypress: function(event) {
-      if (!this.preventInvalidInput && this.type !== 'number') {
-        return;
-      }
-      var regexp = this._patternRegExp;
-      if (!regexp) {
-        return;
-      }
-
-      // Handle special keys and backspace
-      if (event.metaKey || event.ctrlKey || event.altKey)
-        return;
-
-      // Check the pattern either here or in `_onInput`, but not in both.
-      this._patternAlreadyChecked = true;
-
-      var thisChar = String.fromCharCode(event.charCode);
-      if (this._isPrintable(event) && !regexp.test(thisChar)) {
-        event.preventDefault();
-      }
-    },
-
-    _checkPatternValidity: function() {
-      var regexp = this._patternRegExp;
-      if (!regexp) {
-        return true;
-      }
-      for (var i = 0; i < this.value.length; i++) {
-        if (!regexp.test(this.value[i])) {
-          return false;
-        }
-      }
-      return true;
-    },
-
-    /**
-     * Returns true if `value` is valid. The validator provided in `validator` will be used first,
-     * then any constraints.
-     * @return {boolean} True if the value is valid.
-     */
-    validate: function() {
-      // Empty, non-required input is valid.
-      if (!this.required && this.value == '') {
-        this.invalid = false;
-        return true;
-      }
-
-      var valid;
-      if (this.hasValidator()) {
-        valid = Polymer.IronValidatableBehavior.validate.call(this, this.value);
-      } else {
-        this.invalid = !this.validity.valid;
-        valid = this.validity.valid;
-      }
-      this.fire('iron-input-validate');
-      return valid;
-    }
-
-  });
-
-  /*
-  The `iron-input-validate` event is fired whenever `validate()` is called.
-  @event iron-input-validate
-  */
-
-</script>
 <script type="text/javascript">/*! URI.js v1.14.2 http://medialize.github.io/URI.js/ */
 /* build contains: IPv6.js, punycode.js, SecondLevelDomains.js, URI.js, URITemplate.js */
 (function(f,l){"object"===typeof exports?module.exports=l():"function"===typeof define&&define.amd?define(l):f.IPv6=l(f)})(this,function(f){var l=f&&f.IPv6;return{best:function(g){g=g.toLowerCase().split(":");var m=g.length,b=8;""===g[0]&&""===g[1]&&""===g[2]?(g.shift(),g.shift()):""===g[0]&&""===g[1]?g.shift():""===g[m-1]&&""===g[m-2]&&g.pop();m=g.length;-1!==g[m-1].indexOf(".")&&(b=7);var k;for(k=0;k<m&&""!==g[k];k++);if(k<b)for(g.splice(k,1,"0000");g.length<b;)g.splice(k,0,"0000");for(k=0;k<b;k++){for(var m=
@@ -10119,114 +10200,7 @@ l)&&void 0!==f[l]&&null!==f[l]&&g.val.push([l,String(f[l])]);g.val.length&&(g.ty
         }
     </style>
 </head>
-<body><div hidden="" by-vulcanize=""><dom-module id="teamcity-ajax" assetpath="elements/">
-    <template>
-        <iron-ajax id="ajax" with-credentials="true" method="GET" headers="{&quot;Accept&quot;: &quot;application/json&quot;}" handle-as="json" on-response="handleResponse" on-error="handleError"></iron-ajax>
-    </template>
-    <script>
-        // element registration
-        Polymer({
-            is: "teamcity-ajax",
-            properties: {
-                server: {
-                    type: String
-                },
-                loginUrl: {
-                    type: String
-                },
-                restUrl: {
-                    type: String
-                },
-                restObjectName: {
-                    type: String //name of the property to be retrived form request
-                },
-                state:{
-                    type: Object,
-                    notify: true
-                },
-                data: {
-                    type: Object,
-                    notify: true
-                }
-            },
-            ready: function(){
-                this.$.ajax.url = this.server + this.restUrl;
-                this.goAjax();
-            },
-            handleResponse: function (event, detail){
-                this.data = this.$.ajax.lastResponse[this.restObjectName];
-                this.state = {name:'OK'};
-            },
-            handleError: function (event, detail){
-                this.state = {name:'ERROR', detail: event.detail};
-                this.async(this.goAjax, 1000 * 20);
-            },
-            goAjax: function(){
-                this.$.ajax.generateRequest();
-            }
-
-        });
-    </script>
-</dom-module><dom-module id="flat-to-nested" assetpath="elements/">
-    <script>
-        // element registration
-        Polymer({
-            is: "flat-to-nested",
-            properties: {
-                data: {
-                    type: Object,
-                    observer: "_dataChanged"
-                },
-                dataTree: {
-                    type: Object,
-                    notify: true,
-                    observer: "_dataTreeChanged"
-                }
-            },
-            _dataTreeChanged: function (value){
-                this.fire('dataTreeChanged', {dataTree: value});
-            },
-            _dataChanged: function (newValue, oldValue){
-                this.projects = this.data;
-                var dataMap = this.projects.reduce(function(map, node) {
-                    map[node.id] = node;
-                    return map;
-                }, {});
-
-                var dataTree = [];
-                for (var i=0; i<this.projects.length; i++){
-                    var node = this.projects[i];
-                    // add to parent
-                    node.text = node.name;
-                    var bts = node.buildTypes!=undefined ? node.buildTypes.buildType : undefined;
-                    node.href = node.webUrl;
-                    var parent = dataMap[node.parentProjectId];
-                    if (parent) {
-                        // create child array if it doesn't exist
-                        var pp = (parent.children || (parent.children = []));
-                        pp.push(node);
-                        if (bts != undefined && bts.length>0){
-                            var ppp = (node.children || (node.children = []));
-                            for (var z=0; z<bts.length; z++) {
-                                var bt = {
-                                    text: bts[z].name,
-                                    href: bts[z].webUrl,
-                                    isBuildType: true,
-                                    parentProjectId: node.id
-                                };
-                                ppp.push(bt);
-                            }
-                        }
-                    } else {
-                        // parent is null or missing
-                        dataTree.push(node);
-                    }
-                }
-                this.dataTree = dataTree;
-            }
-        });
-    </script>
-</dom-module><dom-module id="iron-icon" assetpath="bower_components/iron-icon/">
+<body><div hidden="" by-vulcanize=""><dom-module id="iron-icon" assetpath="bower_components/iron-icon/">
 
   <style>
     :host {
@@ -10610,25 +10584,27 @@ l)&&void 0!==f[l]&&null!==f[l]&&g.val.push([l,String(f[l])]);g.val.length&&(g.ty
 <dom-module id="tree-icon" assetpath="elements/">
     <style>
         :host{
-            width: 16px;
-            height: 16px;
-            line-height: 1.5em;
             display: inline-block;
+            width: 10px;
+            vertical-align: middle;
+        }
+        span{
+            display: block;
+            width: 10px;
+            height: 10px;
+            margin-right: 0.5em;
+            background: transparent url("elements/icons/teamcity-sprite.png") no-repeat;
+            background-position: -180px -20px;
             cursor: pointer;
         }
-        :host .icon{
-            width: 100%;
-            height: 100%;
-            display: inline-block;
-            background: transparent url("elements/icons/arrow-closed.png") no-repeat 0 0 ;
+        .true{
+            background-position: -180px 0;
         }
-        :host(.expanded) .icon{
-            background: transparent url("elements/icons/arrow-opened.png") no-repeat 0 0 ;
-        }
+
     </style>
     <template>
-        <template is="dom-if" if="{{hasChildren}}">
-            <span class="icon">&nbsp;</span>
+        <template is="dom-if" if="{{hasChildren}}" restamp="true">
+            <span class$="{{data.isExpanded}}" on-click="_toggleExpanded"></span>
         </template>
     </template>
     <script>
@@ -10638,48 +10614,59 @@ l)&&void 0!==f[l]&&null!==f[l]&&g.val.push([l,String(f[l])]);g.val.length&&(g.ty
             properties: {
                 data:{
                     type: Object,
-                    notify: true
+                    notify: true,
+                    observer: "_dataChanged"
                 },
                 hasChildren:{
                     type: Boolean,
+                    notify: true,
                     computed: 'computeHasChildren(data)'
                 }
             },
-            behaviors: [ExpandedBehavior],
-            listeners: {
-                click: '_toggleExpanded'
+            _dataChanged: function(data){
+              // console.log('_dataChanged: tree-icon');
+              // console.log(data.text);
+              // console.log(data.isExpanded);
             },
             computeHasChildren: function(data){
                 return data.children && data.children.length > 0;
+            },
+            _toggleExpanded: function() {
+                this.data.isExpanded = !this.data.isExpanded;
+                this.notifyPath("data.isExpanded", this.data.isExpanded);
+                this.fire("expand", {state: this.data.isExpanded});
             }
-
         });
     </script>
 </dom-module><dom-module id="tree-node" assetpath="elements/">
     <style>
-        .btIcon{
-            background: transparent url("elements/icons/build-configuration-neutral.png") no-repeat 0 0 ;
-            width: 16px;
-            height: 16px;
-            line-height: 1.5em;
+        .icon{
             display: inline-block;
+            width: 10px;
+            height: 10px;
+            background-repeat: no-repeat;
+            background-image: url("elements/icons/teamcity-sprite.png");
+            background-color: transparent;
         }
-        .pIcon{
-            background: transparent url("elements/icons/project-neutral.png") no-repeat 0 0 ;
-            width: 16px;
-            height: 16px;
-            line-height: 1.5em;
-            display: inline-block;
+
+        .icon.bt{
+            background-position: -100px 0;
         }
+
+        .icon.project{
+            background-position: -100px -20px;
+        }
+
         .node {
             height: 1.5em;
             display: inline-block;
-            width: 300px;
+            max-width: 340px;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
         }
         a {
+            margin-left: 0.25em;
             text-decoration: none;
             color: black;
             height: 100%;
@@ -10688,18 +10675,15 @@ l)&&void 0!==f[l]&&null!==f[l]&&g.val.push([l,String(f[l])]);g.val.length&&(g.ty
         a:hover{
             text-decoration: underline;
         }
-
+        a /deep/ .highlighted{
+            background-color: yellow;
+        }
     </style>
     <template>
-        <div class="node">
-            <tree-icon is-expanded="{{isExpanded}}" data="{{data}}"></tree-icon>
-            <template is="dom-if" if="{{data.isBuildType}}">
-                <span class="btIcon"></span>
-            </template>
-            <template is="dom-if" if="{{!data.isBuildType}}">
-                <span class="pIcon"></span>
-            </template>
-            <a href="{{data.href}}">{{data.text}}</a>
+        <div class="node" id="node">
+            <tree-icon data="{{currentNode}}"></tree-icon>
+            <span class$="icon {{iconType}}"></span>
+            <a id="anode" href="{{currentNode.href}}">{{currentNode.text}}</a>
         </div>
     </template>
     <script>
@@ -10707,13 +10691,360 @@ l)&&void 0!==f[l]&&null!==f[l]&&g.val.push([l,String(f[l])]);g.val.length&&(g.ty
         Polymer({
             is: "tree-node",
             properties: {
-                data:{
+                currentNode:{
                     type: Object,
                     notify: true,
-                    observer: "_dataChanged"
+                    observer: "_currentNodeChanged"
+                },
+                terms:{
+                    type: String,
+                    value: "",
+                    notify: true
+                },
+                iconType:{
+                    type: String,
+                    notify: true
                 }
             },
-            behaviors: [ExpandedBehavior]
+            observers: ["_highlight(currentNode, terms)"],
+            _currentNodeChanged: function(){
+               // console.log(currentNode);
+                this.$.node.style.padding = "0 0 0 " + (this.currentNode.level * 17) + "px";
+                this.$.node.style.maxWidth = (370 - this.currentNode.level * 17) + "px";
+                this.iconType = this.currentNode.isBuildType ? "bt" : "project";
+            },
+            _highlight: function(currentNode, terms){
+                if (currentNode == undefined || currentNode.text == undefined){
+                    return;
+                }
+                if (terms==undefined || terms == ''){
+                    this.$.anode.innerHTML = currentNode.text;
+                    return;
+                }
+                var query = new RegExp("(" + terms + ")", "gim");
+                this.$.anode.innerHTML = currentNode.text.replace(query, "<span class='highlighted'>$1</span>");
+            }
+        });
+    </script>
+</dom-module><dom-module id="teamcity-search-input" assetpath="elements/">
+    <style type="text/css">
+        :host{
+        }
+        input:focus{
+            outline: none !important;
+        }
+        input[is=iron-input]:focus{
+            border:1px solid gray !important;
+        }
+        input[type=search]{
+            width: 100%;
+            margin-right: 10px;
+            line-height: 2em;
+            -webkit-appearance:textfield;
+            box-sizing: content-box;
+            border:1px solid lightgray;
+            padding: 2px;
+        }
+        ::-webkit-input-placeholder {
+            font-style: italic;
+        }
+
+        ::-moz-placeholder {  /* Firefox 19+ */
+            font-style: italic;
+        }
+
+        :-ms-input-placeholder {
+            font-style: italic;
+        }
+    </style>
+    <template>
+        <input type="search" bind-value="{{terms}}" is="iron-input" on-keydown="checkEnter" placeholder="Filter projects and build configurations">
+    </template>
+    <script>
+        // element registration
+        Polymer({
+            is: "teamcity-search-input",
+            properties: {
+                terms:{
+                    type: String,
+                    notify: true,
+                    observer: '_termsChanged'
+                }
+            },
+            submitSearch: function(){
+                this.fire('iron-signal', {name: "terms", data: this.terms});
+            },
+            checkEnter: function(e){
+                if (e.keyCode==13){
+                   this.fireTermsChanged();
+                }
+            },
+            fireTermsChanged: function(){
+                this.fire('iron-signal', {name: "terms", data: this.terms});
+            },
+            _termsChanged: function(){
+                this.fireTermsChanged();
+            }
+
+        });
+    </script>
+</dom-module><dom-module id="teamcity-search" assetpath="elements/">
+    <style>
+        :host{
+        }
+        input:focus{
+            outline: none !important;
+        }
+        input[type=button]{
+            background-color: #00b0ff;
+            -moz-border-radius: 10px;
+            -webkit-border-radius: 10px;
+            border-radius:10px;
+            color: #fff;
+            text-decoration: none;
+            cursor: pointer;
+            border:none;
+            line-height: 2em;
+            padding: 3px;
+            width: 100px;
+        }
+        #logo {
+            /*background: url("elements/icons/logo64x64.png") no-repeat;*/
+            display: inline-block;
+            background-size: 64px 64px;
+            height: 64px;
+            padding-left: 74px;
+            border: 1px solid lightgray;
+            background-color: lightgray;
+        }
+        #inputContainer{
+            width: 40vw;
+            padding: 0 20px 0 10px;
+        }
+    </style>
+    <template>
+        <div id="search" class="fullbleed layout horizontal center-center" style="padding-top: 50px;">
+            <span id="logo"></span>
+            <span id="inputContainer"><teamcity-search-input></teamcity-search-input></span>
+            <input type="button" value="SEARCH" on-click="submitSearch">
+        </div>
+    </template>
+    <script>
+        // element registration
+        Polymer({
+            is: "teamcity-search",
+            properties: {
+                terms:{
+                    type: String,
+                    notify: true,
+                    observer: '_termsChanged'
+                }
+            },
+            submitSearch: function(){
+                this.fire('iron-signal', {name: "terms", data: this.terms});
+            }
+        });
+    </script>
+</dom-module><dom-module id="teamcity-ajax" assetpath="elements/">
+    <template>
+        <iron-ajax id="ajax" with-credentials="true" method="GET" headers="{&quot;Accept&quot;: &quot;application/json&quot;}" handle-as="json" on-response="handleResponse" on-error="handleError"></iron-ajax>
+    </template>
+    <script>
+        // element registration
+        Polymer({
+            is: "teamcity-ajax",
+            properties: {
+                server: {
+                    type: String,
+                    notify: true
+                },
+                restUrl: {
+                    type: String,
+                    notify: true,
+                    observer: 'goAjax'
+                },
+                state:{
+                    type: Object,
+                    notify: true
+                },
+                data: {
+                    type: Object,
+                    notify: true
+                },
+                auto: {
+                    type: Boolean,
+                    value: false
+                }
+            },
+            behaviors: [LoggingBehavior],
+            ready: function(){
+                if (this.auto && this.server != undefined && this.restUrl != undefined){
+                    this.goAjax();
+                }
+            },
+            handleResponse: function (event, detail){
+                this.data = this.$.ajax.lastResponse;
+                this.state = {name:'OK'};
+            },
+            handleError: function (event, detail){
+                this.state = {name:'ERROR', detail: event.detail};
+                //this.async(this.goAjax, 1000 * 20);
+            },
+            goAjax: function(){
+                this.debug('goAjax(): ' + this.server + "   " + this.restUrl);
+                //this.$.ajax.url = 'http://localhost:8080/dashboard/testData/buildserver.jetbrains.com.json';
+                this.$.ajax.url = this.server + this.restUrl;
+                this.$.ajax.generateRequest();
+            }
+        });
+    </script>
+</dom-module><dom-module id="teamcity-server-urls" assetpath="elements/">
+    <script>
+        // element registration
+        Polymer({
+            is: "teamcity-server-urls",
+            properties: {
+                login: {
+                    type: String,
+                    value: "login.html",
+                    readOnly: true
+                },
+                projects: {
+                    type: String,
+                    value: "/app/rest/projects?fields=project%28id,name,parentProjectId,webUrl,buildTypes%28buildType%28id,name,webUrl%29%29%29",
+                    readOnly: true
+                },
+                overview: {
+                    type: String,
+                    value: "/app/rest/projects?locator=selectedByUser:current&fields=count,project(id,parentProjectId,projects(count,project(id),$locator(selectedByUser:current)),buildTypes(count,buildType(id),$locator(selectedByUser:current)))",
+                    readOnly: true
+                }
+            }
+        });
+    </script>
+</dom-module><dom-module id="server-auth" assetpath="elements/">
+    <style>
+        .state{
+            font-size: larger;
+        }
+        .unknown{
+            color: gray;
+        }
+        .auth{
+            color: green;
+        }
+        .not-auth{
+            color: red;
+        }
+        .info{
+            padding-top: 10px;
+            color: gray;
+        }
+    </style>
+    <template>
+        <span class$="state {{state}}">●</span>&nbsp;<span class="name">{{server}}</span>
+        <template is="dom-if" if="{{notAuthorized}}">
+            <div class="info">You are not authorized on this server. Please <a href="{{server}}/{{loginUrl}}" target="_blank">login.</a> </div>
+        </template>
+    </template>
+    <script>
+        // element registration
+        Polymer({
+            is: "server-auth",
+            properties: {
+                server: {
+                    type: String
+                },
+                serverState: {
+                    type: Object,
+                    notify: true,
+                    observer: '_serverStateChanged'
+                },
+                loginUrl: {
+                    type: String
+                },
+                state:{
+                    type: String,
+                    value: 'unknown',
+                    notify: true
+                },
+                notAuthorized:{
+                    type: Boolean,
+                    computed: '_isNotAuthorized(state)'
+                }
+
+            },
+            _isNotAuthorized: function(state){
+                return state == 'not-auth';
+            },
+            ready: function(){
+            },
+            _serverStateChanged: function(value){
+                this.state = value.name == 'OK' ? "auth" : "not-auth";
+            }
+        });
+    </script>
+</dom-module><dom-module id="teamcity-server" assetpath="elements/">
+    <template>
+        <teamcity-server-urls id="urls"></teamcity-server-urls>
+        <teamcity-ajax id="ajaxProject" server="{{server}}" state="{{projectsState}}" data="{{projects}}"></teamcity-ajax>
+        <teamcity-ajax id="ajaxOverview" server="{{server}}" state="{{overviewState}}" data="{{overview}}"></teamcity-ajax>
+        <server-auth server-state="{{projectsState}}" server="{{server}}" login-url="{{ urls.login}}"></server-auth>
+    </template>
+    <script>
+        // element registration
+        Polymer({
+            is: "teamcity-server",
+            properties: {
+                server: {
+                    type: String,
+                    notify: true,
+                    observer: '_serverUrlChanged'
+                },
+                projectsState: {
+                    type: Object,
+                    notify: true
+                },
+                overviewState: {
+                    type: Object,
+                    notify: true
+                },
+                projects:{
+                    type: Object,
+                    notify: true,
+                    observer: '_projectsLoaded'
+                },
+                overview:{
+                    type: Object,
+                    notify: true
+                }
+            },
+            behaviors: [LoggingBehavior, ConverterBehavior],
+            observers: ['dataLoaded(projects, overview)'],
+            stateChanged: function(state){
+                 console.log('stateChanged');
+                 console.log(state);
+            },
+            getProjects: function(){
+
+            },
+            getUser: function(){
+
+            },
+            dataLoaded: function(projects, overview){
+
+            },
+            _projectsLoaded: function(projects){
+                this.projectTree = this.flatToNested(projects["project"]);
+                this.fire('iron-signal', {name: "project-tree-loaded", data: this.projectTree});
+            },
+            _serverUrlChanged: function(){
+                this.urls = this.$.urls;
+                this.$.ajaxProject.restUrl = this.urls.projects;
+                this.$.ajaxOverview.restUrl = this.urls.overview;
+            },
+            ready: function(){
+            }
         });
     </script>
 </dom-module><dom-module id="iron-list" assetpath="bower_components/iron-list/">
@@ -11317,6 +11648,7 @@ l)&&void 0!==f[l]&&null!==f[l]&&g.val.push([l,String(f[l])]);g.val.length&&(g.ty
       if (this._physicalAverage === 0) {
         return false;
       }
+
       if (this._physicalBottom < this._scrollBottom || this._physicalTop > this._scrollPosition) {
         return this._increasePool(1);
       }
@@ -11923,316 +12255,233 @@ l)&&void 0!==f[l]&&null!==f[l]&&g.val.push([l,String(f[l])]);g.val.length&&(g.ty
 })();
 
 </script>
-<dom-module id="tree-view" assetpath="elements/">
+<dom-module id="projects-list" assetpath="elements/">
     <style>
-        .subTree{
-            padding-left: 15px;
-            display: none;
+        iron-list{
+            width: 400px;
+            height: 500px;
+            overflow-y: scroll;
+            overflow-x: hidden;
+            background-color: white;
+            padding-left: 10px;
+            padding-top: 10px;
         }
-        :host(.expanded) > .subTree{
-           display: block;
+        ::-webkit-scrollbar {
+            width: 5px;
         }
-        iron-list {
-            height: 100%;
+
+        ::-webkit-scrollbar-track {
+            -webkit-border-radius: 5px;
+            border-radius: 5px;
+            -webkit-box-shadow: inset 0 0 2px rgba(0,0,0,0.5);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            -webkit-border-radius: 5px;
+            border-radius: 5px;
+            background: rgba(0,0,0,0.5);
+
+        }
+        ::-webkit-scrollbar-thumb:window-inactive {
+            background: rgba(0,0,0,0.3);
         }
     </style>
     <template>
-        <tree-node data="{{data}}" is-expanded="{{isExpanded}}"></tree-node>
-        
-        <template is="dom-if" if="{{isExpanded}}">
-            <template is="dom-repeat" items="{{data.children}}">
-                <div class="subTree">
-                    <tree-view data="{{item}}"></tree-view>
-                </div>
-            </template>
-        </template>
-    </template>
-    <script>
-        Polymer({
-            is: "tree-view",
-            properties: {
-                data:{
-                    type: Object,
-                    notify: true,
-                    observer: "_dataChanged"
-                }
-            },
-            behaviors: [ExpandedBehavior]
-        });
-    </script>
-</dom-module><dom-module id="projects-presenter" assetpath="elements/">
-    <template>
-        <iron-signals on-iron-signal-terms="filterResult">
-        
-        <template is="dom-repeat" items="{{filtered}}">
-            <div>
-                <tree-view data="{{item}}"></tree-view>
-            </div>
-        </template>
+          <iron-signals on-iron-signal-terms="filterResult">
+          <iron-list items="[[visibleItems]]" as="item" id="list">
+                <template>
+                        <div data-index="{{index}}"> 
+                            <tree-node current-node="{{item.node}}" terms="{{terms}}" on-expand="onExpand" data-index="{{index}}"></tree-node>
+                        </div>
+                </template>
+          </iron-list>
     </iron-signals></template>
     <script>
         // element registration
         Polymer({
-            is: "projects-presenter",
+            is: "projects-list",
             properties: {
                 dataTree:{
-                    type: Object,
-                    observer: "_dataTreeChanged",
+                    type: Array,
+                    observer: "_dataChanged",
                     notify: true
                 },
-                filtered:{
-                    type: Object,
-                    notify: true,
-                    computed: "filteredData(dataTree, terms)"
+                visibleItems:{
+                    type: Array,
+                    notify: true
                 },
-                terms:{
+                terms: {
                     type: String,
                     value: "",
-                    notify: true
+                    notify: true,
+                    observer: "_termsChanged"
                 }
             },
-            _dataTreeChanged: function(){
-                console.log('_dataTreeChanged');
-            },
-            filteredData: function(dataTree, terms){
-                if (terms == ""){
-                    return dataTree[0].children;
-                }
-
-                return this.filteredTreeData(JSON.parse(JSON.stringify(dataTree))[0].children, new RegExp(terms.replace(/[.*+?^${}()|[\]\/\\]/g, '\\$&'), 'i'));
-            },
-            filteredTreeData: function(children, re){
-                if (children == undefined || children.length == 0){
-                    return [];
-                }
+            _visibleItems: function(dataTree, terms){
                 var d = [];
+                this.index = 0;
+                var t1 = this.filteredData(dataTree, terms, 0);
+                if (t1 == undefined){
+                    return d;
+                }
                 var self = this;
-                children.forEach(function(node){
-                    var c = self.filteredTreeData(node.children, re);
-                    var hasRequiredText = re.test(node.text);
-                    if (c.length>0 || hasRequiredText){
-                        node.isExpanded = true;
-                        node.children = c;
+                var data = this._visitDfs(t1, 0, function(node){
+                    if (self.terms=="") {
+                        if (node.node.level == 1 || node.node.level == 0){
+                            d.push(node);
+                        }
+                    } else {
                         d.push(node);
                     }
                 });
+
+                if (dataTree.length==2) {
+                    var t2 = this.filteredData(dataTree, terms, 1);
+                    if (t2 != undefined) {
+                        var data2 = this._visitDfs(t2, 0, function (node) {
+                            if (self.terms == "") {
+                                if (node.node.level == 1 || node.node.level == 0) {
+                                    d.push(node);
+                                }
+                            } else {
+                                d.push(node);
+                            }
+                        });
+                    }
+                }
                 return d;
+            },
+            _dataChanged: function(){
+                this.visibleItems = this._visibleItems(this.dataTree, this.terms);
+            },
+            _termsChanged: function(){
+                this.visibleItems = this._visibleItems(this.dataTree, this.terms);
+            },
+            click: function(e){
+            },
+            _visitDfs: function(node, level, func){
+                var self = this;
+
+                node.index = this.index;
+                node.level = level;
+                var listNode = {node:node, index: this.index};
+
+                if (func) {
+                    func(listNode);
+                }
+
+                this.index++;
+
+                if (node.children==undefined) {
+                    return;
+                }
+                node.children.forEach(function (child) {
+                    self._visitDfs(child, level+1, func);
+                });
+            },
+            filteredData: function(dataTree, terms, x){
+                if (dataTree == undefined){
+                    return undefined;
+                }
+                if (terms == ""){
+                    return dataTree[x];
+                }
+                return this.filteredTreeData(JSON.parse(JSON.stringify(dataTree))[x], new RegExp(terms.replace(/[.*+?^${}()|[\]\/\\]/g, '\\$&'), 'i'));
+            },
+            filteredNode: function(node, re){
+                var self = this;
+                var hasRequiredText = re.test(node.text);
+                var filteredChildren = [];
+                if (node.children != undefined){
+                    node.children.forEach(function(child){
+                        var fc = self.filteredNode(child, re);
+                        if (fc != undefined){
+                            filteredChildren.push(fc);
+                        }
+                    });
+                }
+
+                node.children = filteredChildren;
+
+                if (filteredChildren.length>0){
+                    node.isExpanded = true;
+                } else {
+                    node.isExpanded = false;
+                }
+
+                if (hasRequiredText || filteredChildren.length>0){
+                    return node;
+                }
+
+                return undefined;
+            },
+            filteredTreeData: function(node, re){
+                return this.filteredNode(node,re);
             },
             filterResult: function(e, detail, sender){
                 this.terms = detail;
             },
-            filterChildren: function(arr){
-               var d = [];
-               arr.forEach(function(node){
-                    if (node.text.indexOf(terms)>-1){
-                        d.push(node);
+            onExpand: function(e){
+                var item = e.model.item;
+                if (item == undefined){
+                    return;
+                }
+                var expanded = item.node.isExpanded;
+                var i = this.visibleItems.indexOf(item);
+                var self = this;
+                this.removeIndex = i++;
+
+                if (expanded) {
+                    item.node.children.forEach(function (c) {
+                        var entry = {node: c, index: c.index};
+                        c.isExpanded = false;
+                        self.splice('visibleItems', i++, 0, entry);
+                    });
+                } else {
+                    this.spliceChildren(item.node);
+                }
+            },
+            spliceChildren: function(node){
+                this.removeIndex++;
+                var self = this;
+                node.isExpanded = false;
+                node.children.forEach(function (c) {
+                    if (c.isExpanded && !c.isBuildType){
+                       self.spliceChildren(c);
                     }
+                    self.splice('visibleItems', self.removeIndex, 1);
                 });
-               return d;
+                self.removeIndex--;
+            },
+            addNewServer: function(server){
+                console.log('addNewServer');
+                this.dataTree.push(server[0]);
+                this._dataChanged();
             }
         });
     </script>
-</dom-module><dom-module id="server-auth" assetpath="elements/">
+</dom-module><dom-module id="project-list-wrapper" assetpath="elements/">
     <style>
-        .state{
-            font-size: larger;
-        }
-        .unknown{
-            color: gray;
-        }
-        .auth{
-            color: green;
-        }
-        .not-auth{
-            color: red;
-        }
-        .info{
-            padding-top: 10px;
-            color: gray;
-        }
-    </style>
-    <template>
-        <span class$="state {{state}}">●</span>&nbsp;<span class="name">{{server}}</span>
-        <template is="dom-if" if="{{notAuthorized}}">
-            <div class="info">You are not authorized on this server. Please <a href="{{server}}/{{loginUrl}}" target="_blank">login.</a> </div>
-        </template>
-    </template>
-    <script>
-        // element registration
-        Polymer({
-            is: "server-auth",
-            properties: {
-                server: {
-                    type: String
-                },
-                serverState: {
-                    type: Object,
-                    notify: true,
-                    observer: '_serverStateChanged'
-                },
-                restUrl: {
-                    type: String
-                },
-                loginUrl: {
-                    type: String
-                },
-                state:{
-                    type: String,
-                    value: 'unknown',
-                    notify: true
-                },
-                notAuthorized:{
-                    type: Boolean,
-                    computed: '_isNotAuthorized(state)'
-                }
+       #container{
+           flex-direction: column;
+       }
 
-            },
-            _isNotAuthorized: function(state){
-                return state == 'not-auth';
-            },
-            ready: function(){
-            },
-            _serverStateChanged: function(value){
-                this.state = value.name == 'OK' ? "auth" : "not-auth";
-            }
-        });
-    </script>
-</dom-module><dom-module id="server-view" assetpath="elements/">
-    <style>
-        #container{
-            background-color: #fff;
-            border: 1px solid #c8c8c8;
-            min-height: 350px;
-            min-width: 400px;
-            margin: 20px;
-            padding: 0 20px 20px 20px;
-            display: inline-block;
-            height: 100%;
-        }
-        #server{
-            padding: 20px;
-        }
-        #auth{
-            margin-top: 20px;
-            margin-bottom: 20px;
-        }
+       .item, projects-list{
+            flex: auto;
+       }
     </style>
     <template>
+        <iron-signals on-iron-signal-project-tree-loaded="dataLoaded">
         <div id="container">
-            <div id="auth"><teamcity-request server="{{server}}" data-tree="{{dataTree}}"></teamcity-request></div>
-            <projects-presenter data-tree="{{dataTree}}"></projects-presenter>
-        </div>
-    </template>
-    <script>
-        // element registration
-        Polymer({
-            is: "server-view",
-            properties: {
-                server: {
-                    type: String
-                }
-            }
-        });
-    </script>
-</dom-module><dom-module id="teamcity-search" assetpath="elements/">
-    <style>
-        :host{
-        }
-        input:focus{
-            outline: none !important;
-        }
-        input[is=iron-input]:focus{
-            border:1px solid gray !important;
-        }
-        input[type=button]{
-            background-color: #00b0ff;
-            -moz-border-radius: 10px;
-            -webkit-border-radius: 10px;
-            border-radius:10px;
-            color: #fff;
-            text-decoration: none;
-            cursor: pointer;
-            border:none;
-            line-height: 2em;
-            padding: 3px;
-            width: 100px;
-        }
-        input[is=iron-input]{
-            width: 40%;
-            margin-right: 10px;
-            line-height: 2em;
-            -webkit-appearance:textfield;
-            box-sizing: content-box;
-            border:1px solid lightgray;
-            padding: 2px;
-        }
-        .logo {
-            background: url("elements/icons/logo64x64.png") no-repeat;
-            display: inline-block;
-            background-size: 64px 64px;
-            height: 64px;
-            padding-left: 74px;
-        }
-    </style>
-    <template>
-        <div id="search" class="fullbleed layout horizontal center-center" style="padding-top: 50px;">
-            <span class="logo"></span>
-            <input type="search" bind-value="{{terms}}" is="iron-input" on-keydown="checkEnter">
-            <input type="button" value="SEARCH" on-click="submitSearch">
-        </div>
-    </template>
-    <script>
-        // element registration
-        Polymer({
-            is: "teamcity-search",
-            properties: {
-                terms:{
-                    type: String,
-                    notify: true,
-                    observer: '_termsChanged'
-                }
-            },
-            submitSearch: function(){
-                this.fire('iron-signal', {name: "terms", data: this.terms});
-            },
-            checkEnter: function(e){
-                if (e.keyCode==13){
-                   this.fireTermsChanged();
-                }
-            },
-            fireTermsChanged: function(){
-                this.fire('iron-signal', {name: "terms", data: this.terms});
-            },
-            _termsChanged: function(value, oldValue){
-                if (value=='' && oldValue!='') {
-                   this.fireTermsChanged();
-                }
-            }
+            <div id="view" class="item">
 
-        });
-    </script>
-</dom-module><dom-module id="teamcity-request" assetpath="elements/">
-    <style>
-        .container {
-            background-color: #fff;
-            border: 1px solid #c8c8c8;
-            min-height: 350px;
-            min-width: 400px;
-            margin: 20px;
-            padding: 20px 20px 20px 20px;
-            display: inline-block;
-            height: 100%;
-        }
-    </style>
-    <template>
-        <server-auth server="{{server}}" rest-url="{{restUrl}}" login-url="{{loginUrl}}" server-state="{{state}}"></server-auth>
-        <teamcity-ajax server="{{server}}" rest-url="{{restUrl}}" rest-object-name="{{restObjectName}}" data="{{data}}" state="{{state}}"></teamcity-ajax>
-        <flat-to-nested id="ftn" data="{{data}}" data-tree="{{dataTree}}">
-    </flat-to-nested></template>
+            </div>
+        </div>
+    </iron-signals></template>
     <script>
         // element registration
         Polymer({
-            is: "teamcity-request",
+            is: "project-list-wrapper",
             properties: {
                 server: {
                     type: String
@@ -12257,66 +12506,20 @@ l)&&void 0!==f[l]&&null!==f[l]&&g.val.push([l,String(f[l])]);g.val.length&&(g.ty
                     type: Object,
                     notify: true
                 }
-
             },
-            ready: function(){
-                var self = this;
-                this.$.ftn.addEventListener('dataTreeChanged', function (e) {
-                    self.fire('dataTreeChanged',{dataTree:this.dataTree});
-                });
-            }
-        });
-    </script>
-</dom-module><dom-module id="multi-server-view" assetpath="elements/">
-    <style>
-        .container{
-            background-color: #fff;
-            border: 1px solid #c8c8c8;
-            min-height: 350px;
-            min-width: 400px;
-            margin: 20px;
-            padding: 20px 20px 20px 20px;
-            display: inline-block;
-            height: 100%;
-        }
-    </style>
-    <template>
-        <div class="horizontal layout wrap center-justified">
-            <div style="align-self: flex-start;">
-                <div class="container">
-                    <template is="dom-repeat" items="{{servers}}" as="server">
-                        <div>
-                            <teamcity-request server="{{server}}" on-data-tree-changed="aggregateData"></teamcity-request>
-                        </div>
-                    </template>
-                </div>
-            </div>
-            <div style="align-self: flex-start;">
-                 <div class="container" id="dataContainer"></div>
-            </div>
-        </div>
-    </template>
-    <script>
-        // element registration
-        Polymer({
-            is: "multi-server-view",
-             properties: {
-                servers: {
-                    type: Array
-                },
-                allData:{
-                    type: Array,
-                    value: function() { return []; },
-                    notify: true
+            _flatDataChanged: function(value){
+                console.log(value);
+            },
+            dataLoaded: function(e){
+                var pl = document.querySelector("projects-list");
+                if (pl == undefined) {
+                    pl = document.createElement("projects-list");
+                    this.$.view.appendChild(pl);
+                    pl.dataTree = e.detail;
+                } else {
+                    pl.addNewServer(e.detail);
                 }
-            },
-            aggregateData: function(e){
-                this.allData.push(e.detail.value[0]);
-                var innerDiv = document.createElement("div");
-                var treeView = document.createElement("projects-presenter");
-                treeView.dataTree = e.detail.value;
-                innerDiv.appendChild(treeView);
-                this.$.dataContainer.appendChild(innerDiv);
+
             }
         });
     </script>
@@ -12326,25 +12529,32 @@ l)&&void 0!==f[l]&&null!==f[l]&&g.val.push([l,String(f[l])]);g.val.length&&(g.ty
             label{
                 cursor: pointer;
             }
+            #serversHolder{
+                background-color: white;
+                width: 300px;
+                min-height: 100px;
+                margin-left: 20px;
+                padding-left: 10px;
+                padding-top: 5px;
+            }
+            #resultsHolder{
+                width: 413px;
+            }
         </style>
-        <teamcity-search></teamcity-search>
-        <div style="width: 100%; text-align: center;">
-            <input id="aggregateDataSetting" is="iron-input" type="checkbox" checked="{{aggregateData}}" on-change="_aggregateDataChanged">
-            <label for="aggregateDataSetting">Show data from all servers in one tree</label>
+
+        <div style="width: 100%; text-align: center; margin-bottom: 25px;">
+            <teamcity-search></teamcity-search>
         </div>
-        <template is="dom-if" if="{{!aggregateData}}">
-                <div class="horizontal layout wrap center-justified">
-                    <template is="dom-repeat" items="{{servers}}" as="server">
-                        <div style="align-self: flex-start;">
-                            <server-view server="{{server}}"></server-view>
-                        </div>
-                    </template>
-                </div>
-        </template>
-        <template is="dom-if" if="{{aggregateData}}">
-                <multi-server-view servers="{{servers}}"></multi-server-view>
-        </template>
+        <div class="horizontal layout wrap center-justified">
+            <div id="resultsHolder">
+                <project-list-wrapper></project-list-wrapper>
+            </div>
+            <div id="serversHolder" class="vertical layout">
+
+            </div>
+        </div>
     </template>
+
     <script>
         Polymer({
             is: "search-container",
@@ -12360,18 +12570,30 @@ l)&&void 0!==f[l]&&null!==f[l]&&g.val.push([l,String(f[l])]);g.val.length&&(g.ty
                     notify: true
                 }
             },
+            behaviors: [LoggingBehavior],
             ready: function(){
-                console.log(this.servers);
                 var params = URI(document.location.href).search(true);
                 var servers = params["server"];
 
-                if (servers == undefined && this.servers.length > 0){
-                    return;
+                if (servers != undefined){
+                    this._applyDataFromUrl(servers);
                 }
-                if (servers == undefined && this.servers.length){
-                    console.log("No servers URL are provided. Ensure you pass the parameters to the URL, e.g. server=http://server1.com&server=http://server2.com");
-                    return;
-                }
+
+                var serversHolder = this.$.serversHolder;
+
+                this.debug('servers: ' + this.servers);
+                this.debug('serversHolder: ' + serversHolder);
+
+                var self = this;
+                this.servers.forEach(function(s){
+                    var ts = document.createElement("teamcity-server");
+                    ts.server = s;
+                    self.debug('teamcity-server will be added for: ' + s);
+                    serversHolder.appendChild(ts);
+                });
+            },
+            _applyDataFromUrl: function(servers){
+                this.debug('Data from URL will be applied: ' + servers);
                 if (Array.isArray(servers)){
                     this.servers = servers;
                 } else {

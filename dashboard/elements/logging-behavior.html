@@ -29,8 +29,9 @@
         },
         _log: function(level, message){
             if (level >= this.level){
-                console.log('['+ this.levels[level] + '] ' + (this.id != undefined ? this.id : this.tagName) + ": " + message);
-                if (!(typeof message == String)){
+                var el = this.id != undefined && this.id.length > 0 ? this.id : this.tagName;
+                console.log('['+ this.levels[level] + '] ' + el + " -> " + message);
+                if (!(typeof message == 'string')){
                     console.log(message);
                 }
             }

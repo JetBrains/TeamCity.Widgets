@@ -34,7 +34,8 @@
             properties: {
                 server: {
                     type: String,
-                    notify: true
+                    notify: true,
+                    observer: '_serverUrlChanged'
                 },
                 projectsState: {
                     type: Object,
@@ -73,10 +74,12 @@
                 this.projectTree = this.flatToNested(projects["project"]);
                 this.fire('iron-signal', {name: "project-tree-loaded", data: this.projectTree});
             },
-            ready: function(){
+            _serverUrlChanged: function(){
                 this.urls = this.$.urls;
                 this.$.ajaxProject.restUrl = this.urls.projects;
                 this.$.ajaxOverview.restUrl = this.urls.overview;
+            },
+            ready: function(){
             }
         });
     </script>

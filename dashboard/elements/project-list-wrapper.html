@@ -15,7 +15,6 @@
   -->
 
 <link rel="import" href="teamcity-ajax.html">
-<link rel="import" href="flat-to-nested.html">
 <link rel="import" href="server-auth.html">
 <link rel="import" href="projects-list.html">
 <link rel="import" href="../bower_components/iron-signals/iron-signals.html">
@@ -24,9 +23,10 @@
        #container{
            flex-direction: column;
        }
-        .item, projects-list{
+
+       .item, projects-list{
             flex: auto;
-        }
+       }
     </style>
     <template>
         <iron-signals on-iron-signal-project-tree-loaded="dataLoaded"/>

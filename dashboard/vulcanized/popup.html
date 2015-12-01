@@ -9856,8 +9856,9 @@ l)&&void 0!==f[l]&&null!==f[l]&&g.val.push([l,String(f[l])]);g.val.length&&(g.ty
         },
         _log: function(level, message){
             if (level >= this.level){
-                console.log('['+ this.levels[level] + '] ' + (this.id != undefined ? this.id : this.tagName) + ": " + message);
-                if (!(typeof message == String)){
+                var el = this.id != undefined && this.id.length > 0 ? this.id : this.tagName;
+                console.log('['+ this.levels[level] + '] ' + el + " -> " + message);
+                if (!(typeof message == 'string')){
                     console.log(message);
                 }
             }
@@ -10748,18 +10749,24 @@ l)&&void 0!==f[l]&&null!==f[l]&&g.val.push([l,String(f[l])]);g.val.length&&(g.ty
             padding: 3px;
             width: 100px;
         }
-        .logo {
-            background: url("elements/icons/logo64x64.png") no-repeat;
+        #logo {
+            /*background: url("elements/icons/logo64x64.png") no-repeat;*/
             display: inline-block;
             background-size: 64px 64px;
             height: 64px;
             padding-left: 74px;
+            border: 1px solid lightgray;
+            background-color: lightgray;
+        }
+        #inputContainer{
+            width: 40vw;
+            padding: 0 20px 0 10px;
         }
     </style>
     <template>
         <div id="search" class="fullbleed layout horizontal center-center" style="padding-top: 50px;">
-            <span class="logo"></span>
-            <teaamcity-search-input></teaamcity-search-input>
+            <span id="logo"></span>
+            <span id="inputContainer"><teamcity-search-input></teamcity-search-input></span>
             <input type="button" value="SEARCH" on-click="submitSearch">
         </div>
     </template>
@@ -10829,73 +10836,6 @@ l)&&void 0!==f[l]&&null!==f[l]&&g.val.push([l,String(f[l])]);g.val.length&&(g.ty
                 //this.$.ajax.url = 'http://localhost:8080/dashboard/testData/buildserver.jetbrains.com.json';
                 this.$.ajax.url = this.server + this.restUrl;
                 this.$.ajax.generateRequest();
-            }
-        });
-    </script>
-</dom-module><dom-module id="flat-to-nested" assetpath="elements/">
-    <script>
-        // element registration
-        Polymer({
-            is: "flat-to-nested",
-            properties: {
-                data: {
-                    type: Object,
-                    observer: "_dataChanged"
-                },
-                dataTree: {
-                    type: Object,
-                    notify: true,
-                    observer: "_dataTreeChanged"
-                }
-            },
-            _dataTreeChanged: function (value){
-                this.fire('dataTreeChanged', {dataTree: value});
-            },
-            _dataChanged: function (newValue, oldValue){
-                this.projects = this.data;
-                var dataMap = this.projects.reduce(function(map, node) {
-                    map[node.id] = node;
-                    return map;
-                }, {});
-
-                var dataTree = [];
-                for (var i=0; i<this.projects.length; i++){
-                    var node = this.projects[i];
-                    // add to parent
-                    node.text = node.name;
-                    node.isExpanded = false;
-                    var bts = node.buildTypes!=undefined ? node.buildTypes.buildType : undefined;
-                    node.href = node.webUrl;
-                    if (node.id == '_Root'){
-                        var serverName = node.webUrl.replace('/project.html?projectId=_Root','');
-                        node.text = serverName;
-                        node.name = serverName;
-                        node.isExpanded = true;
-                    }
-                    var parent = dataMap[node.parentProjectId];
-                    if (parent) {
-                        // create child array if it doesn't exist
-                        var pp = (parent.children || (parent.children = []));
-                        pp.push(node);
-                        if (bts != undefined && bts.length>0){
-                            var ppp = (node.children || (node.children = []));
-                            for (var z=0; z<bts.length; z++) {
-                                var bt = {
-                                    text: bts[z].name,
-                                    href: bts[z].webUrl,
-                                    isBuildType: true,
-                                    parentProjectId: node.id,
-                                    isExpanded: false
-                                };
-                                ppp.push(bt);
-                            }
-                        }
-                    } else {
-                        // parent is null or missing
-                        dataTree.push(node);
-                    }
-                }
-                this.dataTree = dataTree;
             }
         });
     </script>
@@ -12177,6 +12117,8 @@ l)&&void 0!==f[l]&&null!==f[l]&&g.val.push([l,String(f[l])]);g.val.length&&(g.ty
             overflow-y: scroll;
             overflow-x: hidden;
             background-color: white;
+            padding-left: 10px;
+            padding-top: 10px;
         }
         ::-webkit-scrollbar {
             width: 5px;
@@ -12377,9 +12319,10 @@ l)&&void 0!==f[l]&&null!==f[l]&&g.val.push([l,String(f[l])]);g.val.length&&(g.ty
        #container{
            flex-direction: column;
        }
-        .item, projects-list{
+
+       .item, projects-list{
             flex: auto;
-        }
+       }
     </style>
     <template>
         <iron-signals on-iron-signal-project-tree-loaded="dataLoaded">
@@ -12472,7 +12415,8 @@ l)&&void 0!==f[l]&&null!==f[l]&&g.val.push([l,String(f[l])]);g.val.length&&(g.ty
             properties: {
                 server: {
                     type: String,
-                    notify: true
+                    notify: true,
+                    observer: '_serverUrlChanged'
                 },
                 projectsState: {
                     type: Object,
@@ -12511,10 +12455,12 @@ l)&&void 0!==f[l]&&null!==f[l]&&g.val.push([l,String(f[l])]);g.val.length&&(g.ty
                 this.projectTree = this.flatToNested(projects["project"]);
                 this.fire('iron-signal', {name: "project-tree-loaded", data: this.projectTree});
             },
-            ready: function(){
+            _serverUrlChanged: function(){
                 this.urls = this.$.urls;
                 this.$.ajaxProject.restUrl = this.urls.projects;
                 this.$.ajaxOverview.restUrl = this.urls.overview;
+            },
+            ready: function(){
             }
         });
     </script>
