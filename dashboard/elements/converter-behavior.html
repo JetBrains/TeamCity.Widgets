@@ -16,52 +16,67 @@
 
 <script type="text/javascript">
     ConverterBehavior = {
-            flatToNested: function (data){
-                var dataMap = data.reduce(function(map, node) {
-                    map[node.id] = node;
-                    return map;
-                }, {});
+        _getServerName: function(href){
+            var i1 = href.indexOf("//");
+            var i2 = href.indexOf("/", i1+2);
+            return href.substring(0, i2);
+        },
+        flatToNested: function (data){
+            var dataMap = data.reduce(function(map, node) {
+                map[node.id] = node;
+                return map;
+            }, {});
 
-                console.log(dataMap);
-
-                var dataTree = [];
-                for (var i=0; i<data.length; i++){
-                    var node = data[i];
-                    // add to parent
-                    node.text = node.name;
-                    node.isExpanded = false;
-                    var bts = node.buildTypes!=undefined ? node.buildTypes.buildType : undefined;
-                    node.href = node.webUrl;
-                    if (node.id == '_Root'){
-                        var serverName = node.webUrl.replace('/project.html?projectId=_Root','');
-                        node.text = serverName;
-                        node.name = serverName;
-                        node.isExpanded = true;
-                    }
-                    var parent = dataMap[node.parentProjectId];
-                    if (parent) {
-                        // create child array if it doesn't exist
-                        var pp = (parent.children || (parent.children = []));
-                        pp.push(node);
-                        if (bts != undefined && bts.length>0){
-                            var ppp = (node.children || (node.children = []));
-                            for (var z=0; z<bts.length; z++) {
-                                var bt = {
-                                    text: bts[z].name,
-                                    href: bts[z].webUrl,
-                                    isBuildType: true,
-                                    parentProjectId: node.id,
-                                    isExpanded: false
-                                };
-                                ppp.push(bt);
-                            }
-                        }
-                    } else {
-                        // parent is null or missing
-                        dataTree.push(node);
-                    }
+            var dataTree = [];
+            for (var i=0; i<data.length; i++){
+                var node = data[i];
+                // add to parent
+                node.text = node.name;
+                node.isExpanded = false;
+                var bts = node.buildTypes!=undefined ? node.buildTypes.buildType : undefined;
+                node.href = node.webUrl;
+                if (node.id == '_Root'){
+                    var serverName = node.webUrl.replace('/project.html?projectId=_Root','');
+                    node.text = serverName;
+                    node.name = serverName;
+                    node.isExpanded = true;
                 }
-                return dataTree;
+                var parent = dataMap[node.parentProjectId];
+                if (parent) {
+                    // create child array if it doesn't exist
+                    var pp = (parent.children || (parent.children = []));
+                    pp.push(node);
+                    if (bts != undefined && bts.length>0){
+                        var ppp = (node.children || (node.children = []));
+                        for (var z=0; z<bts.length; z++) {
+                            var bt = {
+                                text: bts[z].name,
+                                href: bts[z].webUrl,
+                                isBuildType: true,
+                                parentProjectId: node.id,
+                                isExpanded: false
+                            };
+                            ppp.push(bt);
+                        }
+                    }
+                } else {
+                    dataTree.push(node);
+                }
             }
+
+            if (dataTree.length > 1){
+                var href = this._getServerName(dataTree[0].webUrl);
+                var root = {
+                  name: href,
+                  text: href,
+                  webUrl: href,
+                  children: dataTree,
+                    isExpanded: true
+                };
+                return [root];
+            }
+            return dataTree;
+        }
+
     };
 </script>

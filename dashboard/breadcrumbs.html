@@ -20,9 +20,7 @@
     <link href='http://fonts.googleapis.com/css?family=Roboto Condensed:400,700,900' rel='stylesheet' type='text/css'>
     <script src="bower_components/webcomponentsjs/webcomponents.min.js"></script>
     <link rel="import" href="bower_components/polymer/polymer.html">
-    <link rel="import" href="elements/teamcity-search.html">
-    <link rel="import" href="elements/project-list-wrapper.html">
-    <link rel="import" href="elements/teamcity-server.html">
+    <link rel="import" href="elements/search-container.html">
     <style is="custom-style">
         html, body {
             padding: 0;
@@ -31,7 +29,7 @@
         }
 
         .container {
-            width: 840px;
+            width: 425px;
             height: 80%;
             border: 1px solid blue;
             display: flex;
@@ -39,13 +37,8 @@
 
         .search {
             display: inline-block;
-            width: 50%;
+            width: 100%;
             border-right: 1px solid gray;
-        }
-
-        .servers {
-            display: inline-block;
-            width: 50%;
         }
 
         teamcity-search-input{
@@ -73,16 +66,9 @@
     <div class="search">
         <teamcity-search-input></teamcity-search-input>
         <div class="results">
-            <project-list-wrapper></project-list-wrapper>
+            <project-list-wrapper server="http://buildserver.labs.intellij.net"></project-list-wrapper>
         </div>
-    </div>
-    <div class="servers">
-        <div>
-           <teamcity-server server="http://buildserver.labs.intellij.net"></teamcity-server>
-        </div>
-        <div>
-           <teamcity-server server="https://teamcity.jetbrains.com"></teamcity-server>
-        </div>
+        <teamcity-server server="http://buildserver.labs.intellij.net"></teamcity-server>
     </div>
 </div>
 </body>

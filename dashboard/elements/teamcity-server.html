@@ -20,12 +20,14 @@
 <link rel="import" href="logging-behavior.html">
 <link rel="import" href="converter-behavior.html">
 <link rel="import" href="../bower_components/iron-signals/iron-signals.html">
+<script type="text/javascript" src="../bower_components/uri.js/src/URI.min.js"></script>
 <dom-module id="teamcity-server">
     <template>
-        <teamcity-server-urls id="urls"></teamcity-server-urls>
+        <teamcity-server-urls id="urls" affected-project="{{rootProject}}"></teamcity-server-urls>
         <teamcity-ajax id="ajaxProject" server="{{server}}" state="{{projectsState}}" data="{{projects}}"></teamcity-ajax>
         <teamcity-ajax id="ajaxOverview" server="{{server}}" state="{{overviewState}}" data="{{overview}}"></teamcity-ajax>
         <server-auth server-state="{{projectsState}}" server="{{server}}" login-url="{{ urls.login}}"></server-auth>
+        <div>{{rootProject}}</div>
     </template>
     <script>
         // element registration
@@ -34,8 +36,12 @@
             properties: {
                 server: {
                     type: String,
+                    notify: true
+                },
+                rootProject:{
+                    type: String,
                     notify: true,
-                    observer: '_serverUrlChanged'
+                    value: "_Root"
                 },
                 projectsState: {
                     type: Object,
@@ -56,7 +62,7 @@
                 }
             },
             behaviors: [LoggingBehavior, ConverterBehavior],
-            observers: ['dataLoaded(projects, overview)'],
+            observers: ['dataLoaded(projects, overview)', '_serverUrlChanged(server, rootProject)'],
             stateChanged: function(state){
                  this.debug(state)
             },
@@ -73,12 +79,19 @@
                 this.projectTree = this.flatToNested(projects["project"]);
                 this.fire('iron-signal', {name: "project-tree-loaded", data: this.projectTree});
             },
-            _serverUrlChanged: function(){
+            _serverUrlChanged: function(server, rootProject){
+                this.debug('_serverUrlChanged: ' + server + " -> " + rootProject);
                 this.urls = this.$.urls;
                 this.$.ajaxProject.restUrl = this.urls.projects;
                 this.$.ajaxOverview.restUrl = this.urls.overview;
             },
             ready: function(){
+                var params = URI(document.location.href).search(true);
+                var rootProject = params["rootProject"];
+                if (rootProject != undefined){
+                  this.debug('root project applied from URL: ' + rootProject);
+                  this.rootProject = rootProject;
+                }
             }
         });
     </script>

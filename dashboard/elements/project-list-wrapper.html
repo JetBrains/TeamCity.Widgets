@@ -41,21 +41,6 @@
         Polymer({
             is: "project-list-wrapper",
             properties: {
-                server: {
-                    type: String
-                },
-                restObjectName: {
-                    type: String,
-                    value: "project"
-                },
-                loginUrl: {
-                    type: String,
-                    value: "login.html"
-                },
-                restUrl: {
-                    type: String,
-                    value: "/app/rest/projects?fields=project%28id,name,parentProjectId,webUrl,buildTypes%28buildType%28id,name,webUrl%29%29%29"
-                },
                 data:{
                     type: Object,
                     notify: true
@@ -65,9 +50,7 @@
                     notify: true
                 }
             },
-            _flatDataChanged: function(value){
-                console.log(value);
-            },
+            behaviors: [LoggingBehavior],
             dataLoaded: function(e){
                 var pl = document.querySelector("projects-list");
                 if (pl == undefined) {

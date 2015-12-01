@@ -26,16 +26,30 @@
                     value: "login.html",
                     readOnly: true
                 },
+                _projects: {
+                    type: String,
+                    value: "/app/rest/projects?fields=project(id,name,parentProjectId,webUrl,buildTypes(buildType(id,name,webUrl)))&locator=affectedProject:",
+                    readOnly: true
+                },
+                affectedProject: {
+                    type: String,
+                    notify: true,
+                    value: "_Root"
+                },
                 projects: {
                     type: String,
-                    value: "/app/rest/projects?fields=project%28id,name,parentProjectId,webUrl,buildTypes%28buildType%28id,name,webUrl%29%29%29",
-                    readOnly: true
+                    computed: '_getProjectsUrlWithLocator(_projects, affectedProject)'
                 },
                 overview: {
                     type: String,
                     value: "/app/rest/projects?locator=selectedByUser:current&fields=count,project(id,parentProjectId,projects(count,project(id),$locator(selectedByUser:current)),buildTypes(count,buildType(id),$locator(selectedByUser:current)))",
                     readOnly: true
                 }
+            },
+            behaviors: [LoggingBehavior],
+            _getProjectsUrlWithLocator: function(_projects, affectedProject){
+                this.debug('_getProjectsUrlWithLocator: ' + _projects + affectedProject);
+                return _projects + affectedProject;
             }
         });
     </script>
