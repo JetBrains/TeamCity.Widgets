@@ -20,12 +20,23 @@
     <script src="bower_components/webcomponentsjs/webcomponents.min.js"></script>
     <link rel="import" href="bower_components/polymer/polymer.html">
     <link rel="import" href="elements/search-container.html">
-    <style>
+    <style is="custom-style">
         html, body{
             padding: 0;
             margin: 0;
             background-color: #f1f1f1;
             font-family: 'Roboto Condensed';
+        }
+        :root {
+            --projects-list: {
+                width: 400px;
+                height: 500px;
+                overflow-y: scroll;
+                overflow-x: hidden;
+                background-color: white;
+                padding-top: 10px;
+                padding-left: 10px;
+            }
         }
     </style>
 </head>

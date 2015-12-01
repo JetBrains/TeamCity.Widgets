@@ -58,8 +58,7 @@
             behaviors: [LoggingBehavior, ConverterBehavior],
             observers: ['dataLoaded(projects, overview)'],
             stateChanged: function(state){
-                 console.log('stateChanged');
-                 console.log(state);
+                 this.debug(state)
             },
             getProjects: function(){
 

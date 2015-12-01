@@ -10106,7 +10106,7 @@ l)&&void 0!==f[l]&&null!==f[l]&&g.val.push([l,String(f[l])]);g.val.length&&(g.ty
                 return dataTree;
             }
     };
-</script><style>
+</script><style is="custom-style">
         html, body {
             padding: 0;
             margin: 0;
@@ -10138,6 +10138,16 @@ l)&&void 0!==f[l]&&null!==f[l]&&g.val.push([l,String(f[l])]);g.val.length&&(g.ty
 
         .results{
             margin: 10px;
+        }
+
+        :root {
+            --projects-list: {
+                width: 400px;
+                height: 500px;
+                overflow-y: scroll;
+                overflow-x: hidden;
+                background-color: white;
+            }
         }
     </style>
 </head>
@@ -12112,13 +12122,7 @@ l)&&void 0!==f[l]&&null!==f[l]&&g.val.push([l,String(f[l])]);g.val.length&&(g.ty
 <dom-module id="projects-list" assetpath="elements/">
     <style>
         iron-list{
-            width: 400px;
-            height: 500px;
-            overflow-y: scroll;
-            overflow-x: hidden;
-            background-color: white;
-            padding-left: 10px;
-            padding-top: 10px;
+            @apply(--projects-list);
         }
         ::-webkit-scrollbar {
             width: 5px;
@@ -12439,8 +12443,7 @@ l)&&void 0!==f[l]&&null!==f[l]&&g.val.push([l,String(f[l])]);g.val.length&&(g.ty
             behaviors: [LoggingBehavior, ConverterBehavior],
             observers: ['dataLoaded(projects, overview)'],
             stateChanged: function(state){
-                 console.log('stateChanged');
-                 console.log(state);
+                 this.debug(state)
             },
             getProjects: function(){
 

@@ -23,7 +23,7 @@
     <link rel="import" href="elements/teamcity-search.html">
     <link rel="import" href="elements/project-list-wrapper.html">
     <link rel="import" href="elements/teamcity-server.html">
-    <style>
+    <style is="custom-style">
         html, body {
             padding: 0;
             margin: 0;
@@ -55,6 +55,16 @@
 
         .results{
             margin: 10px;
+        }
+
+        :root {
+            --projects-list: {
+                width: 400px;
+                height: 500px;
+                overflow-y: scroll;
+                overflow-x: hidden;
+                background-color: white;
+            }
         }
     </style>
 </head>

@@ -10191,12 +10191,23 @@ e[0]+'"');p=e[2].split(",");for(var v=0,r=p.length;v<r;v++){u=p[v].match(k);if(n
 g={type:0,val:[],encode:[],encodeReserved:[]},l;if(void 0!==this.cache[b])return this.cache[b];this.cache[b]=g;f="[object Function]"===String(Object.prototype.toString.call(f))?f(b):"[object Function]"===String(Object.prototype.toString.call(f[b]))?f[b](b):f[b];if(void 0!==f&&null!==f)if("[object Array]"===String(Object.prototype.toString.call(f))){l=0;for(b=f.length;l<b;l++)void 0!==f[l]&&null!==f[l]&&g.val.push([void 0,String(f[l])]);g.val.length&&(g.type=3)}else if("[object Object]"===String(Object.prototype.toString.call(f))){for(l in f)k.call(f,
 l)&&void 0!==f[l]&&null!==f[l]&&g.val.push([l,String(f[l])]);g.val.length&&(g.type=2)}else g.type=1,g.val.push([void 0,String(f)]);return g};f.expand=function(b,k){var l=(new g(b)).expand(k);return new f(l)};return g});
 </script>
-<style>
+<style is="custom-style">
         html, body{
             padding: 0;
             margin: 0;
             background-color: #f1f1f1;
             font-family: 'Roboto Condensed';
+        }
+        :root {
+            --projects-list: {
+                width: 400px;
+                height: 500px;
+                overflow-y: scroll;
+                overflow-x: hidden;
+                background-color: white;
+                padding-top: 10px;
+                padding-left: 10px;
+            }
         }
     </style>
 </head>
@@ -11022,8 +11033,7 @@ l)&&void 0!==f[l]&&null!==f[l]&&g.val.push([l,String(f[l])]);g.val.length&&(g.ty
             behaviors: [LoggingBehavior, ConverterBehavior],
             observers: ['dataLoaded(projects, overview)'],
             stateChanged: function(state){
-                 console.log('stateChanged');
-                 console.log(state);
+                 this.debug(state)
             },
             getProjects: function(){
 
@@ -12258,13 +12268,7 @@ l)&&void 0!==f[l]&&null!==f[l]&&g.val.push([l,String(f[l])]);g.val.length&&(g.ty
 <dom-module id="projects-list" assetpath="elements/">
     <style>
         iron-list{
-            width: 400px;
-            height: 500px;
-            overflow-y: scroll;
-            overflow-x: hidden;
-            background-color: white;
-            padding-left: 10px;
-            padding-top: 10px;
+            @apply(--projects-list);
         }
         ::-webkit-scrollbar {
             width: 5px;
