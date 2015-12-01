@@ -1,5 +1,6 @@
 <link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
 <script type="text/javascript" src="../bower_components/uri.js/src/URI.min.js"></script>
+<link rel="import" href="logging-behavior.html">
 <dom-module id="teamcity-ajax">
     <template>
         <iron-ajax id="ajax"
@@ -16,16 +17,13 @@
             is: "teamcity-ajax",
             properties: {
                 server: {
-                    type: String
-                },
-                loginUrl: {
-                    type: String
+                    type: String,
+                    notify: true
                 },
                 restUrl: {
-                    type: String
-                },
-                restObjectName: {
-                    type: String //name of the property to be retrived form request
+                    type: String,
+                    notify: true,
+                    observer: 'goAjax'
                 },
                 state:{
                     type: Object,
@@ -34,24 +32,32 @@
                 data: {
                     type: Object,
                     notify: true
+                },
+                auto: {
+                    type: Boolean,
+                    value: false
                 }
             },
+            behaviors: [LoggingBehavior],
             ready: function(){
-                this.$.ajax.url = this.server + this.restUrl;
-                this.goAjax();
+                if (this.auto && this.server != undefined && this.restUrl != undefined){
+                    this.goAjax();
+                }
             },
             handleResponse: function (event, detail){
-                this.data = this.$.ajax.lastResponse[this.restObjectName];
+                this.data = this.$.ajax.lastResponse;
                 this.state = {name:'OK'};
             },
             handleError: function (event, detail){
                 this.state = {name:'ERROR', detail: event.detail};
-                this.async(this.goAjax, 1000 * 20);
+                //this.async(this.goAjax, 1000 * 20);
             },
             goAjax: function(){
+                this.debug('goAjax(): ' + this.server + "   " + this.restUrl);
+                //this.$.ajax.url = 'http://localhost:8080/dashboard/testData/buildserver.jetbrains.com.json';
+                this.$.ajax.url = this.server + this.restUrl;
                 this.$.ajax.generateRequest();
             }
-
         });
     </script>
 </dom-module>

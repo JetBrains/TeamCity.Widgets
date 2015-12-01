@@ -15,49 +15,50 @@
   -->
 
 <link rel="import" href="tree-node.html">
-<link rel="import" href="teamcity-search-input.html">
-<link rel="import" href="../bower_components/iron-flex-layout/classes/iron-flex-layout.html">
+<link rel="import" href="expanded-behavior.html">
 <link rel="import" href="../bower_components/iron-input/iron-input.html">
 <link rel="import" href="../bower_components/iron-signals/iron-signals.html">
-<dom-module id="teamcity-search">
-    <style>
+<dom-module id="teamcity-search-input">
+    <style type="text/css">
         :host{
         }
         input:focus{
             outline: none !important;
         }
-        input[type=button]{
-            background-color: #00b0ff;
-            -moz-border-radius: 10px;
-            -webkit-border-radius: 10px;
-            border-radius:10px;
-            color: #fff;
-            text-decoration: none;
-            cursor: pointer;
-            border:none;
-            line-height: 2em;
-            padding: 3px;
-            width: 100px;
+        input[is=iron-input]:focus{
+            border:1px solid gray !important;
         }
-        .logo {
-            background: url('icons/logo64x64.png') no-repeat;
-            display: inline-block;
-            background-size: 64px 64px;
-            height: 64px;
-            padding-left: 74px;
+        input[type=search]{
+            width: 100%;
+            margin-right: 10px;
+            line-height: 2em;
+            -webkit-appearance:textfield;
+            box-sizing: content-box;
+            border:1px solid lightgray;
+            padding: 2px;
+        }
+        ::-webkit-input-placeholder {
+            font-style: italic;
+        }
+
+        ::-moz-placeholder {  /* Firefox 19+ */
+            font-style: italic;
+        }
+
+        :-ms-input-placeholder {
+            font-style: italic;
         }
     </style>
     <template>
-        <div id="search" class="fullbleed layout horizontal center-center" style="padding-top: 50px;">
-            <span class="logo"></span>
-            <teaamcity-search-input></teaamcity-search-input>
-            <input type="button" value="SEARCH" on-click="submitSearch"/>
-        </div>
+        <input type="search" bind-value="{{terms}}"
+                   is="iron-input"
+                   on-keydown="checkEnter"
+                   placeholder="Filter projects and build configurations"/>
     </template>
     <script>
         // element registration
         Polymer({
-            is: "teamcity-search",
+            is: "teamcity-search-input",
             properties: {
                 terms:{
                     type: String,
@@ -67,7 +68,19 @@
             },
             submitSearch: function(){
                 this.fire('iron-signal', {name: "terms", data: this.terms});
+            },
+            checkEnter: function(e){
+                if (e.keyCode==13){
+                   this.fireTermsChanged();
+                }
+            },
+            fireTermsChanged: function(){
+                this.fire('iron-signal', {name: "terms", data: this.terms});
+            },
+            _termsChanged: function(){
+                this.fireTermsChanged();
             }
+
         });
     </script>
 </dom-module>

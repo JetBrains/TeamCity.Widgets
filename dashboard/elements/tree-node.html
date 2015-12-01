@@ -1,5 +1,5 @@
 <!--
-  ~ Copyright 2000-2015 JetBrains s.r.o.
+  ~ Copyhighlight015 JetBrains s.r.o.
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -18,29 +18,33 @@
 <link rel="import" href="tree-icon.html">
 <dom-module id="tree-node">
     <style>
-        .btIcon{
-            background: transparent url('icons/build-configuration-neutral.png') no-repeat 0 0 ;
-            width: 16px;
-            height: 16px;
-            line-height: 1.5em;
+        .icon{
             display: inline-block;
+            width: 10px;
+            height: 10px;
+            background-repeat: no-repeat;
+            background-image: url(icons/teamcity-sprite.png);
+            background-color: transparent;
         }
-        .pIcon{
-            background: transparent url('icons/project-neutral.png') no-repeat 0 0 ;
-            width: 16px;
-            height: 16px;
-            line-height: 1.5em;
-            display: inline-block;
+
+        .icon.bt{
+            background-position: -100px 0;
         }
+
+        .icon.project{
+            background-position: -100px -20px;
+        }
+
         .node {
             height: 1.5em;
             display: inline-block;
-            width: 300px;
+            max-width: 340px;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
         }
         a {
+            margin-left: 0.25em;
             text-decoration: none;
             color: black;
             height: 100%;
@@ -49,18 +53,15 @@
         a:hover{
             text-decoration: underline;
         }
-
+        a /deep/ .highlighted{
+            background-color: yellow;
+        }
     </style>
     <template>
-        <div class="node">
-            <tree-icon is-expanded="{{isExpanded}}" data="{{data}}"></tree-icon>
-            <template is="dom-if" if="{{data.isBuildType}}">
-                <span class="btIcon"></span>
-            </template>
-            <template is="dom-if" if="{{!data.isBuildType}}">
-                <span class="pIcon"></span>
-            </template>
-            <a href="{{data.href}}">{{data.text}}</a>
+        <div class="node" id="node">
+            <tree-icon data="{{currentNode}}"></tree-icon>
+            <span class$="icon {{iconType}}"></span>
+            <a id="anode" href="{{currentNode.href}}">{{currentNode.text}}</a>
         </div>
     </template>
     <script>
@@ -68,13 +69,39 @@
         Polymer({
             is: "tree-node",
             properties: {
-                data:{
+                currentNode:{
                     type: Object,
                     notify: true,
-                    observer: "_dataChanged"
+                    observer: "_currentNodeChanged"
+                },
+                terms:{
+                    type: String,
+                    value: "",
+                    notify: true
+                },
+                iconType:{
+                    type: String,
+                    notify: true
                 }
             },
-            behaviors: [ExpandedBehavior]
+            observers: ["_highlight(currentNode, terms)"],
+            _currentNodeChanged: function(){
+               // console.log(currentNode);
+                this.$.node.style.padding = "0 0 0 " + (this.currentNode.level * 17) + "px";
+                this.$.node.style.maxWidth = (370 - this.currentNode.level * 17) + "px";
+                this.iconType = this.currentNode.isBuildType ? "bt" : "project";
+            },
+            _highlight: function(currentNode, terms){
+                if (currentNode == undefined || currentNode.text == undefined){
+                    return;
+                }
+                if (terms==undefined || terms == ''){
+                    this.$.anode.innerHTML = currentNode.text;
+                    return;
+                }
+                var query = new RegExp("(" + terms + ")", "gim");
+                this.$.anode.innerHTML = currentNode.text.replace(query, "<span class='highlighted'>$1</span>");
+            }
         });
     </script>
 </dom-module>

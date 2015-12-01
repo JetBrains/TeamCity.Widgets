@@ -17,34 +17,33 @@
 <script type="text/javascript">
     ExpandedBehavior = {
         properties: {
-            isExpanded: {
+            /*isExpanded: {
                 type: Boolean,
                 value: false,
                 notify: true,
                 observer: '_expandedChanged'
+            }*/
+            data: {
+                type: Object,
+                notify: true,
+                observer: "_dataChanged"
             }
         },
-
         listeners: {
             //click: '_toggleExpanded'
         },
-
         created: function() {
-            //console.log('Expanded for ', this, 'enabled!');
+            //this.toggleClass('expanded', false);
         },
-
         _toggleExpanded: function() {
-            this.isExpanded = !this.isExpanded;
+            this.data.isExpanded = !this.data.isExpanded;
+            this.toggleClass('expanded', this.data.isExpanded);
+            this.fire('expand', {state: this.data.isExpanded});
         },
-
-        _expandedChanged: function(value) {
-            this.toggleClass('expanded', value);
-        },
-
         _dataChanged: function(){
-            this.isExpanded = this.data.isExpanded != undefined ? this.data.isExpanded : false;
+            //console.log(this.data);
+            //console.log(this.data.isExpanded);
         }
-
 
     };
 </script>

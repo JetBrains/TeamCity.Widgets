@@ -17,31 +17,29 @@
 <link rel="import" href="teamcity-ajax.html">
 <link rel="import" href="flat-to-nested.html">
 <link rel="import" href="server-auth.html">
-<link rel="import" href="../bower_components/iron-flex-layout/classes/iron-flex-layout.html">
-<dom-module id="teamcity-request">
+<link rel="import" href="projects-list.html">
+<link rel="import" href="../bower_components/iron-signals/iron-signals.html">
+<dom-module id="project-list-wrapper">
     <style>
-        .container {
-            background-color: #fff;
-            border: 1px solid #c8c8c8;
-            min-height: 350px;
-            min-width: 400px;
-            margin: 20px;
-            padding: 20px 20px 20px 20px;
-            display: inline-block;
-            height: 100%;
+       #container{
+           flex-direction: column;
+       }
+        .item, projects-list{
+            flex: auto;
         }
     </style>
     <template>
-        <server-auth server="{{server}}" rest-url="{{restUrl}}" login-url="{{loginUrl}}"
-                     server-state="{{state}}"></server-auth>
-        <teamcity-ajax server="{{server}}" rest-url="{{restUrl}}" rest-object-name="{{restObjectName}}" data="{{data}}"
-                       state="{{state}}"></teamcity-ajax>
-        <flat-to-nested id="ftn" data="{{data}}" data-tree="{{dataTree}}"/>
+        <iron-signals on-iron-signal-project-tree-loaded="dataLoaded"/>
+        <div id="container">
+            <div id="view" class="item">
+
+            </div>
+        </div>
     </template>
     <script>
         // element registration
         Polymer({
-            is: "teamcity-request",
+            is: "project-list-wrapper",
             properties: {
                 server: {
                     type: String
@@ -56,7 +54,7 @@
                 },
                 restUrl: {
                     type: String,
-                    value: "/app/rest/9.1/projects?fields=project%28id,name,parentProjectId,webUrl,buildTypes%28buildType%28id,name,webUrl%29%29%29"
+                    value: "/app/rest/projects?fields=project%28id,name,parentProjectId,webUrl,buildTypes%28buildType%28id,name,webUrl%29%29%29"
                 },
                 data:{
                     type: Object,
@@ -66,13 +64,20 @@
                     type: Object,
                     notify: true
                 }
-
             },
-            ready: function(){
-                var self = this;
-                this.$.ftn.addEventListener('dataTreeChanged', function (e) {
-                    self.fire('dataTreeChanged',{dataTree:this.dataTree});
-                });
+            _flatDataChanged: function(value){
+                console.log(value);
+            },
+            dataLoaded: function(e){
+                var pl = document.querySelector("projects-list");
+                if (pl == undefined) {
+                    pl = document.createElement("projects-list");
+                    this.$.view.appendChild(pl);
+                    pl.dataTree = e.detail;
+                } else {
+                    pl.addNewServer(e.detail);
+                }
+
             }
         });
     </script>

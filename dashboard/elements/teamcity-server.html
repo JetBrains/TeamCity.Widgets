@@ -1,0 +1,83 @@
+<!--
+  ~ Copyright 2000-2015 JetBrains s.r.o.
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<link rel="import" href="teamcity-server-urls.html">
+<link rel="import" href="teamcity-ajax.html">
+<link rel="import" href="server-auth.html">
+<link rel="import" href="logging-behavior.html">
+<link rel="import" href="converter-behavior.html">
+<link rel="import" href="../bower_components/iron-signals/iron-signals.html">
+<dom-module id="teamcity-server">
+    <template>
+        <teamcity-server-urls id="urls"></teamcity-server-urls>
+        <teamcity-ajax id="ajaxProject" server="{{server}}" state="{{projectsState}}" data="{{projects}}"></teamcity-ajax>
+        <teamcity-ajax id="ajaxOverview" server="{{server}}" state="{{overviewState}}" data="{{overview}}"></teamcity-ajax>
+        <server-auth server-state="{{projectsState}}" server="{{server}}" login-url="{{ urls.login}}"></server-auth>
+    </template>
+    <script>
+        // element registration
+        Polymer({
+            is: "teamcity-server",
+            properties: {
+                server: {
+                    type: String,
+                    notify: true
+                },
+                projectsState: {
+                    type: Object,
+                    notify: true
+                },
+                overviewState: {
+                    type: Object,
+                    notify: true
+                },
+                projects:{
+                    type: Object,
+                    notify: true,
+                    observer: '_projectsLoaded'
+                },
+                overview:{
+                    type: Object,
+                    notify: true
+                }
+            },
+            behaviors: [LoggingBehavior, ConverterBehavior],
+            observers: ['dataLoaded(projects, overview)'],
+            stateChanged: function(state){
+                 console.log('stateChanged');
+                 console.log(state);
+            },
+            getProjects: function(){
+
+            },
+            getUser: function(){
+
+            },
+            dataLoaded: function(projects, overview){
+
+            },
+            _projectsLoaded: function(projects){
+                this.projectTree = this.flatToNested(projects["project"]);
+                this.fire('iron-signal', {name: "project-tree-loaded", data: this.projectTree});
+            },
+            ready: function(){
+                this.urls = this.$.urls;
+                this.$.ajaxProject.restUrl = this.urls.projects;
+                this.$.ajaxOverview.restUrl = this.urls.overview;
+            }
+        });
+    </script>
+</dom-module>

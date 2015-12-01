@@ -82,15 +82,6 @@
             },
             filterResult: function(e, detail, sender){
                 this.terms = detail;
-            },
-            filterChildren: function(arr){
-               var d = [];
-               arr.forEach(function(node){
-                    if (node.text.indexOf(terms)>-1){
-                        d.push(node);
-                    }
-                });
-               return d;
             }
         });
     </script>

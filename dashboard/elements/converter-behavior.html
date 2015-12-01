@@ -1,32 +1,32 @@
-<dom-module id="flat-to-nested">
-    <script>
-        // element registration
-        Polymer({
-            is: "flat-to-nested",
-            properties: {
-                data: {
-                    type: Object,
-                    observer: "_dataChanged"
-                },
-                dataTree: {
-                    type: Object,
-                    notify: true,
-                    observer: "_dataTreeChanged"
-                }
-            },
-            _dataTreeChanged: function (value){
-                this.fire('dataTreeChanged', {dataTree: value});
-            },
-            _dataChanged: function (newValue, oldValue){
-                this.projects = this.data;
-                var dataMap = this.projects.reduce(function(map, node) {
+<!--
+  ~ Copyright 2000-2015 JetBrains s.r.o.
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<script type="text/javascript">
+    ConverterBehavior = {
+            flatToNested: function (data){
+                var dataMap = data.reduce(function(map, node) {
                     map[node.id] = node;
                     return map;
                 }, {});
 
+                console.log(dataMap);
+
                 var dataTree = [];
-                for (var i=0; i<this.projects.length; i++){
-                    var node = this.projects[i];
+                for (var i=0; i<data.length; i++){
+                    var node = data[i];
                     // add to parent
                     node.text = node.name;
                     node.isExpanded = false;
@@ -61,8 +61,7 @@
                         dataTree.push(node);
                     }
                 }
-                this.dataTree = dataTree;
+                return dataTree;
             }
-        });
-    </script>
-</dom-module>
+    };
+</script>
