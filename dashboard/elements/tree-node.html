@@ -53,15 +53,15 @@
         a:hover{
             text-decoration: underline;
         }
-        a /deep/ .highlighted{
+        .highlighted{
             background-color: yellow;
         }
     </style>
     <template>
         <div class="node" id="node">
             <tree-icon data="{{currentNode}}"></tree-icon>
-            <span class$="icon {{iconType}}"></span>
-            <a id="anode" href="{{currentNode.href}}">{{currentNode.text}}</a>
+            <span class$="icon tc-sprite {{iconType}}"></span>
+            <a id="anode" href$="{{currentNode.href}}" target="_top">{{currentNode.text}}</a>
         </div>
     </template>
     <script>
@@ -86,7 +86,6 @@
             },
             observers: ["_highlight(currentNode, terms)"],
             _currentNodeChanged: function(){
-               // console.log(currentNode);
                 this.$.node.style.padding = "0 0 0 " + (this.currentNode.level * 17) + "px";
                 this.$.node.style.maxWidth = (370 - this.currentNode.level * 17) + "px";
                 this.iconType = this.currentNode.isBuildType ? "bt" : "project";
@@ -100,7 +99,7 @@
                     return;
                 }
                 var query = new RegExp("(" + terms + ")", "gim");
-                this.$.anode.innerHTML = currentNode.text.replace(query, "<span class='highlighted'>$1</span>");
+                Polymer.dom(this.$.anode).innerHTML = currentNode.text.replace(query, "<span class='highlighted'>$1</span>");
             }
         });
     </script>

@@ -27,7 +27,6 @@
         <teamcity-ajax id="ajaxProject" server="{{server}}" state="{{projectsState}}" data="{{projects}}"></teamcity-ajax>
         <teamcity-ajax id="ajaxOverview" server="{{server}}" state="{{overviewState}}" data="{{overview}}"></teamcity-ajax>
         <server-auth server-state="{{projectsState}}" server="{{server}}" login-url="{{ urls.login}}"></server-auth>
-        <div>{{rootProject}}</div>
     </template>
     <script>
         // element registration

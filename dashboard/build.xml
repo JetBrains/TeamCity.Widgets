@@ -1,0 +1,18 @@
+<project name="build dashboard widgets" default="copy" basedir=".">
+
+  <property name="base.dir" value="/Users/shkate/Work/TeamCity.Widgets/dashboard"/>
+  <property name="copy.to" value="/Users/shkate/bsd/dev2.BuildServer/config/_static_ui_extensions/pages/widgets/dashboard/"/>
+
+  <target name="copy">
+    <copy todir="${copy.to}">
+      <fileset dir="${base.dir}/vulcanized">
+      </fileset>
+    </copy>
+    <copy todir="${copy.to}/elements/icons">
+      <fileset dir="${base.dir}/elements/icons">
+      </fileset>
+    </copy>
+  </target>
+
+
+</project>

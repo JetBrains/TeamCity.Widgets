@@ -19,6 +19,8 @@
 <dom-module id="projects-list">
     <style>
         iron-list{
+            width: 400px;
+            height: 450px;
             @apply(--projects-list);
         }
         ::-webkit-scrollbar {
@@ -72,38 +74,37 @@
                     observer: "_termsChanged"
                 }
             },
+            behaviors: [LoggingBehavior],
+            _addVisibleItemFromServer: function(visibleItems, rootNode, terms){
+                var self  = this;
+                var filtered = self.filteredData(rootNode, terms);
+                if (filtered == undefined) {
+                    return;
+                }
+                self._visitDfs(filtered, 0, function (node) {
+                    if (self.terms == "") {
+                        if (node.node.level == 1 || node.node.level == 0) {
+                            visibleItems.push(node);
+                        }
+                    } else {
+                        visibleItems.push(node);
+                    }
+                });
+            },
             _visibleItems: function(dataTree, terms){
                 var d = [];
                 this.index = 0;
-                var t1 = this.filteredData(dataTree, terms, 0);
-                if (t1 == undefined){
-                    return d;
-                }
+
                 var self = this;
-                var data = this._visitDfs(t1, 0, function(node){
-                    if (self.terms=="") {
-                        if (node.node.level == 1 || node.node.level == 0){
-                            d.push(node);
-                        }
-                    } else {
-                        d.push(node);
-                    }
+
+                if (dataTree == undefined){
+                    return;
+                }
+
+                dataTree.forEach(function(server){
+                    self._addVisibleItemFromServer(d, server, terms);
                 });
 
-                if (dataTree.length==2) {
-                    var t2 = this.filteredData(dataTree, terms, 1);
-                    if (t2 != undefined) {
-                        var data2 = this._visitDfs(t2, 0, function (node) {
-                            if (self.terms == "") {
-                                if (node.node.level == 1 || node.node.level == 0) {
-                                    d.push(node);
-                                }
-                            } else {
-                                d.push(node);
-                            }
-                        });
-                    }
-                }
                 return d;
             },
             _dataChanged: function(){
@@ -134,18 +135,18 @@
                     self._visitDfs(child, level+1, func);
                 });
             },
-            filteredData: function(dataTree, terms, x){
-                if (dataTree == undefined){
+            filteredData: function(rootNode, terms){
+                if (rootNode == undefined){
                     return undefined;
                 }
                 if (terms == ""){
-                    return dataTree[x];
+                    return rootNode;
                 }
-                return this.filteredTreeData(JSON.parse(JSON.stringify(dataTree))[x], new RegExp(terms.replace(/[.*+?^${}()|[\]\/\\]/g, '\\$&'), 'i'));
+                return this.filteredTreeData(JSON.parse(JSON.stringify(rootNode)), new RegExp(terms.replace(/[.*+?^${}()|[\]\/\\]/g, '\\$&'), 'i'));
             },
             filteredNode: function(node, re){
                 var self = this;
-                var hasRequiredText = re.test(node.text);
+                var hasRequiredText = re.test(node.text); //node.name.indexOf(this.terms)>-1;
                 var filteredChildren = [];
                 if (node.children != undefined){
                     node.children.forEach(function(child){
@@ -158,11 +159,7 @@
 
                 node.children = filteredChildren;
 
-                if (filteredChildren.length>0){
-                    node.isExpanded = true;
-                } else {
-                    node.isExpanded = false;
-                }
+                node.isExpanded = filteredChildren.length > 0;
 
                 if (hasRequiredText || filteredChildren.length>0){
                     return node;
@@ -209,7 +206,7 @@
                 self.removeIndex--;
             },
             addNewServer: function(server){
-                console.log('addNewServer');
+                this.debug('addNewServer: ' + server);
                 this.dataTree.push(server[0]);
                 this._dataChanged();
             }

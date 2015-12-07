@@ -71,7 +71,14 @@
                 }
             },
             submitSearch: function(){
-                this.fire('iron-signal', {name: "terms", data: this.terms});
+                var self = this;
+                this.debounce(
+                  'fireTermsChange', function(){
+                           self.fire('iron-signal', {name: "terms", data: this.terms});
+                  },
+                  250
+                );
+
             }
         });
     </script>

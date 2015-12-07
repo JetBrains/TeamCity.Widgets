@@ -1,5 +1,5 @@
 <link rel="import" href="teamcity-search.html">
-<link rel="import" href="teamcity-server.html">
+<link rel="import" href="teamcity-server-list.html">
 <link rel="import" href="project-list-wrapper.html">
 <link rel="import" href="../bower_components/iron-flex-layout/classes/iron-flex-layout.html">
 <link rel="import" href="../bower_components/iron-input/iron-input.html">
@@ -31,7 +31,7 @@
                 <project-list-wrapper></project-list-wrapper>
             </div>
             <div id="serversHolder" class="vertical layout">
-
+                <teamcity-server-list servers="{{servers}}"></teamcity-server-list>
             </div>
         </div>
     </template>
@@ -51,34 +51,11 @@
                     notify: true
                 }
             },
-            behaviors: [LoggingBehavior],
+            behaviors: [LoggingBehavior, UrlReaderBehavior],
             ready: function(){
-                var params = URI(document.location.href).search(true);
-                var servers = params["server"];
-
-                if (servers != undefined){
-                    this._applyDataFromUrl(servers);
-                }
-
-                var serversHolder = this.$.serversHolder;
-
-                this.debug('servers: ' + this.servers);
-                this.debug('serversHolder: ' + serversHolder);
-
-                var self = this;
-                this.servers.forEach(function(s){
-                    var ts = document.createElement("teamcity-server");
-                    ts.server = s;
-                    self.debug('teamcity-server will be added for: ' + s);
-                    serversHolder.appendChild(ts);
-                });
-            },
-            _applyDataFromUrl: function(servers){
-                this.debug('Data from URL will be applied: ' + servers);
-                if (Array.isArray(servers)){
-                    this.servers = servers;
-                } else {
-                    this.servers = [servers];
+              var p = this.getAsArray("server");
+                if (p != undefined){
+                    this.servers = p;
                 }
             },
             _aggregateDataChanged: function(value){
