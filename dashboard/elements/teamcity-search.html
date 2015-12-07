@@ -74,7 +74,7 @@
                 var self = this;
                 this.debounce(
                   'fireTermsChange', function(){
-                           self.fire('iron-signal', {name: "terms", data: this.terms});
+                     self.fire('iron-signal', {name: "terms", data: this.terms});
                   },
                   250
                 );

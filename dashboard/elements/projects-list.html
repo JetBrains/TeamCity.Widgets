@@ -21,8 +21,10 @@
         iron-list{
             width: 400px;
             height: 450px;
+            outline: none;
             @apply(--projects-list);
         }
+
         ::-webkit-scrollbar {
             width: 5px;
         }
@@ -42,14 +44,15 @@
         ::-webkit-scrollbar-thumb:window-inactive {
             background: rgba(0,0,0,0.3);
         }
+
     </style>
     <template>
           <iron-signals on-iron-signal-terms="filterResult"/>
-          <iron-list items="[[visibleItems]]" as="item" id="list">
+          <iron-signals on-iron-signal-results="moveFocusOnResults"/>
+          <iron-list items="[[visibleItems]]" as="item" id="list" tabindex="-1">
+                <!--we need data-index="{{index}}" due to https://github.com/Polymer/core-list/issues/62 -->
                 <template>
-                        <div data-index="{{index}}"> <!--we need data-index="{{index}}" due to https://github.com/Polymer/core-list/issues/62 -->
-                            <tree-node current-node="{{item.node}}" terms="{{terms}}" on-expand="onExpand" data-index="{{index}}"></tree-node>
-                        </div>
+                     <tree-node current-node="{{item.node}}" terms="{{terms}}" on-expand="onExpand" data-index="[[index]]"></tree-node>
                 </template>
           </iron-list>
     </template>
@@ -72,15 +75,21 @@
                     value: "",
                     notify: true,
                     observer: "_termsChanged"
+                },
+                selectedItems: {
+                    type: Object,
+                    notify: true
                 }
             },
             behaviors: [LoggingBehavior],
             _addVisibleItemFromServer: function(visibleItems, rootNode, terms){
                 var self  = this;
+
                 var filtered = self.filteredData(rootNode, terms);
                 if (filtered == undefined) {
                     return;
                 }
+
                 self._visitDfs(filtered, 0, function (node) {
                     if (self.terms == "") {
                         if (node.node.level == 1 || node.node.level == 0) {
@@ -112,8 +121,6 @@
             },
             _termsChanged: function(){
                 this.visibleItems = this._visibleItems(this.dataTree, this.terms);
-            },
-            click: function(e){
             },
             _visitDfs: function(node, level, func){
                 var self = this;
@@ -205,11 +212,15 @@
                 });
                 self.removeIndex--;
             },
-            addNewServer: function(server){
-                this.debug('addNewServer: ' + server);
-                this.dataTree.push(server[0]);
+            addNewServer: function(server, index){
+                this.debug('add new server: ' + server + ' at position: ' + index);
+                this.dataTree.splice(index, 0, server[0]);
                 this._dataChanged();
+            },
+            moveFocusOnResults: function(e){
+                document.querySelector('tree-node[data-index="0"]').focus();
             }
+
         });
     </script>
 </dom-module>

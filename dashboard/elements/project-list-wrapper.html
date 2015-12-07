@@ -56,9 +56,9 @@
                 if (pl == undefined) {
                     pl = document.createElement("projects-list");
                     this.$.view.appendChild(pl);
-                    pl.dataTree = e.detail;
+                    pl.dataTree = e.detail.projectTree;
                 } else {
-                    pl.addNewServer(e.detail);
+                    pl.addNewServer(e.detail.projectTree, e.detail.index);
                 }
 
             }

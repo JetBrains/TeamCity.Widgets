@@ -20,7 +20,7 @@
 <dom-module id="teamcity-server-list">
     <template>
         <template is="dom-repeat" items="{{servers}}">
-            <div><teamcity-server server="{{item}}"></teamcity-server></div>
+            <div><teamcity-server server="{{item}}" server-index="{{index}}"></teamcity-server></div>
         </template>
     </template>
     <script>

@@ -18,6 +18,7 @@
 <link rel="import" href="expanded-behavior.html">
 <link rel="import" href="../bower_components/iron-input/iron-input.html">
 <link rel="import" href="../bower_components/iron-signals/iron-signals.html">
+<link rel="import" href="../bower_components/iron-a11y-keys/iron-a11y-keys.html"/>
 <dom-module id="teamcity-search-input">
     <style type="text/css">
         :host{
@@ -50,35 +51,44 @@
         }
     </style>
     <template>
-        <input type="search" bind-value="{{terms}}"
-                   is="iron-input"
-                   on-keydown="checkEnter"
-                   placeholder="Filter projects and build configurations"/>
+        <iron-a11y-keys id="a11y" target="[[target]]" keys="enter down"
+                        on-keys-pressed="moveFocusOnResults"></iron-a11y-keys>
+        <input type="search" id="input" tabindex="0"
+                     placeholder="Filter projects and build configurations"
+                     value="{{userInput::input}}"/>
     </template>
     <script>
         // element registration
         Polymer({
             is: "teamcity-search-input",
             properties: {
-                terms:{
+                userInput: {
                     type: String,
                     notify: true,
-                    observer: '_termsChanged'
+                    observer: '_userInputChanged'
+                },
+                target: {
+                    type: Object,
+                    value: function() {
+                        return this.$.input;
+                    }
                 }
             },
-            submitSearch: function(){
-                this.fire('iron-signal', {name: "terms", data: this.terms});
+            moveFocusOnResults: function(e){
+                e.detail.keyboardEvent.preventDefault();
+                this.fire('iron-signal', {name: "results", data: this.userInput});
             },
-            checkEnter: function(e){
-                if (e.keyCode==13){
-                   this.fireTermsChanged();
-                }
+            _userInputChanged: function(){
+                this.fire('iron-signal', {name: "terms", data: this.userInput});
             },
-            fireTermsChanged: function(){
-                this.fire('iron-signal', {name: "terms", data: this.terms});
+            ready: function(){
+                var self = this;
+                window.setTimeout(function(){
+                    self.focus();
+                },100);
             },
-            _termsChanged: function(){
-                this.fireTermsChanged();
+            focus: function(){
+                this.$.input.focus();
             }
 
         });

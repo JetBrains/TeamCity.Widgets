@@ -16,6 +16,8 @@
 
 <link rel="import" href="expanded-behavior.html">
 <link rel="import" href="tree-icon.html">
+<link rel="import" href="../bower_components/iron-behaviors/iron-control-state.html">
+<link rel="import" href="../bower_components/iron-a11y-keys/iron-a11y-keys.html"/>
 <dom-module id="tree-node">
     <style>
         .icon{
@@ -36,13 +38,14 @@
         }
 
         .node {
-            height: 1.5em;
-            display: inline-block;
+            line-height: 1.6em;
+            display: block;
             max-width: 340px;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
         }
+
         a {
             margin-left: 0.25em;
             text-decoration: none;
@@ -50,14 +53,32 @@
             height: 100%;
             vertical-align: top;
         }
+
         a:hover{
             text-decoration: underline;
         }
+
+        a:focus{
+            outline: none !important;
+        }
+
         .highlighted{
             background-color: yellow;
         }
+
+        :host[focused] .node, .node:hover{
+            background-color: rgba(255, 222, 0, 0.2);
+            outline: none !important;
+        }
+
+        tree-icon {
+            margin-left: 2px;
+        }
+
     </style>
     <template>
+        <iron-a11y-keys id="a11y" target="[[target]]" keys="left right down up"
+                        on-keys-pressed="onExpandCollapsed"></iron-a11y-keys>
         <div class="node" id="node">
             <tree-icon data="{{currentNode}}"></tree-icon>
             <span class$="icon tc-sprite {{iconType}}"></span>
@@ -82,8 +103,13 @@
                 iconType:{
                     type: String,
                     notify: true
+                },
+                dataIndex:{
+                    type: String,
+                    reflectToAttribute: true
                 }
             },
+            behaviors: [Polymer.IronControlState],
             observers: ["_highlight(currentNode, terms)"],
             _currentNodeChanged: function(){
                 this.$.node.style.padding = "0 0 0 " + (this.currentNode.level * 17) + "px";
@@ -100,6 +126,42 @@
                 }
                 var query = new RegExp("(" + terms + ")", "gim");
                 Polymer.dom(this.$.anode).innerHTML = currentNode.text.replace(query, "<span class='highlighted'>$1</span>");
+            },
+            focus: function(){
+                this.focused = true;
+                this.$.anode.focus();
+            },
+            _tabIndex: function(){
+                return this.dataIndex;
+            },
+            onExpandCollapsed: function(e){
+                var action = e.detail.combo;
+                var icon = this.querySelector('tree-icon');
+                var index = this.getAttribute("data-index");
+                e.detail.keyboardEvent.preventDefault();
+                if (action == 'right'){
+                    if (icon.hasChildren){
+                        icon.expand();
+                    }
+                } else if (action == 'left'){
+                    if (icon.hasChildren) {
+                        icon.collapse();
+                    }
+                } else if (action == 'up'){
+                    index--;
+                    var prev = document.querySelector("tree-node[data-index='"+index+"']");
+                    if (prev == undefined){
+                        prev = document.querySelector("teamcity-search-input");
+                    }
+                    prev.focus();
+                } else if (action == 'down'){
+                    index++;
+
+                    var next = document.querySelector("tree-node[data-index='"+index+"']");
+                    if (next!=undefined){
+                        next.focus();
+                    }
+                }
             }
         });
     </script>

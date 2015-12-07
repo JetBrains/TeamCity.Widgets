@@ -70,9 +70,22 @@
                 return data.children && data.children.length > 0;
             },
             _toggleExpanded: function() {
-                this.data.isExpanded = !this.data.isExpanded;
+                this._updateState(!this.data.isExpanded);
+            },
+            _updateState: function(isExpanded) {
+                this.data.isExpanded = isExpanded;
                 this.notifyPath("data.isExpanded", this.data.isExpanded);
                 this.fire("expand", {state: this.data.isExpanded});
+            },
+            collapse: function(){
+                if (this.data.isExpanded) {
+                    this._updateState(false);
+                }
+            },
+            expand: function(){
+                if (!this.data.isExpanded) {
+                    this._updateState(true);
+                }
             }
         });
     </script>

@@ -58,6 +58,11 @@
                 overview:{
                     type: Object,
                     notify: true
+                },
+                serverIndex: {
+                    type: Number,
+                    value: 0,
+                    reflectToAttribute: true
                 }
             },
             behaviors: [LoggingBehavior, ConverterBehavior],
@@ -76,7 +81,7 @@
             },
             _projectsLoaded: function(projects){
                 this.projectTree = this.flatToNested(projects["project"]);
-                this.fire('iron-signal', {name: "project-tree-loaded", data: this.projectTree});
+                this.fire('iron-signal', {name: "project-tree-loaded", data: {projectTree: this.projectTree, index: this.serverIndex} });
             },
             _serverUrlChanged: function(server, rootProject){
                 this.debug('_serverUrlChanged: ' + server + " -> " + rootProject);
