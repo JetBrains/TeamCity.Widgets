@@ -29,7 +29,7 @@
        }
     </style>
     <template>
-        <iron-signals on-iron-signal-project-tree-loaded="dataLoaded"/>
+        <!--<iron-signals on-iron-signal-project-tree-loaded="_dataLoaded"/>-->
         <div id="container">
             <div id="view" class="item">
 
@@ -51,17 +51,28 @@
                 }
             },
             behaviors: [LoggingBehavior],
-            dataLoaded: function(e){
+            _dataLoaded: function(e){
+                this.debug('catched project-tree-loaded');
+                this.debug(e.detail);
                 var pl = document.querySelector("projects-list");
                 if (pl == undefined) {
                     pl = document.createElement("projects-list");
                     this.$.view.appendChild(pl);
-                    pl.dataTree = e.detail.projectTree;
-                } else {
-                    pl.addNewServer(e.detail.projectTree, e.detail.index);
                 }
-
+                pl.addNewServer(e.detail.projectTree, e.detail.index);
+            },
+            dataLoaded: function(projectTree, index){
+                this.debug('catched project-tree-loaded (almost)');
+                this.debug(projectTree);
+                this.debug(index);
+                var pl = document.querySelector("projects-list");
+                if (pl == undefined) {
+                    pl = document.createElement("projects-list");
+                    this.$.view.appendChild(pl);
+                }
+                pl.addNewServer(projectTree, index);
             }
+
         });
     </script>
 </dom-module>

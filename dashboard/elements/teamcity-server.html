@@ -81,7 +81,12 @@
             },
             _projectsLoaded: function(projects){
                 this.projectTree = this.flatToNested(projects["project"]);
-                this.fire('iron-signal', {name: "project-tree-loaded", data: {projectTree: this.projectTree, index: this.serverIndex} });
+                this.debug('should fire project-tree-loaded');
+                this.debug(this.projectTree);
+                //this.fire('iron-signal', {name: "project-tree-loaded", data: {projectTree: this.projectTree, index: this.serverIndex} });
+                var element = document.querySelector('project-list-wrapper');
+                this.debug(this.projectTree);
+                element.dataLoaded(this.projectTree, this.serverIndex);
             },
             _serverUrlChanged: function(server, rootProject){
                 this.debug('_serverUrlChanged: ' + server + " -> " + rootProject);

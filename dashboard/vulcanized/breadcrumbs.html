@@ -11577,6 +11577,7 @@ l)&&void 0!==f[l]&&null!==f[l]&&g.val.push([l,String(f[l])]);g.val.length&&(g.ty
             background-repeat: no-repeat;
             background-image: url("elements/icons/teamcity-sprite.png");
             background-color: transparent;
+            background-position: -200px -200px;
         }
 
         .icon.bt{
@@ -12063,7 +12064,12 @@ l)&&void 0!==f[l]&&null!==f[l]&&g.val.push([l,String(f[l])]);g.val.length&&(g.ty
             },
             _projectsLoaded: function(projects){
                 this.projectTree = this.flatToNested(projects["project"]);
-                this.fire('iron-signal', {name: "project-tree-loaded", data: {projectTree: this.projectTree, index: this.serverIndex} });
+                this.debug('should fire project-tree-loaded');
+                this.debug(this.projectTree);
+                //this.fire('iron-signal', {name: "project-tree-loaded", data: {projectTree: this.projectTree, index: this.serverIndex} });
+                var element = document.querySelector('project-list-wrapper');
+                this.debug(this.projectTree);
+                element.dataLoaded(this.projectTree, this.serverIndex);
             },
             _serverUrlChanged: function(server, rootProject){
                 this.debug('_serverUrlChanged: ' + server + " -> " + rootProject);
@@ -13362,7 +13368,8 @@ l)&&void 0!==f[l]&&null!==f[l]&&g.val.push([l,String(f[l])]);g.val.length&&(g.ty
                 dataTree:{
                     type: Array,
                     observer: "_dataChanged",
-                    notify: true
+                    notify: true,
+                    value: []
                 },
                 visibleItems:{
                     type: Array,
@@ -13511,8 +13518,26 @@ l)&&void 0!==f[l]&&null!==f[l]&&g.val.push([l,String(f[l])]);g.val.length&&(g.ty
                 self.removeIndex--;
             },
             addNewServer: function(server, index){
-                this.debug('add new server: ' + server + ' at position: ' + index);
-                this.dataTree.splice(index, 0, server[0]);
+                this.debug('add new server: ' + server[0].text + ' at position: ' + index);
+                this.debug('this.dataTree.length=' + this.dataTree.length);
+
+                server[0].serverIndex = index;
+
+                var splicePosition = this.dataTree.length;
+
+                for (var i=0; i<this.dataTree.length; i++){
+                    var serverIndex = this.dataTree[i].serverIndex;
+                    this.debug('i=' + i);
+                    this.debug('stored server index =' + serverIndex);
+                    if (serverIndex > index){
+                        splicePosition = i;
+                        break;
+                    }
+                }
+                this.debug('insert in position ' + splicePosition);
+                this.dataTree.splice(splicePosition, 0, server[0]);
+                this.debug('new server added');
+                this.debug('this.dataTree.length=' + this.dataTree.length);
                 this._dataChanged();
             },
             moveFocusOnResults: function(e){
@@ -13533,13 +13558,13 @@ l)&&void 0!==f[l]&&null!==f[l]&&g.val.push([l,String(f[l])]);g.val.length&&(g.ty
        }
     </style>
     <template>
-        <iron-signals on-iron-signal-project-tree-loaded="dataLoaded">
+        
         <div id="container">
             <div id="view" class="item">
 
             </div>
         </div>
-    </iron-signals></template>
+    </template>
     <script>
         // element registration
         Polymer({
@@ -13555,17 +13580,28 @@ l)&&void 0!==f[l]&&null!==f[l]&&g.val.push([l,String(f[l])]);g.val.length&&(g.ty
                 }
             },
             behaviors: [LoggingBehavior],
-            dataLoaded: function(e){
+            _dataLoaded: function(e){
+                this.debug('catched project-tree-loaded');
+                this.debug(e.detail);
                 var pl = document.querySelector("projects-list");
                 if (pl == undefined) {
                     pl = document.createElement("projects-list");
                     this.$.view.appendChild(pl);
-                    pl.dataTree = e.detail.projectTree;
-                } else {
-                    pl.addNewServer(e.detail.projectTree, e.detail.index);
                 }
-
+                pl.addNewServer(e.detail.projectTree, e.detail.index);
+            },
+            dataLoaded: function(projectTree, index){
+                this.debug('catched project-tree-loaded (almost)');
+                this.debug(projectTree);
+                this.debug(index);
+                var pl = document.querySelector("projects-list");
+                if (pl == undefined) {
+                    pl = document.createElement("projects-list");
+                    this.$.view.appendChild(pl);
+                }
+                pl.addNewServer(projectTree, index);
             }
+
         });
     </script>
 </dom-module><dom-module id="search-container" assetpath="elements/">
