@@ -15,7 +15,7 @@
   -->
 
 <link rel="import" href="tree-node.html">
-<link rel="import" href="expanded-behavior.html">
+<link rel="import" href="logging-behavior.html">
 <link rel="import" href="../bower_components/iron-input/iron-input.html">
 <link rel="import" href="../bower_components/iron-signals/iron-signals.html">
 <link rel="import" href="../bower_components/iron-a11y-keys/iron-a11y-keys.html"/>
@@ -74,7 +74,9 @@
                     }
                 }
             },
+            behaviors: [LoggingBehavior],
             moveFocusOnResults: function(e){
+                this.debug('fired moveFocusOnResults');
                 e.detail.keyboardEvent.preventDefault();
                 this.fire('iron-signal', {name: "results", data: this.userInput});
             },

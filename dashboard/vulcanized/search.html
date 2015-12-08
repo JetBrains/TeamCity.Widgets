@@ -6917,6 +6917,38 @@ this.fire('dom-change');
 }
 });</script>
 <script type="text/javascript">
+    LoggingBehavior = {
+        properties: {
+            level: {
+                type: String,
+                value: 1,
+                notify: true
+            },
+            levels: {
+                type: Array,
+                value: ['debug', 'info', 'error']
+            }
+        },
+        _log: function(level, message){
+            if (level >= this.level){
+                var el = this.id != undefined && this.id.length > 0 ? this.id : this.tagName;
+                console.log('['+ this.levels[level] + '] ' + el + " -> " + message);
+                if (!(typeof message == 'string')){
+                    console.log(message);
+                }
+            }
+        },
+        info: function(message){
+            this._log(1,  message);
+        },
+        debug: function(message){
+            this._log(0, message);
+        },
+        error: function(message){
+            this._log(2, message);
+        }
+    };
+</script><script type="text/javascript">
     ExpandedBehavior = {
         properties: {
             /*isExpanded: {
@@ -10520,38 +10552,6 @@ g={type:0,val:[],encode:[],encodeReserved:[]},l;if(void 0!==this.cache[b])return
 l)&&void 0!==f[l]&&null!==f[l]&&g.val.push([l,String(f[l])]);g.val.length&&(g.type=2)}else g.type=1,g.val.push([void 0,String(f)]);return g};f.expand=function(b,k){var l=(new g(b)).expand(k);return new f(l)};return g});
 </script>
 <script type="text/javascript">
-    LoggingBehavior = {
-        properties: {
-            level: {
-                type: String,
-                value: 0,
-                notify: true
-            },
-            levels: {
-                type: Array,
-                value: ['debug', 'info', 'error']
-            }
-        },
-        _log: function(level, message){
-            if (level >= this.level){
-                var el = this.id != undefined && this.id.length > 0 ? this.id : this.tagName;
-                console.log('['+ this.levels[level] + '] ' + el + " -> " + message);
-                if (!(typeof message == 'string')){
-                    console.log(message);
-                }
-            }
-        },
-        info: function(message){
-            this._log(1,  message);
-        },
-        debug: function(message){
-            this._log(0, message);
-        },
-        error: function(message){
-            this._log(2, message);
-        }
-    };
-</script><script type="text/javascript">
     ConverterBehavior = {
         _getServerName: function(href){
             var i1 = href.indexOf("//");
@@ -11573,6 +11573,7 @@ l)&&void 0!==f[l]&&null!==f[l]&&g.val.push([l,String(f[l])]);g.val.length&&(g.ty
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+            outline: none;
         }
 
         a {
@@ -11595,7 +11596,7 @@ l)&&void 0!==f[l]&&null!==f[l]&&g.val.push([l,String(f[l])]);g.val.length&&(g.ty
             background-color: yellow;
         }
 
-        :host[focused] .node, .node:hover{
+        :host[focused], :host:hover{
             background-color: rgba(255, 222, 0, 0.2);
             outline: none !important;
         }
@@ -11606,7 +11607,7 @@ l)&&void 0!==f[l]&&null!==f[l]&&g.val.push([l,String(f[l])]);g.val.length&&(g.ty
 
     </style>
     <template>
-        <iron-a11y-keys id="a11y" target="[[target]]" keys="left right down up" on-keys-pressed="onExpandCollapsed"></iron-a11y-keys>
+        <iron-a11y-keys id="a11y" target="[[target]]" keys="left right down up enter" on-keys-pressed="onExpandCollapsed"></iron-a11y-keys>
         <div class="node" id="node">
             <tree-icon data="{{currentNode}}"></tree-icon>
             <span class$="icon tc-sprite {{iconType}}"></span>
@@ -11637,7 +11638,7 @@ l)&&void 0!==f[l]&&null!==f[l]&&g.val.push([l,String(f[l])]);g.val.length&&(g.ty
                     reflectToAttribute: true
                 }
             },
-            behaviors: [Polymer.IronControlState],
+            behaviors: [LoggingBehavior, Polymer.IronControlState],
             observers: ["_highlight(currentNode, terms)"],
             _currentNodeChanged: function(){
                 this.$.node.style.padding = "0 0 0 " + (this.currentNode.level * 17) + "px";
@@ -11655,18 +11656,15 @@ l)&&void 0!==f[l]&&null!==f[l]&&g.val.push([l,String(f[l])]);g.val.length&&(g.ty
                 var query = new RegExp("(" + terms + ")", "gim");
                 Polymer.dom(this.$.anode).innerHTML = currentNode.text.replace(query, "<span class='highlighted'>$1</span>");
             },
-            focus: function(){
-                this.focused = true;
-                this.$.anode.focus();
-            },
             _tabIndex: function(){
                 return this.dataIndex;
             },
             onExpandCollapsed: function(e){
                 var action = e.detail.combo;
                 var icon = this.querySelector('tree-icon');
-                var index = this.getAttribute("data-index");
+                var index = this.getAttribute("tabindex");
                 e.detail.keyboardEvent.preventDefault();
+                this.debug(action);
                 if (action == 'right'){
                     if (icon.hasChildren){
                         icon.expand();
@@ -11677,7 +11675,7 @@ l)&&void 0!==f[l]&&null!==f[l]&&g.val.push([l,String(f[l])]);g.val.length&&(g.ty
                     }
                 } else if (action == 'up'){
                     index--;
-                    var prev = document.querySelector("tree-node[data-index='"+index+"']");
+                    var prev = document.querySelector("tree-node[tabindex='"+index+"']");
                     if (prev == undefined){
                         prev = document.querySelector("teamcity-search-input");
                     }
@@ -11685,10 +11683,12 @@ l)&&void 0!==f[l]&&null!==f[l]&&g.val.push([l,String(f[l])]);g.val.length&&(g.ty
                 } else if (action == 'down'){
                     index++;
 
-                    var next = document.querySelector("tree-node[data-index='"+index+"']");
+                    var next = document.querySelector("tree-node[tabindex='"+index+"']");
                     if (next!=undefined){
                         next.focus();
                     }
+                } else if (action == 'enter'){
+                    this.$.anode.click();
                 }
             }
         });
@@ -11745,7 +11745,9 @@ l)&&void 0!==f[l]&&null!==f[l]&&g.val.push([l,String(f[l])]);g.val.length&&(g.ty
                     }
                 }
             },
+            behaviors: [LoggingBehavior],
             moveFocusOnResults: function(e){
+                this.debug('fired moveFocusOnResults');
                 e.detail.keyboardEvent.preventDefault();
                 this.fire('iron-signal', {name: "results", data: this.userInput});
             },
@@ -13327,7 +13329,7 @@ l)&&void 0!==f[l]&&null!==f[l]&&g.val.push([l,String(f[l])]);g.val.length&&(g.ty
           <iron-list items="[[visibleItems]]" as="item" id="list" tabindex="-1">
                 
                 <template>
-                     <tree-node current-node="{{item.node}}" terms="{{terms}}" on-expand="onExpand" data-index="[[index]]"></tree-node>
+                     <tree-node current-node="{{item.node}}" terms="{{terms}}" on-expand="onExpand" data-index="[[index]]" tabindex$="[[index]]"></tree-node>
                 </template>
           </iron-list>
     </iron-signals></iron-signals></template>
@@ -13493,7 +13495,8 @@ l)&&void 0!==f[l]&&null!==f[l]&&g.val.push([l,String(f[l])]);g.val.length&&(g.ty
                 this._dataChanged();
             },
             moveFocusOnResults: function(e){
-                document.querySelector('tree-node[data-index="0"]').focus();
+                this.debug('received moveFocusOnResults');
+                document.querySelector('tree-node[tabindex="0"]').focus();
             }
 
         });

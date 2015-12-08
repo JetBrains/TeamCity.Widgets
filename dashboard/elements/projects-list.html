@@ -52,7 +52,7 @@
           <iron-list items="[[visibleItems]]" as="item" id="list" tabindex="-1">
                 <!--we need data-index="{{index}}" due to https://github.com/Polymer/core-list/issues/62 -->
                 <template>
-                     <tree-node current-node="{{item.node}}" terms="{{terms}}" on-expand="onExpand" data-index="[[index]]"></tree-node>
+                     <tree-node current-node="{{item.node}}" terms="{{terms}}" on-expand="onExpand" data-index="[[index]]" tabindex$="[[index]]"></tree-node>
                 </template>
           </iron-list>
     </template>
@@ -218,7 +218,8 @@
                 this._dataChanged();
             },
             moveFocusOnResults: function(e){
-                document.querySelector('tree-node[data-index="0"]').focus();
+                this.debug('received moveFocusOnResults');
+                document.querySelector('tree-node[tabindex="0"]').focus();
             }
 
         });
