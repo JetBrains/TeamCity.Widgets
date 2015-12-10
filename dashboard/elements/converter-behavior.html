@@ -21,11 +21,94 @@
             var i2 = href.indexOf("/", i1+2);
             return href.substring(0, i2);
         },
-        flatToNested: function (data){
+        _sortChildren: function(node){
+          if (node.children == undefined){
+              return;
+          }
+
+          node.children.sort(this._sort);
+
+          var self = this;
+          node.children.forEach(function(child){
+              self._sortChildren(child);
+          });
+        },
+        _sort: function(nodeA,nodeB){
+            var b = (nodeA.isBuildType? -1: 1) - (nodeB.isBuildType? -1: 1);
+
+            if (b != 0) {
+                return b;
+            }
+
+            var v = nodeB.visible - nodeA.visible;
+
+            if (v != 0) {
+                return v;
+            }
+
+            var r = nodeA.rank - nodeB.rank;
+
+            if (r != 0){
+                return r;
+            }
+
+            return nodeA.text.localeCompare(nodeB.text);
+        },
+        flatToNested: function (data, orderedData){
+
             var dataMap = data.reduce(function(map, node) {
                 map[node.id] = node;
                 return map;
             }, {});
+
+            var orderedDataMap = [];
+            var visibleBuildTypesMap = [];
+
+            if (orderedData != undefined){
+                orderedDataMap = orderedData.reduce(function(map, node, i) {
+                    map[node.id] = node;
+                    node.rank = i;
+                    var bts = node.buildTypes != undefined ? node.buildTypes.buildType : undefined;
+
+                    if (bts != undefined){
+                       bts.forEach(function(bt,i){
+                           visibleBuildTypesMap[bt.id] = bt;
+                           bt.rank = i;
+                       });
+                    }
+
+                    return map;
+                }, {});
+
+                var processParent = function(parentProjectId, rank){
+                    console.log('processParent');
+                    console.log(parentProjectId);
+
+                    var parent = dataMap[parentProjectId];
+
+                    if (!parent){
+                        return;
+                    }
+
+                    var stored = orderedDataMap[parent.id];
+
+                    if (!stored){
+                        orderedDataMap[parent.id] = parent;
+                        orderedDataMap[parent.id].rank = rank;
+                    } else {
+                        stored.rank = Math.min(stored.rank, rank);
+                    }
+
+                    processParent(parent.parentProjectId, rank);
+                };
+
+                orderedData.forEach(function(node){
+                    processParent(node.parentProjectId, node.rank);
+                });
+
+            }
+
+            console.log(orderedDataMap);
 
             var dataTree = [];
             for (var i=0; i<data.length; i++){
@@ -34,6 +117,15 @@
                 node.text = node.name;
                 node.isExpanded = false;
                 node.nodeType = 'project';
+                node.isBuildType = false;
+                var visible = orderedDataMap[node.id];
+                if (visible){
+                    node.visible = 1;
+                    node.rank = visible.rank;
+                } else {
+                    node.visible = 0;
+                    node.rank = 50000000;
+                }
                 var bts = node.buildTypes!=undefined ? node.buildTypes.buildType : undefined;
                 node.href = node.webUrl;
                 if (node.id == '_Root'){
@@ -48,22 +140,30 @@
                     // create child array if it doesn't exist
                     var pp = (parent.children || (parent.children = []));
                     pp.push(node);
-                    if (bts != undefined && bts.length>0){
-                        var ppp = (node.children || (node.children = []));
-                        for (var z=0; z<bts.length; z++) {
-                            var bt = {
-                                text: bts[z].name,
-                                href: bts[z].webUrl,
-                                isBuildType: true,
-                                nodeType: 'buildType',
-                                parentProjectId: node.id,
-                                isExpanded: false
-                            };
-                            ppp.push(bt);
-                        }
-                    }
                 } else {
                     dataTree.push(node);
+                }
+
+                if (bts != undefined && bts.length>0){
+                    var ppp = (node.children || (node.children = []));
+                    for (var z=0; z<bts.length; z++) {
+                        var bt = {
+                            text: bts[z].name,
+                            href: bts[z].webUrl,
+                            isBuildType: true,
+                            nodeType: 'buildType',
+                            parentProjectId: node.id,
+                            isExpanded: false,
+                            rank: -1,
+                            visible: false
+                        };
+                        var vbt = visibleBuildTypesMap[bts[z].id];
+                        if (vbt != undefined){
+                            bt.rank = vbt.rank;
+                            bt.visible = true;
+                        }
+                        ppp.push(bt);
+                    }
                 }
             }
 
@@ -77,7 +177,10 @@
                   children: dataTree,
                     isExpanded: true
                 };
+                this._sortChildren(root);
                 return [root];
+            } else {
+                this._sortChildren(dataTree);
             }
             return dataTree;
         }

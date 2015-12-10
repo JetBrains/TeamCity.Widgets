@@ -28,7 +28,7 @@
                 },
                 _projects: {
                     type: String,
-                    value: "/app/rest/projects?fields=project(id,name,parentProjectId,webUrl,buildTypes(buildType(id,name,webUrl)))&locator=affectedProject:",
+                    value: "/app/rest/projects?fields=project(id,name,parentProjectId,webUrl,buildTypes(buildType(id,name,webUrl)))&locator=archived:false,affectedProject:",
                     readOnly: true
                 },
                 affectedProject: {

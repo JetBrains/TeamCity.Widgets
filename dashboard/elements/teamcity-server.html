@@ -52,8 +52,7 @@
                 },
                 projects:{
                     type: Object,
-                    notify: true,
-                    observer: '_projectsLoaded'
+                    notify: true
                 },
                 overview:{
                     type: Object,
@@ -66,7 +65,7 @@
                 }
             },
             behaviors: [LoggingBehavior, ConverterBehavior],
-            observers: ['dataLoaded(projects, overview)', '_serverUrlChanged(server, rootProject)'],
+            observers: ['dataLoaded(projects, overviewState)', '_serverUrlChanged(server, rootProject)'],
             stateChanged: function(state){
                  this.debug(state)
             },
@@ -76,14 +75,15 @@
             getUser: function(){
 
             },
-            dataLoaded: function(projects, overview){
-
-            },
-            _projectsLoaded: function(projects){
-                this.projectTree = this.flatToNested(projects["project"]);
+            dataLoaded: function(projects, overviewState){
+                var orderedData = (overviewState.name == 'OK'
+                                    && overviewState.result!=undefined
+                                    && overviewState.result["project"]!=undefined)
+                                ? overviewState.result["project"] : undefined;
+                this.projectTree = this.flatToNested(projects["project"], orderedData);
                 this.debug('should fire project-tree-loaded');
                 this.debug(this.projectTree);
-                //this.fire('iron-signal', {name: "project-tree-loaded", data: {projectTree: this.projectTree, index: this.serverIndex} });
+
                 var element = document.querySelector('project-list-wrapper');
                 this.debug(this.projectTree);
                 element.dataLoaded(this.projectTree, this.serverIndex);

@@ -46,10 +46,10 @@
             },
             handleResponse: function (event, detail){
                 this.data = this.$.ajax.lastResponse;
-                this.state = {name:'OK'};
+                this.state = {name:'OK', result: this.data};
             },
             handleError: function (event, detail){
-                this.state = {name:'ERROR', detail: event.detail};
+                this.state = {name:'ERROR', detail: event.detail, result: undefined};
                 //this.async(this.goAjax, 1000 * 20);
             },
             goAjax: function(){
