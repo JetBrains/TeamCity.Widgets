@@ -30,7 +30,7 @@
         .container {
             width: 840px;
             display: flex;
-            height: 520px;
+            height: 500px;
         }
 
         .search {
@@ -43,6 +43,7 @@
             display: inline-block;
             width: 50%;
             padding-left: 10px;
+            padding-top: 10px;
         }
 
         .servers > div{
@@ -51,11 +52,11 @@
 
         teamcity-search-input{
             display: block;
-            margin: 10px 50px 10px 10px;
+            margin: 10px 50px 10px 0;
         }
 
         .results{
-            margin: 10px;
+            margin: 0 10px 0 0;
         }
 
         :root {
@@ -71,7 +72,7 @@
 
     </style>
 </head>
-<body>
+<body is="dom-bind">
 <div class="container">
     <div class="search">
         <teamcity-search-input></teamcity-search-input>

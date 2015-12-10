@@ -33,6 +33,7 @@
                 // add to parent
                 node.text = node.name;
                 node.isExpanded = false;
+                node.nodeType = 'project';
                 var bts = node.buildTypes!=undefined ? node.buildTypes.buildType : undefined;
                 node.href = node.webUrl;
                 if (node.id == '_Root'){
@@ -40,6 +41,7 @@
                     node.text = serverName;
                     node.name = serverName;
                     node.isExpanded = true;
+                    node.nodeType = 'server';
                 }
                 var parent = dataMap[node.parentProjectId];
                 if (parent) {
@@ -53,6 +55,7 @@
                                 text: bts[z].name,
                                 href: bts[z].webUrl,
                                 isBuildType: true,
+                                nodeType: 'buildType',
                                 parentProjectId: node.id,
                                 isExpanded: false
                             };
@@ -70,6 +73,7 @@
                   name: href,
                   text: href,
                   webUrl: href,
+                  nodeType: 'server',
                   children: dataTree,
                     isExpanded: true
                 };

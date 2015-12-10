@@ -16,7 +16,7 @@
 
 <link rel="import" href="expanded-behavior.html">
 <link rel="import" href="../bower_components/iron-icons/iron-icons.html">
-
+<link rel="import" href="../bower_components/iron-behaviors/iron-control-state.html">
 <dom-module id="tree-icon">
     <style>
         :host{
@@ -24,6 +24,7 @@
             width: 10px;
             vertical-align: middle;
         }
+
         span{
             display: block;
             width: 10px;
@@ -39,10 +40,34 @@
             background-position: -180px 0;
         }
 
+        :host(.inverted) span{
+            background-position: -220px -20px;
+        }
+
+        :host(.inverted) span.true{
+            background-position: -200px 0;
+        }
+
+        :host span.server.true{
+            background-position: -220px -100px;
+        }
+
+        :host(.inverted) span.server.true{
+            background-position: -220px -120px;
+        }
+
+        :host span.server{
+            background-position: -200px -100px;
+        }
+
+        :host(.inverted) span.server{
+            background-position: -200px -120px;
+        }
+
     </style>
     <template>
         <template is="dom-if" if="{{hasChildren}}" restamp="true">
-            <span class$="{{data.isExpanded}}" on-click="_toggleExpanded"></span>
+            <span class$="{{data.isExpanded}} {{typeClass}}" on-click="_toggleExpanded" id="icon"></span>
         </template>
     </template>
     <script>
@@ -59,8 +84,20 @@
                     type: Boolean,
                     notify: true,
                     computed: 'computeHasChildren(data)'
+                },
+                typeClass:{
+                    type: String,
+                    notify: true,
+                    computed: 'computeTypeClass(data)'
+                },
+                inverted: {
+                    type: Boolean,
+                    value: false,
+                    notify: true,
+                    observer: '_invertedChanged'
                 }
             },
+            behaviors: [Polymer.IronControlState],
             _dataChanged: function(data){
               // console.log('_dataChanged: tree-icon');
               // console.log(data.text);
@@ -68,6 +105,9 @@
             },
             computeHasChildren: function(data){
                 return data.children && data.children.length > 0;
+            },
+            computeTypeClass: function(data){
+                return data.nodeType;
             },
             _toggleExpanded: function() {
                 this._updateState(!this.data.isExpanded);
@@ -85,6 +125,13 @@
             expand: function(){
                 if (!this.data.isExpanded) {
                     this._updateState(true);
+                }
+            },
+            _invertedChanged: function(){
+                if (this.inverted) {
+                    this.classList.add('inverted');
+                }else {
+                    this.classList.remove('inverted');
                 }
             }
         });

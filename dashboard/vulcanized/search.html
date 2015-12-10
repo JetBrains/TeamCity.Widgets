@@ -10570,6 +10570,7 @@ l)&&void 0!==f[l]&&null!==f[l]&&g.val.push([l,String(f[l])]);g.val.length&&(g.ty
                 // add to parent
                 node.text = node.name;
                 node.isExpanded = false;
+                node.nodeType = 'project';
                 var bts = node.buildTypes!=undefined ? node.buildTypes.buildType : undefined;
                 node.href = node.webUrl;
                 if (node.id == '_Root'){
@@ -10577,6 +10578,7 @@ l)&&void 0!==f[l]&&null!==f[l]&&g.val.push([l,String(f[l])]);g.val.length&&(g.ty
                     node.text = serverName;
                     node.name = serverName;
                     node.isExpanded = true;
+                    node.nodeType = 'server';
                 }
                 var parent = dataMap[node.parentProjectId];
                 if (parent) {
@@ -10590,6 +10592,7 @@ l)&&void 0!==f[l]&&null!==f[l]&&g.val.push([l,String(f[l])]);g.val.length&&(g.ty
                                 text: bts[z].name,
                                 href: bts[z].webUrl,
                                 isBuildType: true,
+                                nodeType: 'buildType',
                                 parentProjectId: node.id,
                                 isExpanded: false
                             };
@@ -10607,6 +10610,7 @@ l)&&void 0!==f[l]&&null!==f[l]&&g.val.push([l,String(f[l])]);g.val.length&&(g.ty
                   name: href,
                   text: href,
                   webUrl: href,
+                  nodeType: 'server',
                   children: dataTree,
                     isExpanded: true
                 };
@@ -11482,6 +11486,7 @@ l)&&void 0!==f[l]&&null!==f[l]&&g.val.push([l,String(f[l])]);g.val.length&&(g.ty
             width: 10px;
             vertical-align: middle;
         }
+
         span{
             display: block;
             width: 10px;
@@ -11497,10 +11502,34 @@ l)&&void 0!==f[l]&&null!==f[l]&&g.val.push([l,String(f[l])]);g.val.length&&(g.ty
             background-position: -180px 0;
         }
 
+        :host(.inverted) span{
+            background-position: -220px -20px;
+        }
+
+        :host(.inverted) span.true{
+            background-position: -200px 0;
+        }
+
+        :host span.server.true{
+            background-position: -220px -100px;
+        }
+
+        :host(.inverted) span.server.true{
+            background-position: -220px -120px;
+        }
+
+        :host span.server{
+            background-position: -200px -100px;
+        }
+
+        :host(.inverted) span.server{
+            background-position: -200px -120px;
+        }
+
     </style>
     <template>
         <template is="dom-if" if="{{hasChildren}}" restamp="true">
-            <span class$="{{data.isExpanded}}" on-click="_toggleExpanded"></span>
+            <span class$="{{data.isExpanded}} {{typeClass}}" on-click="_toggleExpanded" id="icon"></span>
         </template>
     </template>
     <script>
@@ -11517,8 +11546,20 @@ l)&&void 0!==f[l]&&null!==f[l]&&g.val.push([l,String(f[l])]);g.val.length&&(g.ty
                     type: Boolean,
                     notify: true,
                     computed: 'computeHasChildren(data)'
+                },
+                typeClass:{
+                    type: String,
+                    notify: true,
+                    computed: 'computeTypeClass(data)'
+                },
+                inverted: {
+                    type: Boolean,
+                    value: false,
+                    notify: true,
+                    observer: '_invertedChanged'
                 }
             },
+            behaviors: [Polymer.IronControlState],
             _dataChanged: function(data){
               // console.log('_dataChanged: tree-icon');
               // console.log(data.text);
@@ -11526,6 +11567,9 @@ l)&&void 0!==f[l]&&null!==f[l]&&g.val.push([l,String(f[l])]);g.val.length&&(g.ty
             },
             computeHasChildren: function(data){
                 return data.children && data.children.length > 0;
+            },
+            computeTypeClass: function(data){
+                return data.nodeType;
             },
             _toggleExpanded: function() {
                 this._updateState(!this.data.isExpanded);
@@ -11543,6 +11587,13 @@ l)&&void 0!==f[l]&&null!==f[l]&&g.val.push([l,String(f[l])]);g.val.length&&(g.ty
             expand: function(){
                 if (!this.data.isExpanded) {
                     this._updateState(true);
+                }
+            },
+            _invertedChanged: function(){
+                if (this.inverted) {
+                    this.classList.add('inverted');
+                }else {
+                    this.classList.remove('inverted');
                 }
             }
         });
@@ -11568,17 +11619,38 @@ l)&&void 0!==f[l]&&null!==f[l]&&g.val.push([l,String(f[l])]);g.val.length&&(g.ty
         }
 
         .node {
-            line-height: 1.6em;
+            line-height: 2em;
             display: block;
             max-width: 340px;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
             outline: none;
+            margin-left: 10px;
+            clear: both;
+        }
+        .node.server {
+            padding-top: 10px !important;
+            padding-bottom: 5px !important;
+        }
+
+        .node.server a{
+            font-size: 90%;
+            color: gray;
+            margin-bottom: 10px;
+        }
+
+        .node.server tree-icon{
+            float:right;
+            margin-top: 10px;
+        }
+
+        .node.server .icon{
+            display: none;
         }
 
         a {
-            margin-left: 0.25em;
+            margin-left: 0.15em;
             text-decoration: none;
             color: black;
             height: 100%;
@@ -11594,22 +11666,53 @@ l)&&void 0!==f[l]&&null!==f[l]&&g.val.push([l,String(f[l])]);g.val.length&&(g.ty
         }
 
         .highlighted{
-            background-color: yellow;
+            background-color: #fff889;
         }
 
-        :host[focused], :host:hover{
-            background-color: rgba(255, 222, 0, 0.2);
+        :host:hover{
+            background-color: #f3f7fc;
             outline: none !important;
         }
 
-        tree-icon {
-            margin-left: 2px;
+        :host[focused] .highlighted{
+            color: #1d66bf;
         }
+
+        :host[focused]:hover{
+            background-color: #1d66bf;
+            outline: none !important;
+        }
+
+        :host[focused]{
+            background-color: #1d66bf;
+            outline: none !important;
+        }
+
+        :host[focused] a{
+            color: white;
+        }
+
+        :host[focused] .node.server a{
+            color: white;
+        }
+
+        :host[focused] .icon.bt{
+            background-position: -80px 0;
+        }
+
+        :host[focused] .icon.project{
+            background-position: -80px -20px;
+        }
+
+        /*:host[focused]{
+            --right-arrow: -220px -20px; !*white*!
+            --down-arrow: -200px 0;  !*white*!
+        }*/
 
     </style>
     <template>
         <iron-a11y-keys id="a11y" target="[[target]]" keys="left right down up enter" on-keys-pressed="onExpandCollapsed"></iron-a11y-keys>
-        <div class="node" id="node">
+        <div id="node" class$="node {{currentNode.nodeType}}">
             <tree-icon data="{{currentNode}}"></tree-icon>
             <span class$="icon tc-sprite {{iconType}}"></span>
             <a id="anode" href$="{{currentNode.href}}" target="_top">{{currentNode.text}}</a>
@@ -11634,6 +11737,10 @@ l)&&void 0!==f[l]&&null!==f[l]&&g.val.push([l,String(f[l])]);g.val.length&&(g.ty
                     type: String,
                     notify: true
                 },
+                isServer:{
+                    type: Boolean,
+                    notify: true
+                },
                 dataIndex:{
                     type: String,
                     reflectToAttribute: true
@@ -11642,9 +11749,14 @@ l)&&void 0!==f[l]&&null!==f[l]&&g.val.push([l,String(f[l])]);g.val.length&&(g.ty
             behaviors: [LoggingBehavior, Polymer.IronControlState],
             observers: ["_highlight(currentNode, terms)"],
             _currentNodeChanged: function(){
-                this.$.node.style.padding = "0 0 0 " + (this.currentNode.level * 17) + "px";
-                this.$.node.style.maxWidth = (370 - this.currentNode.level * 17) + "px";
                 this.iconType = this.currentNode.isBuildType ? "bt" : "project";
+                this.isServer = this.currentNode.nodeType == 'server';
+                var padding =  !this.isServer ? (this.currentNode.level-1) * 17 : 0;
+                this.$.node.style.padding = "0 0 0 " + (padding) + "px";
+                this.$.node.style.maxWidth = (370 - padding) + "px";
+            },
+            _changedControlState: function(){
+                this.querySelector('tree-icon').inverted = !!this.focused;
             },
             _highlight: function(currentNode, terms){
                 if (currentNode == undefined || currentNode.text == undefined){
@@ -11924,26 +12036,48 @@ l)&&void 0!==f[l]&&null!==f[l]&&g.val.push([l,String(f[l])]);g.val.length&&(g.ty
     </script>
 </dom-module><dom-module id="server-auth" assetpath="elements/">
     <style>
+        .status{
+            display: block;
+            margin-bottom: 5px;
+        }
+        .status span{
+            display: inline-block;
+        }
         .state{
-            font-size: larger;
+            display: inline-block;
+            width: 20px;
+            height: 11px;
+            background-repeat: no-repeat;
+            background-image: url("elements/icons/teamcity-sprite.png");
+            background-color: transparent;
+            background-position: -200px -200px;
+            margin-bottom: 5px;
         }
         .unknown{
-            color: gray;
+            background-position: -200px -40px;
         }
         .auth{
-            color: green;
+            background-position: -180px -40px;
         }
         .not-auth{
-            color: red;
+            background-position: -220px -40px;
         }
         .info{
             color: gray;
+            margin-bottom: 10px;
+        }
+        .name{
+            padding-left: 5px;
+            padding-bottom: 1px;
+            height: 18px;
+            line-height: 18px;
+            vertical-align: bottom;
         }
     </style>
     <template>
-        <span class$="state {{state}}">●</span>&nbsp;<span class="name">{{server}}</span>
+        <div class="status"><span class$="state {{state}}">&nbsp;</span><span class="name">{{server}}</span></div>
         <template is="dom-if" if="{{notAuthorized}}">
-            <div class="info">You are not authorized on this server. Please <a href="{{server}}/{{loginUrl}}" target="_blank">login.</a> </div>
+            <div class="info">You are not authorized on this server. Please <a href$="{{server}}/{{loginUrl}}" target="_blank">login.</a> </div>
         </template>
     </template>
     <script>
@@ -13303,24 +13437,24 @@ l)&&void 0!==f[l]&&null!==f[l]&&g.val.push([l,String(f[l])]);g.val.length&&(g.ty
     <style>
         iron-list{
             width: 400px;
-            height: 450px;
+            height: 480px;
             outline: none;
             @apply(--projects-list);
         }
 
         ::-webkit-scrollbar {
-            width: 5px;
+            width: 7px;
         }
 
         ::-webkit-scrollbar-track {
-            -webkit-border-radius: 5px;
-            border-radius: 5px;
+            -webkit-border-radius: 7px;
+            border-radius: 7px;
             -webkit-box-shadow: inset 0 0 2px rgba(0,0,0,0.5);
         }
 
         ::-webkit-scrollbar-thumb {
-            -webkit-border-radius: 5px;
-            border-radius: 5px;
+            -webkit-border-radius: 7px;
+            border-radius: 7px;
             background: rgba(0,0,0,0.5);
 
         }

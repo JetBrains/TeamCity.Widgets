@@ -17,26 +17,48 @@
 <link rel="import" href="teamcity-ajax.html">
 <dom-module id="server-auth">
     <style>
+        .status{
+            display: block;
+            margin-bottom: 5px;
+        }
+        .status span{
+            display: inline-block;
+        }
         .state{
-            font-size: larger;
+            display: inline-block;
+            width: 20px;
+            height: 11px;
+            background-repeat: no-repeat;
+            background-image: url(icons/teamcity-sprite.png);
+            background-color: transparent;
+            background-position: -200px -200px;
+            margin-bottom: 5px;
         }
         .unknown{
-            color: gray;
+            background-position: -200px -40px;
         }
         .auth{
-            color: green;
+            background-position: -180px -40px;
         }
         .not-auth{
-            color: red;
+            background-position: -220px -40px;
         }
         .info{
             color: gray;
+            margin-bottom: 10px;
+        }
+        .name{
+            padding-left: 5px;
+            padding-bottom: 1px;
+            height: 18px;
+            line-height: 18px;
+            vertical-align: bottom;
         }
     </style>
     <template>
-        <span class$="state {{state}}">&#9679;</span>&nbsp;<span class="name">{{server}}</span>
+        <div class="status"><span class$="state {{state}}">&nbsp;</span><span class="name">{{server}}</span></div>
         <template is="dom-if" if="{{notAuthorized}}">
-            <div class="info">You are not authorized on this server. Please <a href="{{server}}/{{loginUrl}}" target="_blank">login.</a> </div>
+            <div class="info">You are not authorized on this server. Please <a href$="{{server}}/{{loginUrl}}" target="_blank">login.</a> </div>
         </template>
     </template>
     <script>

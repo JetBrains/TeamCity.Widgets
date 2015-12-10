@@ -39,17 +39,38 @@
         }
 
         .node {
-            line-height: 1.6em;
+            line-height: 2em;
             display: block;
             max-width: 340px;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
             outline: none;
+            margin-left: 10px;
+            clear: both;
+        }
+        .node.server {
+            padding-top: 10px !important;
+            padding-bottom: 5px !important;
+        }
+
+        .node.server a{
+            font-size: 90%;
+            color: gray;
+            margin-bottom: 10px;
+        }
+
+        .node.server tree-icon{
+            float:right;
+            margin-top: 10px;
+        }
+
+        .node.server .icon{
+            display: none;
         }
 
         a {
-            margin-left: 0.25em;
+            margin-left: 0.15em;
             text-decoration: none;
             color: black;
             height: 100%;
@@ -65,23 +86,54 @@
         }
 
         .highlighted{
-            background-color: yellow;
+            background-color: #fff889;
         }
 
-        :host[focused], :host:hover{
-            background-color: rgba(255, 222, 0, 0.2);
+        :host:hover{
+            background-color: #f3f7fc;
             outline: none !important;
         }
 
-        tree-icon {
-            margin-left: 2px;
+        :host[focused] .highlighted{
+            color: #1d66bf;
         }
+
+        :host[focused]:hover{
+            background-color: #1d66bf;
+            outline: none !important;
+        }
+
+        :host[focused]{
+            background-color: #1d66bf;
+            outline: none !important;
+        }
+
+        :host[focused] a{
+            color: white;
+        }
+
+        :host[focused] .node.server a{
+            color: white;
+        }
+
+        :host[focused] .icon.bt{
+            background-position: -80px 0;
+        }
+
+        :host[focused] .icon.project{
+            background-position: -80px -20px;
+        }
+
+        /*:host[focused]{
+            --right-arrow: -220px -20px; !*white*!
+            --down-arrow: -200px 0;  !*white*!
+        }*/
 
     </style>
     <template>
         <iron-a11y-keys id="a11y" target="[[target]]" keys="left right down up enter"
                         on-keys-pressed="onExpandCollapsed"></iron-a11y-keys>
-        <div class="node" id="node">
+        <div id="node" class$="node {{currentNode.nodeType}}">
             <tree-icon data="{{currentNode}}"></tree-icon>
             <span class$="icon tc-sprite {{iconType}}"></span>
             <a id="anode" href$="{{currentNode.href}}" target="_top">{{currentNode.text}}</a>
@@ -106,6 +158,10 @@
                     type: String,
                     notify: true
                 },
+                isServer:{
+                    type: Boolean,
+                    notify: true
+                },
                 dataIndex:{
                     type: String,
                     reflectToAttribute: true
@@ -114,9 +170,14 @@
             behaviors: [LoggingBehavior, Polymer.IronControlState],
             observers: ["_highlight(currentNode, terms)"],
             _currentNodeChanged: function(){
-                this.$.node.style.padding = "0 0 0 " + (this.currentNode.level * 17) + "px";
-                this.$.node.style.maxWidth = (370 - this.currentNode.level * 17) + "px";
                 this.iconType = this.currentNode.isBuildType ? "bt" : "project";
+                this.isServer = this.currentNode.nodeType == 'server';
+                var padding =  !this.isServer ? (this.currentNode.level-1) * 17 : 0;
+                this.$.node.style.padding = "0 0 0 " + (padding) + "px";
+                this.$.node.style.maxWidth = (370 - padding) + "px";
+            },
+            _changedControlState: function(){
+                this.querySelector('tree-icon').inverted = !!this.focused;
             },
             _highlight: function(currentNode, terms){
                 if (currentNode == undefined || currentNode.text == undefined){
