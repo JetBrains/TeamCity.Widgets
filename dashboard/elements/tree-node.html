@@ -41,7 +41,7 @@
         .node {
             line-height: 2em;
             display: block;
-            max-width: 340px;
+            max-width: 580px;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -129,11 +129,35 @@
             --down-arrow: -200px 0;  !*white*!
         }*/
 
+        .level2{
+            padding-left: 17px;
+        }
+
+        .level3{
+            padding-left: 34px;
+        }
+
+        .level4{
+            padding-left: 51px;
+        }
+
+        .level5{
+            padding-left: 68px;
+        }
+
+        .level6{
+            padding-left: 85px;
+        }
+
+        .level7{
+            padding-left: 102px;
+        }
+
     </style>
     <template>
         <iron-a11y-keys id="a11y" target="[[target]]" keys="left right down up enter"
                         on-keys-pressed="onExpandCollapsed"></iron-a11y-keys>
-        <div id="node" class$="node {{currentNode.nodeType}}">
+        <div id="node" class$="node {{currentNode.nodeType}} level{{currentNode.level}}">
             <tree-icon data="{{currentNode}}"></tree-icon>
             <span class$="icon tc-sprite {{iconType}}"></span>
             <a id="anode" href$="{{currentNode.href}}" target="_top">{{currentNode.text}}</a>
@@ -170,27 +194,21 @@
                 }
             },
             behaviors: [LoggingBehavior, Polymer.IronControlState],
-            observers: ["_highlight(currentNode, terms)"],
-            _currentNodeChanged: function(){
-                this.iconType = this.currentNode.isBuildType ? "bt" : "project";
-                this.isServer = this.currentNode.nodeType == 'server';
-                var padding =  !this.isServer ? (this.currentNode.level-1) * 17 : 0;
-                this.$.node.style.padding = "0 0 0 " + (padding) + "px";
-                this.$.node.style.maxWidth = (370 - padding) + "px";
+            observers: ["_highlight(currentNode.text, terms)"],
+            _currentNodeChanged: function(newValue){
+                this.iconType = newValue.isBuildType ? "bt" : "project";
+                this.isServer = newValue.nodeType == 'server';
             },
             _changedControlState: function(){
                 this.querySelector('tree-icon').inverted = !!this.focused;
             },
-            _highlight: function(currentNode, terms){
-                if (currentNode == undefined || currentNode.text == undefined){
-                    return;
-                }
-                if (terms==undefined || terms == ''){
-                    this.$.anode.innerHTML = currentNode.text;
-                    return;
-                }
-                var query = new RegExp("(" + terms + ")", "gim");
-                Polymer.dom(this.$.anode).innerHTML = currentNode.text.replace(query, "<span class='highlighted'>$1</span>");
+             _highlight: function(text, terms){
+                 if (terms==undefined || terms == ''){
+                     this.$.anode.innerHTML = text;
+                     return;
+                 }
+                 var query = new RegExp("(" + terms + ")", "gim");
+                 Polymer.dom(this.$.anode).innerHTML = text.replace(query, "<span class='highlighted'>$1</span>");
             },
             _tabIndex: function(){
                 return this.dataIndex;

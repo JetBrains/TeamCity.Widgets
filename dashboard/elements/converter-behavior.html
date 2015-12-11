@@ -124,7 +124,7 @@
                     node.rank = visible.rank;
                 } else {
                     node.visible = 0;
-                    node.rank = 50000000;
+                    node.rank = Number.MAX_VALUE;
                 }
                 var bts = node.buildTypes!=undefined ? node.buildTypes.buildType : undefined;
                 node.href = node.webUrl;
@@ -155,12 +155,12 @@
                             parentProjectId: node.id,
                             isExpanded: false,
                             rank: -1,
-                            visible: false
+                            visible: 0
                         };
                         var vbt = visibleBuildTypesMap[bts[z].id];
                         if (vbt != undefined){
                             bt.rank = vbt.rank;
-                            bt.visible = true;
+                            bt.visible = 1;
                         }
                         ppp.push(bt);
                     }
@@ -174,6 +174,8 @@
                   text: href,
                   webUrl: href,
                   nodeType: 'server',
+                  rank: 0,
+                  visible: 1,
                   children: dataTree,
                     isExpanded: true
                 };
