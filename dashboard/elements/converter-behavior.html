@@ -81,8 +81,6 @@
                 }, {});
 
                 var processParent = function(parentProjectId, rank){
-                    console.log('processParent');
-                    console.log(parentProjectId);
 
                     var parent = dataMap[parentProjectId];
 
@@ -108,8 +106,6 @@
 
             }
 
-            console.log(orderedDataMap);
-
             var dataTree = [];
             for (var i=0; i<data.length; i++){
                 var node = data[i];
@@ -134,6 +130,7 @@
                     node.name = serverName;
                     node.isExpanded = true;
                     node.nodeType = 'server';
+                    node.authorized = 'auth';
                 }
                 var parent = dataMap[node.parentProjectId];
                 if (parent) {
@@ -177,7 +174,8 @@
                   rank: 0,
                   visible: 1,
                   children: dataTree,
-                    isExpanded: true
+                  isExpanded: true,
+                  authorized: 'auth'
                 };
                 this._sortChildren(root);
                 return [root];
@@ -185,7 +183,26 @@
                 this._sortChildren(dataTree);
             }
             return dataTree;
-        }
+        },
+        rootNodeOnly: function(serverAuthComponent){
+            console.log(serverAuthComponent);
+            var href = serverAuthComponent.server;
+            var root = {
+                name: href,
+                text: href,
+                webUrl: href,
+                nodeType: 'server',
+                rank: 0,
+                visible: 1,
+                children: [],
+                isExpanded: true,
+                authorized: 'non-auth',
+                loginUrl: serverAuthComponent.server + "/" + serverAuthComponent.loginUrl
+            };
+            return [root];
+        },
+        _makeServerRoot: function(){
 
+        }
     };
 </script>

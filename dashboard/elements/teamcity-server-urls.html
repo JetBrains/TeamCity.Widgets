@@ -28,7 +28,7 @@
                 },
                 _projects: {
                     type: String,
-                    value: "/app/rest/projects?fields=project(id,name,parentProjectId,webUrl,buildTypes(buildType(id,name,webUrl)))&locator=archived:false,affectedProject:",
+                    value: "/app/rest/projects?fields=project(id,name,parentProjectId,webUrl,archived,buildTypes(buildType(id,name,webUrl)))&locator=",
                     readOnly: true
                 },
                 affectedProject: {
@@ -38,19 +38,26 @@
                 },
                 projects: {
                     type: String,
-                    computed: '_getProjectsUrlWithLocator(_projects, affectedProject)'
+                    computed: '_getProjectsUrlWithLocator(_projects, affectedProject, archived)'
                 },
                 overview: {
                     type: String,
                     value: "/app/rest/projects?locator=selectedByUser:current&fields=count,project(id,parentProjectId,projects(count,project(id),$locator(selectedByUser:current)),buildTypes(count,buildType(id),$locator(selectedByUser:current)))",
                     readOnly: true
+                },
+                archived: {
+                    type: Boolean,
+                    notify: true,
+                    value: 'false'
                 }
             },
             behaviors: [LoggingBehavior],
-            _getProjectsUrlWithLocator: function(_projects, affectedProject){
+            _getProjectsUrlWithLocator: function(_projects, affectedProject, archived){
+                var locator = "archived:" + archived + ",affectedProject:" + affectedProject;
                 this.debug('_getProjectsUrlWithLocator: ' + _projects + affectedProject);
-                return _projects + affectedProject;
+                return _projects + locator;
             }
+
         });
     </script>
 </dom-module>

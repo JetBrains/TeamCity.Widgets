@@ -19,7 +19,7 @@
         properties: {
             level: {
                 type: String,
-                value: 1,
+                value: 0,
                 notify: true
             },
             levels: {
@@ -28,13 +28,31 @@
             }
         },
         _log: function(level, message){
-            if (level >= this.level){
-                var el = this.id != undefined && this.id.length > 0 ? this.id : this.tagName;
-                console.log('['+ this.levels[level] + '] ' + el + " -> " + message);
-                if (!(typeof message == 'string')){
-                    console.log(message);
-                }
+            if (level < this.level){
+                return;
             }
+
+            var logger = window.console != undefined ? window.console[this.levels[level]] : undefined;
+
+            if (!logger){
+                return;
+            }
+
+            var el = this.tagName;
+            var id = this.id != undefined && this.id.length > 0 ? this.id : undefined;
+
+            if (this.id != undefined && this.id.length > 0){
+                el += '(id: ' + this.id + ')';
+            }
+
+            var msg = '['+ this.levels[level] + '] ' + el + " -> " + message;
+
+            window.console[this.levels[level]](msg);
+
+            if (!(typeof message == 'string')){
+                window.console[this.levels[level]](message);
+            }
+
         },
         info: function(message){
             this._log(1,  message);

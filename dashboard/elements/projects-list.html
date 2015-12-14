@@ -51,7 +51,8 @@
           <iron-list items="[[visibleItems]]" as="item" id="list" tabindex="-1">
                 <!--we need data-index="{{index}}" due to https://github.com/Polymer/core-list/issues/62 -->
                 <template>
-                     <tree-node current-node="{{item.node}}" terms="{{terms}}" on-expand="onExpand" data-index="[[index]]" tabindex$="[[index]]"></tree-node>
+                     <tree-node current-node="{{item.node}}" terms="{{terms}}" expanded="{{item.node.isExpanded}}"
+                                on-expand="onExpand" data-index="[[index]]" tabindex$="[[index]]"></tree-node>
                 </template>
           </iron-list>
     </template>
@@ -200,6 +201,23 @@
                     this.spliceChildren(item.node);
                 }
             },
+            collapseAll: function(){
+                if (this.dataTree == undefined){
+                    return;
+                }
+                var self = this;
+                this.dataTree.forEach(function(dt){
+                    if (dt.isExpanded){
+                        self.debug('will collapse ' + dt);
+                    }
+                });
+            },
+            expandAll: function(){
+                var self = this;
+                this.dataTree.forEach(function(dt){
+                    self.debug('will expand ' + dt);
+                });
+            },
             spliceChildren: function(node){
                 this.removeIndex++;
                 var self = this;
@@ -218,21 +236,30 @@
 
                 server[0].serverIndex = index;
 
-                var splicePosition = this.dataTree.length;
+                if (this.dataTree[index]!=undefined && this.dataTree[index].serverIndex==index){
+                    //replace old data with new data
+                    this.dataTree[index] = server[0];
+                    this.debug('server data replaced');
+                    this.debug('this.dataTree.length=' + this.dataTree.length);
 
-                for (var i=0; i<this.dataTree.length; i++){
-                    var serverIndex = this.dataTree[i].serverIndex;
-                    this.debug('i=' + i);
-                    this.debug('stored server index =' + serverIndex);
-                    if (serverIndex > index){
-                        splicePosition = i;
-                        break;
+                } else {
+
+                    var splicePosition = this.dataTree.length;
+
+                    for (var i = 0; i < this.dataTree.length; i++) {
+                        var serverIndex = this.dataTree[i].serverIndex;
+                        this.debug('i=' + i);
+                        this.debug('stored server index =' + serverIndex);
+                        if (serverIndex > index) {
+                            splicePosition = i;
+                            break;
+                        }
                     }
+                    this.debug('insert in position ' + splicePosition);
+                    this.dataTree.splice(splicePosition, 0, server[0]);
+                    this.debug('new server added');
+                    this.debug('this.dataTree.length=' + this.dataTree.length);
                 }
-                this.debug('insert in position ' + splicePosition);
-                this.dataTree.splice(splicePosition, 0, server[0]);
-                this.debug('new server added');
-                this.debug('this.dataTree.length=' + this.dataTree.length);
                 this._dataChanged();
             },
             moveFocusOnResults: function(e){

@@ -41,7 +41,7 @@
         .node {
             line-height: 2em;
             display: block;
-            max-width: 580px;
+            max-width: 450px;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -54,19 +54,31 @@
             padding-bottom: 5px !important;
         }
 
-        .node.server a{
+        .node.server > a, .login{
             font-size: 90%;
             color: gray;
-            margin-bottom: 10px;
+        }
+
+        .login{
+            float: right;
+        }
+
+        .login > a {
+            color: #1d66bf;
         }
 
         .node.server tree-icon{
             float:right;
             margin-top: 10px;
+            margin-right: 5px;
         }
 
-        .node.server .icon{
-            display: none;
+        .node.server .icon.auth{
+            background-position: -140px -40px;
+        }
+
+        .node.server .icon.non-auth{
+            background-position: -120px -40px;
         }
 
         a {
@@ -124,10 +136,32 @@
             background-position: -80px -20px;
         }
 
-        /*:host[focused]{
-            --right-arrow: -220px -20px; !*white*!
-            --down-arrow: -200px 0;  !*white*!
-        }*/
+        :host .heart{
+            width: 18px;
+            height: 18px;
+            background-position: 0 -120px; /* blue heart*/
+            float:right;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .bt .heart{
+            margin-right: 5px;
+        }
+
+        :host:hover .heart{
+            display: inline-block;
+        }
+
+        :host[focused] .heart{
+            background-position: 0 -120px; /* white heart*/
+            display: inline-block;
+        }
+
+        :host[focused]:hover .heart{
+            background-position: 0 -120px;  /* white heart*/
+            display: inline-block;
+        }
 
         .level2{
             padding-left: 17px;
@@ -153,14 +187,29 @@
             padding-left: 102px;
         }
 
+        .info{
+            font-size: 90%;
+            font-style: italic;
+            color: gray;
+        }
+
     </style>
     <template>
         <iron-a11y-keys id="a11y" target="[[target]]" keys="left right down up enter"
                         on-keys-pressed="onExpandCollapsed"></iron-a11y-keys>
-        <div id="node" class$="node {{currentNode.nodeType}} level{{currentNode.level}}">
-            <tree-icon data="{{currentNode}}"></tree-icon>
-            <span class$="icon tc-sprite {{iconType}}"></span>
+        <div id="node" class$="node {{currentNode.nodeType}} level{{currentNode.level}}" on-click="_expand">
+            <tree-icon data="{{currentNode}}" id="treeIcon" expanded="{{expanded}}"></tree-icon>
+            <span class$="icon tc-sprite {{iconType}} {{serverAuthType}}"></span>
+            <template is="dom-if" if="{{!isServer}}">
+                <span class="icon heart"></span>
+            </template>
             <a id="anode" href$="{{currentNode.href}}" target="_top">{{currentNode.text}}</a>
+            <template is="dom-if" if="{{loginRequired}}" restamp="true">
+                <span class="login">Not authorized. Please <a href="{{currentNode.loginUrl}}" target="_blank">login</a></span>
+            </template>
+            <template is="dom-if" if="{{archived}}" restamp="true">
+                <span class="info">&nbsp;archived</span>
+            </template>
             <!--<span>{{currentNode.visible}}</span>
             <span>{{currentNode.rank}}</span>-->
         </div>
@@ -184,6 +233,14 @@
                     type: String,
                     notify: true
                 },
+                serverAuthType:{
+                    type: String,
+                    notify: true
+                },
+                loginRequired:{
+                    type: Boolean,
+                    notify: true
+                },
                 isServer:{
                     type: Boolean,
                     notify: true
@@ -191,6 +248,11 @@
                 dataIndex:{
                     type: String,
                     reflectToAttribute: true
+                },
+                expanded:{
+                    type: Boolean,
+                    reflectToAttribute: true,
+                    notify: true
                 }
             },
             behaviors: [LoggingBehavior, Polymer.IronControlState],
@@ -198,6 +260,9 @@
             _currentNodeChanged: function(newValue){
                 this.iconType = newValue.isBuildType ? "bt" : "project";
                 this.isServer = newValue.nodeType == 'server';
+                this.serverAuthType = this.isServer ? newValue.authorized : '';
+                this.loginRequired = newValue.loginUrl != undefined;
+                this.archived = newValue.archived == true;
             },
             _changedControlState: function(){
                 this.querySelector('tree-icon').inverted = !!this.focused;
@@ -244,6 +309,11 @@
                 } else if (action == 'enter'){
                     this.$.anode.click();
                 }
+            },
+            _expand: function(e){
+                if (e.path.indexOf(this.$.treeIcon)==-1){
+                    this.$.treeIcon.externalToggleExpanded();
+                };
             }
         });
     </script>

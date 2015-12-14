@@ -50,25 +50,25 @@
         }
 
         :host span.server.true{
-            background-position: -220px -100px;
-        }
-
-        :host(.inverted) span.server.true{
-            background-position: -220px -120px;
-        }
-
-        :host span.server{
             background-position: -200px -100px;
         }
 
+        :host(.inverted) span.server.true{
+            background-position: -200px -100px;
+        }
+
+        :host span.server{
+            background-position: -220px -120px;
+        }
+
         :host(.inverted) span.server{
-            background-position: -200px -120px;
+            background-position: -220px -120px;
         }
 
     </style>
     <template>
         <template is="dom-if" if="{{hasChildren}}" restamp="true">
-            <span class$="{{data.isExpanded}} {{typeClass}}" on-click="_toggleExpanded" id="icon"></span>
+            <span class$="{{expanded}} {{typeClass}}" on-click="_toggleExpanded" id="icon"></span>
         </template>
     </template>
     <script>
@@ -96,6 +96,10 @@
                     value: false,
                     notify: true,
                     observer: '_invertedChanged'
+                },
+                expanded: {
+                    type: Boolean,
+                    notify: true
                 }
             },
             behaviors: [Polymer.IronControlState],
@@ -111,6 +115,12 @@
                 return data.nodeType;
             },
             _toggleExpanded: function() {
+                this._updateState(!this.data.isExpanded);
+            },
+            externalToggleExpanded: function() {
+                if (!this.hasChildren){
+                    return;
+                }
                 this._updateState(!this.data.isExpanded);
             },
             _updateState: function(isExpanded) {

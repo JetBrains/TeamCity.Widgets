@@ -26,7 +26,7 @@
         <teamcity-server-urls id="urls" affected-project="{{rootProject}}"></teamcity-server-urls>
         <teamcity-ajax id="ajaxProject" server="{{server}}" state="{{projectsState}}" data="{{projects}}"></teamcity-ajax>
         <teamcity-ajax id="ajaxOverview" server="{{server}}" state="{{overviewState}}" data="{{overview}}"></teamcity-ajax>
-        <server-auth server-state="{{projectsState}}" server="{{server}}" login-url="{{ urls.login}}"></server-auth>
+        <server-auth server-state="{{projectsState}}" server="{{server}}" login-url="{{urls.login}}" id="serverAuth"></server-auth>
     </template>
     <script>
         // element registration
@@ -36,6 +36,11 @@
                 server: {
                     type: String,
                     notify: true
+                },
+                archived: {
+                    type: String,
+                    notify: true,
+                    value: 'false'
                 },
                 rootProject:{
                     type: String,
@@ -65,7 +70,7 @@
                 }
             },
             behaviors: [LoggingBehavior, ConverterBehavior],
-            observers: ['dataLoaded(projects, overviewState)', '_serverUrlChanged(server, rootProject)'],
+            observers: ['dataLoaded(projectsState, overviewState)', '_serverUrlChanged(server, rootProject, archived)'],
             stateChanged: function(state){
                  this.debug(state)
             },
@@ -75,21 +80,27 @@
             getUser: function(){
 
             },
-            dataLoaded: function(projects, overviewState){
-                var orderedData = (overviewState.name == 'OK'
-                                    && overviewState.result!=undefined
-                                    && overviewState.result["project"]!=undefined)
-                                ? overviewState.result["project"] : undefined;
-                this.projectTree = this.flatToNested(projects["project"], orderedData);
-                this.debug('should fire project-tree-loaded');
-                this.debug(this.projectTree);
-
+            dataLoaded: function(projectsState, overviewState){
                 var element = document.querySelector('project-list-wrapper');
-                this.debug(this.projectTree);
-                element.dataLoaded(this.projectTree, this.serverIndex);
+                if (projectsState.name=='OK') {
+                    var projects = projectsState.result["project"];
+                    var orderedData = (overviewState.name == 'OK'
+                    && overviewState.result != undefined
+                    && overviewState.result["project"] != undefined)
+                            ? overviewState.result["project"] : undefined;
+                    this.projectTree = this.flatToNested(projects, orderedData);
+                    this.debug('will set project-list-wrapper.dataLoaded');
+                    this.debug(this.projectTree);
+                    element.dataLoaded(this.projectTree, this.serverIndex);
+                } else {
+                    this.projectTree = this.rootNodeOnly(this.$.serverAuth);
+                    this.debug('will add server root only to project-list-wrapper.dataLoaded');
+                    this.debug(this.projectTree);
+                    element.dataLoaded(this.projectTree, this.serverIndex);
+                }
             },
-            _serverUrlChanged: function(server, rootProject){
-                this.debug('_serverUrlChanged: ' + server + " -> " + rootProject);
+            _serverUrlChanged: function(server, rootProject, archived){
+                this.debug('_serverUrlChanged: ' + server + " -> " + rootProject + " -> " + archived);
                 this.urls = this.$.urls;
                 this.$.ajaxProject.restUrl = this.urls.projects;
                 this.$.ajaxOverview.restUrl = this.urls.overview;
