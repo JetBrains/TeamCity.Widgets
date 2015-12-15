@@ -12283,9 +12283,7 @@ l)&&void 0!==f[l]&&null!==f[l]&&g.val.push([l,String(f[l])]);g.val.length&&(g.ty
         <div id="node" class$="node {{currentNode.nodeType}} level{{currentNode.level}}" on-click="_expand">
             <tree-icon data="{{currentNode}}" id="treeIcon" expanded="{{expanded}}"></tree-icon>
             <span class$="icon tc-sprite {{iconType}} {{serverAuthType}}"></span>
-            <template is="dom-if" if="{{!isServer}}">
-                <span class="icon heart"></span>
-            </template>
+            
             <a id="anode" href$="{{currentNode.href}}" target="_top">{{currentNode.text}}</a>
             <template is="dom-if" if="{{loginRequired}}" restamp="true">
                 <span class="login">Not authorized. Please <a href="{{currentNode.loginUrl}}" target="_blank">login</a></span>
