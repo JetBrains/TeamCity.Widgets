@@ -2,7 +2,7 @@
 <link rel="import" href="teamcity-server-list.html">
 <link rel="import" href="project-list-wrapper.html">
 <link rel="import" href="../bower_components/iron-flex-layout/classes/iron-flex-layout.html">
-<link rel="import" href="../bower_components/iron-input/iron-input.html">
+<link rel="import" href="teamcity-archived-option.html">
 <script type="text/javascript" src="../bower_components/uri.js/src/URI.min.js"></script>
 <dom-module id="search-container">
     <template>
@@ -10,29 +10,33 @@
             label{
                 cursor: pointer;
             }
-            #serversHolder{
-                background-color: white;
-                width: 300px;
-                min-height: 100px;
-                margin-left: 20px;
-                padding-left: 10px;
-                padding-top: 5px;
-            }
             #resultsHolder{
-                width: 413px;
+                width: 750px;
+            }
+            #optionHolder{
+                width: 750px;
+                text-align: right;
+                margin-top: 10px;
+            }
+            #optionHolder teamcity-archived-option{
+                width: 100%;
+                text-align: right;
             }
         </style>
 
         <div style="width: 100%; text-align: center; margin-bottom: 25px;">
             <teamcity-search></teamcity-search>
         </div>
+        <div class="layout vertical">
         <div class="horizontal layout wrap center-justified">
             <div id="resultsHolder">
                 <project-list-wrapper></project-list-wrapper>
             </div>
-            <div id="serversHolder" class="vertical layout">
-                <teamcity-server-list servers="{{servers}}"></teamcity-server-list>
-            </div>
+        </div>
+        <div class="horizontal layout wrap center-justified">
+            <div id="optionHolder"><teamcity-archived-option></teamcity-archived-option></div>
+        </div>
+            <teamcity-server-list servers="{{servers}}" style="visibility: hidden;"></teamcity-server-list>
         </div>
     </template>
 

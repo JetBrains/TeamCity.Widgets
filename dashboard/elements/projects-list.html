@@ -97,6 +97,7 @@
                             visibleItems.push(node);
                         }
                     } else {
+
                         visibleItems.push(node);
                     }
                 });
@@ -152,7 +153,7 @@
                 }
                 return this.filteredTreeData(JSON.parse(JSON.stringify(rootNode)), new RegExp(terms.replace(/[.*+?^${}()|[\]\/\\]/g, '\\$&'), 'i'));
             },
-            filteredNode: function(node, re){
+            filteredNode: function(node, re, allChildren){
                 var self = this;
                 var hasRequiredText = re.test(node.text); //node.name.indexOf(this.terms)>-1;
                 var filteredChildren = [];

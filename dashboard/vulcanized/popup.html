@@ -11493,8 +11493,7 @@ l)&&void 0!==f[l]&&null!==f[l]&&g.val.push([l,String(f[l])]);g.val.length&&(g.ty
         }
 
         .footer #archived{
-            float: right;
-            padding-right: 10px;
+            padding-left: 10px;
         }
 
         .footer #actions{
@@ -11515,6 +11514,8 @@ l)&&void 0!==f[l]&&null!==f[l]&&g.val.push([l,String(f[l])]);g.val.length&&(g.ty
                 overflow-x: hidden;
                 background-color: white;
             };
+
+            --node-max-width: 750px;
 
         }
         .results{
@@ -12058,7 +12059,7 @@ l)&&void 0!==f[l]&&null!==f[l]&&g.val.push([l,String(f[l])]);g.val.length&&(g.ty
         .node {
             line-height: 2em;
             display: block;
-            max-width: 450px;
+            max-width: var(--node-max-width);
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -13896,6 +13897,7 @@ l)&&void 0!==f[l]&&null!==f[l]&&g.val.push([l,String(f[l])]);g.val.length&&(g.ty
                             visibleItems.push(node);
                         }
                     } else {
+
                         visibleItems.push(node);
                     }
                 });
@@ -13951,7 +13953,7 @@ l)&&void 0!==f[l]&&null!==f[l]&&g.val.push([l,String(f[l])]);g.val.length&&(g.ty
                 }
                 return this.filteredTreeData(JSON.parse(JSON.stringify(rootNode)), new RegExp(terms.replace(/[.*+?^${}()|[\]\/\\]/g, '\\$&'), 'i'));
             },
-            filteredNode: function(node, re){
+            filteredNode: function(node, re, allChildren){
                 var self = this;
                 var hasRequiredText = re.test(node.text); //node.name.indexOf(this.terms)>-1;
                 var filteredChildren = [];

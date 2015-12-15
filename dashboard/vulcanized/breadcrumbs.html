@@ -12125,7 +12125,7 @@ l)&&void 0!==f[l]&&null!==f[l]&&g.val.push([l,String(f[l])]);g.val.length&&(g.ty
         .node {
             line-height: 2em;
             display: block;
-            max-width: 450px;
+            max-width: var(--node-max-width);
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -14127,6 +14127,7 @@ l)&&void 0!==f[l]&&null!==f[l]&&g.val.push([l,String(f[l])]);g.val.length&&(g.ty
                             visibleItems.push(node);
                         }
                     } else {
+
                         visibleItems.push(node);
                     }
                 });
@@ -14182,7 +14183,7 @@ l)&&void 0!==f[l]&&null!==f[l]&&g.val.push([l,String(f[l])]);g.val.length&&(g.ty
                 }
                 return this.filteredTreeData(JSON.parse(JSON.stringify(rootNode)), new RegExp(terms.replace(/[.*+?^${}()|[\]\/\\]/g, '\\$&'), 'i'));
             },
-            filteredNode: function(node, re){
+            filteredNode: function(node, re, allChildren){
                 var self = this;
                 var hasRequiredText = re.test(node.text); //node.name.indexOf(this.terms)>-1;
                 var filteredChildren = [];
@@ -14356,35 +14357,69 @@ l)&&void 0!==f[l]&&null!==f[l]&&g.val.push([l,String(f[l])]);g.val.length&&(g.ty
 
         });
     </script>
+</dom-module><dom-module id="teamcity-archived-option" assetpath="elements/">
+    <template>
+        <label><input id="checkbox" type="checkbox" on-change="_onChange">&nbsp;Show archived projects</label>
+    </template>
+    <script>
+        // element registration
+        Polymer({
+            is: "teamcity-archived-option",
+            properties: {
+                includeArchived:{
+                    type: String,
+                    notify: true,
+                    value: 'false'
+                }
+            },
+            behaviors: [LoggingBehavior],
+            _onChange: function(){
+                this.includeArchived = this.$.checkbox.checked ? 'any' : 'false';
+                this.debug(this.includeArchived);
+                var self = this;
+                /*this.fire('iron-signal', {name: "archived", data: this.includeArchived});*/
+                [].slice.call(document.querySelectorAll("teamcity-server-urls")).forEach(function(url){
+                    url.archived = self.includeArchived;
+                });
+                [].slice.call(document.querySelectorAll("teamcity-server")).forEach(function(url){
+                    url.archived = self.includeArchived;
+                })
+            }
+        });
+    </script>
 </dom-module><dom-module id="search-container" assetpath="elements/">
     <template>
         <style>
             label{
                 cursor: pointer;
             }
-            #serversHolder{
-                background-color: white;
-                width: 300px;
-                min-height: 100px;
-                margin-left: 20px;
-                padding-left: 10px;
-                padding-top: 5px;
-            }
             #resultsHolder{
-                width: 413px;
+                width: 750px;
+            }
+            #optionHolder{
+                width: 750px;
+                text-align: right;
+                margin-top: 10px;
+            }
+            #optionHolder teamcity-archived-option{
+                width: 100%;
+                text-align: right;
             }
         </style>
 
         <div style="width: 100%; text-align: center; margin-bottom: 25px;">
             <teamcity-search></teamcity-search>
         </div>
+        <div class="layout vertical">
         <div class="horizontal layout wrap center-justified">
             <div id="resultsHolder">
                 <project-list-wrapper></project-list-wrapper>
             </div>
-            <div id="serversHolder" class="vertical layout">
-                <teamcity-server-list servers="{{servers}}"></teamcity-server-list>
-            </div>
+        </div>
+        <div class="horizontal layout wrap center-justified">
+            <div id="optionHolder"><teamcity-archived-option></teamcity-archived-option></div>
+        </div>
+            <teamcity-server-list servers="{{servers}}" style="visibility: hidden;"></teamcity-server-list>
         </div>
     </template>
 
