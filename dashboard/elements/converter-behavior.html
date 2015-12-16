@@ -131,13 +131,16 @@
                     node.isExpanded = true;
                     node.nodeType = 'server';
                     node.authorized = 'auth';
+                    node.fullPath = '';
                 }
                 var parent = dataMap[node.parentProjectId];
                 if (parent) {
                     // create child array if it doesn't exist
                     var pp = (parent.children || (parent.children = []));
+                    node.fullPath = parent.fullPath + ' ' + node.text;
                     pp.push(node);
                 } else {
+                    node.fullPath = node.text;
                     dataTree.push(node);
                 }
 
@@ -152,7 +155,9 @@
                             parentProjectId: node.id,
                             isExpanded: false,
                             rank: -1,
-                            visible: 0
+                            visible: 0,
+                            fullPath: node.fullPath + " " + bts[z].name
+
                         };
                         var vbt = visibleBuildTypesMap[bts[z].id];
                         if (vbt != undefined){
@@ -175,7 +180,9 @@
                   visible: 1,
                   children: dataTree,
                   isExpanded: true,
-                  authorized: 'auth'
+                  authorized: 'auth',
+                  fullPath: ''
+
                 };
                 this._sortChildren(root);
                 return [root];
@@ -197,6 +204,7 @@
                 children: [],
                 isExpanded: true,
                 authorized: 'non-auth',
+                fullPath: '',
                 loginUrl: serverAuthComponent.server + "/" + serverAuthComponent.loginUrl
             };
             return [root];

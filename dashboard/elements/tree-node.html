@@ -272,8 +272,9 @@
                      this.$.anode.innerHTML = text;
                      return;
                  }
-                 var query = new RegExp("(" + terms + ")", "gim");
-                 Polymer.dom(this.$.anode).innerHTML = text.replace(query, "<span class='highlighted'>$1</span>");
+                 var pattern = '(' + terms.replace(/\s/g,')|(') + ')';
+                 var query = new RegExp(pattern, "igm");
+                 Polymer.dom(this.$.anode).innerHTML = text.replace(query, "<span class='highlighted'>$&</span>");
             },
             _tabIndex: function(){
                 return this.dataIndex;

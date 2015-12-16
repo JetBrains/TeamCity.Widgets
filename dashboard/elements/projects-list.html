@@ -151,11 +151,14 @@
                 if (terms == ""){
                     return rootNode;
                 }
-                return this.filteredTreeData(JSON.parse(JSON.stringify(rootNode)), new RegExp(terms.replace(/[.*+?^${}()|[\]\/\\]/g, '\\$&'), 'i'));
+
+                var pattern = '(' + terms.replace(/\s/g,')+?.*(') + ')+?.*';
+                return this.filteredTreeData(JSON.parse(JSON.stringify(rootNode)),
+                        new RegExp(pattern, 'i'));
             },
-            filteredNode: function(node, re, allChildren){
+            filteredNode: function(node, re){
                 var self = this;
-                var hasRequiredText = re.test(node.text); //node.name.indexOf(this.terms)>-1;
+                var hasRequiredText = re.test(node.fullPath); //node.name.indexOf(this.terms)>-1;
                 var filteredChildren = [];
                 if (node.children != undefined){
                     node.children.forEach(function(child){
