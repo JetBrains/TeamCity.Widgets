@@ -152,7 +152,8 @@
                     return rootNode;
                 }
 
-                var pattern = '(' + terms.replace(/\s/g,')+?.*(') + ')+?.*';
+                var rt = terms.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+                var pattern = '(' + rt.replace(/\s/g,')+?.*(') + ')+?.*';
                 return this.filteredTreeData(JSON.parse(JSON.stringify(rootNode)),
                         new RegExp(pattern, 'i'));
             },

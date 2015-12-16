@@ -12335,12 +12335,13 @@ l)&&void 0!==f[l]&&null!==f[l]&&g.val.push([l,String(f[l])]);g.val.length&&(g.ty
             _changedControlState: function(){
                 this.querySelector('tree-icon').inverted = !!this.focused;
             },
-             _highlight: function(text, terms){
+            _highlight: function(text, terms){
                  if (terms==undefined || terms == ''){
                      this.$.anode.innerHTML = text;
                      return;
                  }
-                 var pattern = '(' + terms.replace(/\s/g,')|(') + ')';
+                 var rt = terms.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+                 var pattern = '(' + rt.replace(/\s/g,')|(') + ')';
                  var query = new RegExp(pattern, "igm");
                  Polymer.dom(this.$.anode).innerHTML = text.replace(query, "<span class='highlighted'>$&</span>");
             },
@@ -14169,7 +14170,8 @@ l)&&void 0!==f[l]&&null!==f[l]&&g.val.push([l,String(f[l])]);g.val.length&&(g.ty
                     return rootNode;
                 }
 
-                var pattern = '(' + terms.replace(/\s/g,')+?.*(') + ')+?.*';
+                var rt = terms.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+                var pattern = '(' + rt.replace(/\s/g,')+?.*(') + ')+?.*';
                 return this.filteredTreeData(JSON.parse(JSON.stringify(rootNode)),
                         new RegExp(pattern, 'i'));
             },
