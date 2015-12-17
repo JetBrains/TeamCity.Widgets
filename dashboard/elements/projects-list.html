@@ -52,7 +52,8 @@
                 <!--we need data-index="{{index}}" due to https://github.com/Polymer/core-list/issues/62 -->
                 <template>
                      <tree-node current-node="{{item.node}}" terms="{{terms}}" expanded="{{item.node.isExpanded}}"
-                                on-expand="onExpand" data-index="[[index]]" tabindex$="[[index]]"></tree-node>
+                                on-expand="onExpand" data-index="[[index]]"
+                                tabindex$="[[index]]"></tree-node>
                 </template>
           </iron-list>
     </template>
@@ -80,7 +81,7 @@
                 selectedItems: {
                     type: Object,
                     notify: true
-                }
+                },
             },
             behaviors: [LoggingBehavior],
             _addVisibleItemFromServer: function(visibleItems, rootNode, terms){
@@ -271,7 +272,6 @@
                 this.debug('received moveFocusOnResults');
                 document.querySelector('tree-node[tabindex="0"]').focus();
             }
-
         });
     </script>
 </dom-module>

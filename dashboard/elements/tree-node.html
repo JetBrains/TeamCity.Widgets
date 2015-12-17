@@ -195,7 +195,7 @@
 
     </style>
     <template>
-        <iron-a11y-keys id="a11y" target="[[target]]" keys="left right down up enter"
+        <iron-a11y-keys id="a11y" target="[[target]]" keys="left right down up enter pageup pagedown home end"
                         on-keys-pressed="onExpandCollapsed"></iron-a11y-keys>
         <div id="node" class$="node {{currentNode.nodeType}} level{{currentNode.level}}" on-click="_expand">
             <tree-icon data="{{currentNode}}" id="treeIcon" expanded="{{expanded}}"></tree-icon>
@@ -286,6 +286,7 @@
                 var index = this.getAttribute("tabindex");
                 e.detail.keyboardEvent.preventDefault();
                 this.debug(action);
+                this.debug(e);
                 if (action == 'right'){
                     if (icon.hasChildren){
                         icon.expand();
@@ -309,7 +310,12 @@
                         next.focus();
                     }
                 } else if (action == 'enter'){
-                    this.$.anode.click();
+                    var ctrl = e.detail.keyboardEvent.ctrlKey;
+                    if (!ctrl) {
+                        this.$.anode.click(e);
+                    } else {
+                        window.open(this.$.anode.href, "_black");
+                    }
                 }
             },
             _expand: function(e){
