@@ -7282,7 +7282,7 @@ this.fire('dom-change');
         properties: {
             level: {
                 type: String,
-                value: 0,
+                value: 1,
                 notify: true
             },
             levels: {
@@ -13865,7 +13865,7 @@ l)&&void 0!==f[l]&&null!==f[l]&&g.val.push([l,String(f[l])]);g.val.length&&(g.ty
     <template>
           <iron-signals on-iron-signal-terms="filterResult">
           <iron-signals on-iron-signal-results="moveFocusOnResults">
-          <iron-list items="[[visibleItems]]" as="item" id="list" tabindex="-1" selection-enabled="" on-selected-item-changed="itemChanged">
+          <iron-list items="[[visibleItems]]" as="item" id="list" tabindex="-1">
                 
                 <template>
                      <tree-node current-node="{{item.node}}" terms="{{terms}}" expanded="{{item.node.isExpanded}}" on-expand="onExpand" data-index="[[index]]" tabindex$="[[index]]"></tree-node>
@@ -13892,26 +13892,9 @@ l)&&void 0!==f[l]&&null!==f[l]&&g.val.push([l,String(f[l])]);g.val.length&&(g.ty
                     value: "",
                     notify: true,
                     observer: "_termsChanged"
-                },
-                last: Object
+                }
             },
             behaviors: [LoggingBehavior],
-            itemChanged: function(x){
-                console.log('itemChanged');
-                console.log(x);
-                if (this.$.list.selectedItem === null) {
-                    this.async(function(){
-                        if (this.$.list.selectedItem === null && this.last!=undefined) {
-                            this.$.list.selectItem(this.last);
-                        }
-                    }.bind(this));
-                } else {
-                    this.last = this.$.list.selectedItem;
-                }
-                if (this.last!=undefined) {
-                    console.log(this.last.node.text);
-                }
-            },
             _addVisibleItemFromServer: function(visibleItems, rootNode, terms){
                 var self  = this;
 
@@ -14034,23 +14017,6 @@ l)&&void 0!==f[l]&&null!==f[l]&&g.val.push([l,String(f[l])]);g.val.length&&(g.ty
                 } else {
                     this.spliceChildren(item.node);
                 }
-            },
-            collapseAll: function(){
-                if (this.dataTree == undefined){
-                    return;
-                }
-                var self = this;
-                this.dataTree.forEach(function(dt){
-                    if (dt.isExpanded){
-                        self.debug('will collapse ' + dt);
-                    }
-                });
-            },
-            expandAll: function(){
-                var self = this;
-                this.dataTree.forEach(function(dt){
-                    self.debug('will expand ' + dt);
-                });
             },
             spliceChildren: function(node){
                 this.removeIndex++;
@@ -14366,15 +14332,6 @@ l)&&void 0!==f[l]&&null!==f[l]&&g.val.push([l,String(f[l])]);g.val.length&&(g.ty
     <div id="archived"><teamcity-archived-option></teamcity-archived-option></div>
     <div id="actions"></div>
 </div>
-<script>
-    function expandAll(){
-        document.querySelector("projects-list").expandAll();
-    }
-
-    function collapseAll(){
-        document.querySelector("projects-list").collapseAll();
-    }
-</script>
 
 
 
