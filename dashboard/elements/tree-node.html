@@ -195,7 +195,7 @@
 
     </style>
     <template>
-        <iron-a11y-keys id="a11y" target="[[target]]" keys="left right down up enter pageup pagedown home end"
+        <iron-a11y-keys id="a11y" target="[[target]]" keys="left right down up enter"
                         on-keys-pressed="onExpandCollapsed"></iron-a11y-keys>
         <div id="node" class$="node {{currentNode.nodeType}} level{{currentNode.level}}" on-click="_expand">
             <tree-icon data="{{currentNode}}" id="treeIcon" expanded="{{expanded}}"></tree-icon>
@@ -319,9 +319,12 @@
                 }
             },
             _expand: function(e){
+                if (e.target != e.currentTarget){
+                     return;
+                }
                 if (e.path.indexOf(this.$.treeIcon)==-1){
                     this.$.treeIcon.externalToggleExpanded();
-                };
+                }
             }
         });
     </script>
