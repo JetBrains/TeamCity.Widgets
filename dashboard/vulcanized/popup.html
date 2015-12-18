@@ -8188,6 +8188,8 @@ this.fire('dom-change');
       // ShadowDOM land, `event.target` will eventually become `this` due
       // to the second conditional which fires a synthetic event (that is also
       // handled). In either case, we can disregard `event.path`.
+      /*console.log('Polymer.IronControlState');
+      console.log(event);*/
 
       if (event.target === this) {
         this._setFocused(event.type === 'focus');
@@ -11473,11 +11475,25 @@ l)&&void 0!==f[l]&&null!==f[l]&&g.val.push([l,String(f[l])]);g.val.length&&(g.ty
 
     };
 </script><style is="custom-style">
-        html, body{
-            font-family: "Helvetica Neue",serif;
-            font-size: 13px;
-            padding: 0;
+        html {
+            overflow-y: scroll;
+        }
+
+        body {
+            background: #fff;
             margin: 0;
+            padding: 0;
+            font: 82%/1.5em "Helvetica Neue", Arial, sans-serif;
+            color: #151515;
+            text-rendering: optimizeLegibility;
+        }
+
+        .ua-win-chrome body {
+            text-rendering: auto;
+        }
+
+        input, select, button {
+            font: normal 100% "Helvetica Neue", Arial, sans-serif;
         }
         .container {
             width: 450px;
@@ -12284,9 +12300,16 @@ l)&&void 0!==f[l]&&null!==f[l]&&g.val.push([l,String(f[l])]);g.val.length&&(g.ty
                 this.serverAuthType = this.isServer ? newValue.authorized : '';
                 this.loginRequired = newValue.loginUrl != undefined;
                 this.archived = newValue.archived == true;
+                this.removeAttribute('focused');
+                if (window.___focused___!= undefined && window.___focused___.id == newValue.id){
+                    this.setAttribute('focused', '');
+                }
             },
             _changedControlState: function(){
                 this.querySelector('tree-icon').inverted = !!this.focused;
+                if (this.focused) {
+                    window.___focused___ = this.currentNode;
+                }
             },
             _highlight: function(text, terms){
                  if (terms==undefined || terms == ''){
@@ -12340,9 +12363,6 @@ l)&&void 0!==f[l]&&null!==f[l]&&g.val.push([l,String(f[l])]);g.val.length&&(g.ty
                 }
             },
             _expand: function(e){
-                if (e.target != e.currentTarget){
-                     return;
-                }
                 if (e.path.indexOf(this.$.treeIcon)==-1){
                     this.$.treeIcon.externalToggleExpanded();
                 }
@@ -12532,8 +12552,8 @@ l)&&void 0!==f[l]&&null!==f[l]&&g.val.push([l,String(f[l])]);g.val.length&&(g.ty
             },
             goAjax: function(){
                 this.debug('goAjax(): ' + this.server + "   " + this.restUrl);
-                //this.$.ajax.url = 'http://localhost:8080/dashboard/testData/buildserver.jetbrains.com.json';
-                this.$.ajax.url = this.server + this.restUrl;
+                this.$.ajax.url = 'http://localhost:8080/dashboard/testData/buildserver.jetbrains.com.json';
+                //this.$.ajax.url = this.server + this.restUrl;
                 this.$.ajax.generateRequest();
             }
         });
@@ -13148,6 +13168,9 @@ l)&&void 0!==f[l]&&null!==f[l]&&g.val.push([l,String(f[l])]);g.val.length&&(g.ty
           currentRatio += tileHeight / hiddenContentSize;
 
           this._physicalTop += tileHeight;
+
+          console.log(kth);
+
           recycledTileSet.push(kth);
           recycledTiles++;
           kth = (kth + 1) % this._physicalCount;
@@ -13489,6 +13512,9 @@ l)&&void 0!==f[l]&&null!==f[l]&&g.val.push([l,String(f[l])]);g.val.length&&(g.ty
         var el = this._physicalItems[pidx];
         var inst = el._templateInstance;
         var item = this.items && this.items[vidx];
+
+        /*console.log(item);
+        console.log(item.focused);*/
 
         if (item) {
           inst[this.as] = item;
@@ -13859,6 +13885,10 @@ l)&&void 0!==f[l]&&null!==f[l]&&g.val.push([l,String(f[l])]);g.val.length&&(g.ty
         }
         ::-webkit-scrollbar-thumb:window-inactive {
             background: rgba(0,0,0,0.3);
+        }
+
+        tree-node{
+            outline: none !important;
         }
 
     </style>

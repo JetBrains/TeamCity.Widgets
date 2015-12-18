@@ -263,9 +263,16 @@
                 this.serverAuthType = this.isServer ? newValue.authorized : '';
                 this.loginRequired = newValue.loginUrl != undefined;
                 this.archived = newValue.archived == true;
+                this.removeAttribute('focused');
+                if (window.___focused___!= undefined && window.___focused___.id == newValue.id){
+                    this.setAttribute('focused', '');
+                }
             },
             _changedControlState: function(){
                 this.querySelector('tree-icon').inverted = !!this.focused;
+                if (this.focused) {
+                    window.___focused___ = this.currentNode;
+                }
             },
             _highlight: function(text, terms){
                  if (terms==undefined || terms == ''){
@@ -319,9 +326,6 @@
                 }
             },
             _expand: function(e){
-                if (e.target != e.currentTarget){
-                     return;
-                }
                 if (e.path.indexOf(this.$.treeIcon)==-1){
                     this.$.treeIcon.externalToggleExpanded();
                 }

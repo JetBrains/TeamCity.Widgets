@@ -24,11 +24,25 @@
     <link rel="import" href="elements/teamcity-server-list.html">
     <link rel="import" href="elements/teamcity-archived-option.html">
     <style is="custom-style">
-        html, body{
-            font-family: "Helvetica Neue",serif;
-            font-size: 13px;
-            padding: 0;
+        html {
+            overflow-y: scroll;
+        }
+
+        body {
+            background: #fff;
             margin: 0;
+            padding: 0;
+            font: 82%/1.5em "Helvetica Neue", Arial, sans-serif;
+            color: #151515;
+            text-rendering: optimizeLegibility;
+        }
+
+        .ua-win-chrome body {
+            text-rendering: auto;
+        }
+
+        input, select, button {
+            font: normal 100% "Helvetica Neue", Arial, sans-serif;
         }
         .container {
             width: 450px;

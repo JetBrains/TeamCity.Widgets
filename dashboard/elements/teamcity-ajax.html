@@ -54,8 +54,8 @@
             },
             goAjax: function(){
                 this.debug('goAjax(): ' + this.server + "   " + this.restUrl);
-                //this.$.ajax.url = 'http://localhost:8080/dashboard/testData/buildserver.jetbrains.com.json';
-                this.$.ajax.url = this.server + this.restUrl;
+                this.$.ajax.url = 'http://localhost:8080/dashboard/testData/buildserver.jetbrains.com.json';
+                //this.$.ajax.url = this.server + this.restUrl;
                 this.$.ajax.generateRequest();
             }
         });
