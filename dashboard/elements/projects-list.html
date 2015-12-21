@@ -253,7 +253,10 @@
             },
             moveFocusOnResults: function(e){
                 this.debug('received moveFocusOnResults');
-                document.querySelector('tree-node[tabindex="0"]').focus();
+                var el = document.querySelector('tree-node[tabindex="0"]');
+                if (el!=undefined) {
+                    document.querySelector('tree-node[tabindex="0"]').focus();
+                }
             }
 
         });

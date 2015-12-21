@@ -264,7 +264,11 @@
                 this.loginRequired = newValue.loginUrl != undefined;
                 this.archived = newValue.archived == true;
                 this.removeAttribute('focused');
-                if (window.___focused___!= undefined && window.___focused___.id == newValue.id){
+
+                console.log('_currentNodeChanged');
+                console.log(newValue);
+                console.log(window.___focused___);
+                if (window.___focused___!= undefined && window.___focused___ == newValue){
                     this.setAttribute('focused', '');
                 }
             },

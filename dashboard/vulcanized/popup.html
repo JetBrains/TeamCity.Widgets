@@ -12298,7 +12298,11 @@ l)&&void 0!==f[l]&&null!==f[l]&&g.val.push([l,String(f[l])]);g.val.length&&(g.ty
                 this.loginRequired = newValue.loginUrl != undefined;
                 this.archived = newValue.archived == true;
                 this.removeAttribute('focused');
-                if (window.___focused___!= undefined && window.___focused___.id == newValue.id){
+
+                console.log('_currentNodeChanged');
+                console.log(newValue);
+                console.log(window.___focused___);
+                if (window.___focused___!= undefined && window.___focused___ == newValue){
                     this.setAttribute('focused', '');
                 }
             },
@@ -12370,6 +12374,9 @@ l)&&void 0!==f[l]&&null!==f[l]&&g.val.push([l,String(f[l])]);g.val.length&&(g.ty
     <style type="text/css">
         :host{
         }
+
+        .search { position: relative; }
+
         input:focus{
             outline: none !important;
         }
@@ -12377,22 +12384,23 @@ l)&&void 0!==f[l]&&null!==f[l]&&g.val.push([l,String(f[l])]);g.val.length&&(g.ty
             border:1px solid gray !important;
         }
         input[type=search]{
-            width: calc(100% - 20px);
+            width: 100%;
             line-height: 2em;
             -webkit-appearance:textfield;
             box-sizing: content-box;
             border:1px solid lightgray;
-            padding: 2px 2px 2px 20px;
+            padding: 2px;
+            text-indent: 20px;
         }
 
         .icon{
             background: transparent url("elements/icons/teamcity-sprite.png") no-repeat 0 -40px;
             width: 20px;
             height: 20px;
-            margin-left: 5px;
-            margin-top: -22px;
             display: block;
-            position: relative;
+            position: absolute;
+            top: 5px;
+            left: 7px;
         }
 
         ::-webkit-input-placeholder {
@@ -12406,11 +12414,15 @@ l)&&void 0!==f[l]&&null!==f[l]&&g.val.push([l,String(f[l])]);g.val.length&&(g.ty
         :-ms-input-placeholder {
             font-style: italic;
         }
+
     </style>
     <template>
-        <iron-a11y-keys id="a11y" target="[[target]]" keys="enter down pageup pagedown end home" on-keys-pressed="moveFocusOnResults"></iron-a11y-keys>
-        <input type="search" id="input" tabindex="0" placeholder="Filter projects and build configurations" value="{{userInput::input}}">
-        <span class="icon"></span>
+        <iron-a11y-keys id="a11y" target="[[target]]" keys="enter down home end" on-keys-pressed="processKeyboard"></iron-a11y-keys>
+        <div class="search">
+            <span class="icon"></span>
+            <input type="search" id="input" tabindex="0" placeholder="Filter projects and build configurations" value="{{userInput::input}}">
+        </div>
+
     </template>
     <script>
         // element registration
@@ -12430,10 +12442,16 @@ l)&&void 0!==f[l]&&null!==f[l]&&g.val.push([l,String(f[l])]);g.val.length&&(g.ty
                 }
             },
             behaviors: [LoggingBehavior],
-            moveFocusOnResults: function(e){
-                this.debug('fired moveFocusOnResults');
-                e.detail.keyboardEvent.preventDefault();
-                this.fire('iron-signal', {name: "results", data: this.userInput});
+            processKeyboard: function(e){
+                var action = e.detail.combo;
+                this.debug('processKeyboard: ' + action);
+                if (action == 'enter' || action == 'down'){
+                    e.detail.keyboardEvent.preventDefault();
+                    this.debug('fired moveFocusOnResults');
+                    this.fire('iron-signal', {name: "results", data: this.userInput});
+                } else {
+                    e.detail.keyboardEvent.stopPropagation();
+                }
             },
             _userInputChanged: function(){
                 this.fire('iron-signal', {name: "terms", data: this.userInput});
@@ -14102,7 +14120,10 @@ l)&&void 0!==f[l]&&null!==f[l]&&g.val.push([l,String(f[l])]);g.val.length&&(g.ty
             },
             moveFocusOnResults: function(e){
                 this.debug('received moveFocusOnResults');
-                document.querySelector('tree-node[tabindex="0"]').focus();
+                var el = document.querySelector('tree-node[tabindex="0"]');
+                if (el!=undefined) {
+                    document.querySelector('tree-node[tabindex="0"]').focus();
+                }
             }
 
         });
