@@ -11995,10 +11995,7 @@ l)&&void 0!==f[l]&&null!==f[l]&&g.val.push([l,String(f[l])]);g.val.length&&(g.ty
             width: 10px;
             height: 10px;
             margin-right: 0.5em;
-            background-color: transparent;
-            background-image: url("elements/icons/teamcity-sprite.png");
-            background-repeat: no-repeat;
-            background-position: -180px -20px;
+            background: transparent url("elements/icons/teamcity-sprite.png") no-repeat -180px -20px;
             cursor: pointer;
             margin-bottom: 2px;
         }
@@ -12432,12 +12429,22 @@ l)&&void 0!==f[l]&&null!==f[l]&&g.val.push([l,String(f[l])]);g.val.length&&(g.ty
             border:1px solid gray !important;
         }
         input[type=search]{
-            width: 100%;
+            width: calc(100% - 20px);
             line-height: 2em;
             -webkit-appearance:textfield;
             box-sizing: content-box;
             border:1px solid lightgray;
-            padding: 2px;
+            padding: 2px 2px 2px 20px;
+        }
+
+        .icon{
+            background: transparent url("elements/icons/teamcity-sprite.png") no-repeat 0 -40px;
+            width: 20px;
+            height: 20px;
+            margin-left: 5px;
+            margin-top: -22px;
+            display: block;
+            position: relative;
         }
 
         ::-webkit-input-placeholder {
@@ -12455,6 +12462,7 @@ l)&&void 0!==f[l]&&null!==f[l]&&g.val.push([l,String(f[l])]);g.val.length&&(g.ty
     <template>
         <iron-a11y-keys id="a11y" target="[[target]]" keys="enter down pageup pagedown end home" on-keys-pressed="moveFocusOnResults"></iron-a11y-keys>
         <input type="search" id="input" tabindex="0" placeholder="Filter projects and build configurations" value="{{userInput::input}}">
+        <span class="icon"></span>
     </template>
     <script>
         // element registration
