@@ -31,9 +31,6 @@
           <element id="dir-copy" path="$PROJECT_DIR$/dashboard/elements" />
         </element>
       </element>
-      <element id="directory" name="builds">
-        <element id="dir-copy" path="$PROJECT_DIR$/builds" />
-      </element>
     </root>
   </artifact>
 </component>
